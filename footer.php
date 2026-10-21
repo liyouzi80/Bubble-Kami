@@ -86,11 +86,8 @@
 			<span class="btn-inner--icon"><i class="fa fa-arrow-up" aria-hidden="true"></i></span>
 		</button>
 	</a>
-	<!-- Core -->
-	<script src="<?php $this->options->themeUrl("assets/js/jquery.min.js"); ?>"></script>
 	<!-- Viewer.js Plugin -->
 	<script src="<?php $this->options->themeUrl("assets/js/viewer.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/jquery-viewer.min.js"); ?>"></script>
 	<!-- Headroom（导航栏滚动隐藏） -->
 	<script src="<?php $this->options->themeUrl("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
@@ -137,41 +134,71 @@
 </script>
 	<!-- scrollup -->
 	<script>
-		$(function(){
-			var scrollBottom = parseInt($("#adminbtn").css("bottom")) + parseInt($("#adminbtn").css("height")) + 25;
-			$("#scrollbtn").css("bottom", scrollBottom);
+		(function () {
+			var scrollup = document.getElementById('scrollup');
+			var scrollbtn = document.getElementById('scrollbtn');
+			var adminbtn = document.getElementById('adminbtn');
+			if (!scrollup || !scrollbtn) return;
+
+			function positionScrollBtn() {
+				var bottom = 25;
+				if (adminbtn) {
+					var cs = getComputedStyle(adminbtn);
+					var b = parseInt(cs.bottom, 10) + parseInt(cs.height, 10) + 25;
+					if (!isNaN(b)) bottom = b;
+				}
+				scrollbtn.style.bottom = bottom + 'px';
+			}
+
+			positionScrollBtn();
+
 			var resizeTimer;
-			$(window).resize(function(e) {
-				if ($("#adminbtn").length > 0)
-				{
-					clearTimeout(resizeTimer);
-					resizeTimer = setTimeout(function() {
-						scrollBottom = parseInt($("#adminbtn").css("bottom")) + parseInt($("#adminbtn").css("height")) + 25;
-						$("#scrollbtn").css("bottom", scrollBottom);
-					}, 250);
-				}
+			window.addEventListener('resize', function () {
+				if (!adminbtn) return;
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(positionScrollBtn, 250);
 			});
+
 			var scrollLock = 0;
-			if ($(window).scrollTop() > 500) $("#scrollup").fadeIn(400);
-			$(window).scroll(function() {
-				if (!scrollLock)
-				{
-					if ($(window).scrollTop() > 500) $("#scrollup").fadeIn(400);
-					else $("#scrollup").fadeOut(400);
-				}
-			});
-			$("#scrollup").click(function() {
+
+			function toggleVisible() {
+				if (window.pageYOffset > 500) scrollup.style.display = 'block';
+				else scrollup.style.display = 'none';
+			}
+
+			if (window.pageYOffset > 500) scrollup.style.display = 'block';
+			window.addEventListener('scroll', function () {
+				if (!scrollLock) toggleVisible();
+			}, { passive: true });
+
+			scrollup.addEventListener('click', function (e) {
+				e.preventDefault();
 				scrollLock = 1;
-				$("#scrollup").fadeOut(400);
-				$("html,body").animate({scrollTop: "0px"}, 500, function() {
-					scrollLock = 0;
-				});
+				scrollup.style.display = 'none';
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+				setTimeout(function () { scrollLock = 0; }, 500);
 			});
-		});
+		})();
 	</script>
 	<!-- Pjax -->
-	
 	<script>
+		function initViewer() {
+			if (!window.Viewer) return;
+			document.querySelectorAll('.content').forEach(function (el) {
+				if (el.__viewer) return;
+				el.__viewer = new Viewer(el, { url: 'src' });
+			});
+		}
+
+		function destroyViewer() {
+			document.querySelectorAll('.content').forEach(function (el) {
+				if (el.__viewer) {
+					el.__viewer.destroy();
+					el.__viewer = null;
+				}
+			});
+		}
+
 		function init(){
 			// 图片懒加载：正文图片延迟加载，减轻首屏压力
 			document.querySelectorAll('.content img').forEach(function(img){
@@ -205,59 +232,75 @@
 				window.onload()
 			}catch{}
 			<?php endif; ?>
-			setTimeout(() => {
-				$('.content').viewer({
-					url: 'src'
-				})
-			},300)
+			setTimeout(initViewer, 300);
 		}
-		function destroy(){
-			// viewerjs
-			var viewer = $('.content').data('viewer');
-			if(viewer){
-				viewer.destroy()
-			}
-		}
-		window.addEventListener("popstate", function(e) {
-			setTimeout(() => {
-				$('.content').viewer({
-					url: 'src'
-				})
-			},300)
-		}, false);
 	</script>
 	<?php if($this->options->Pjax): ?>
-	<script src="<?php $this->options->themeUrl("assets/js/jquery.pjax.js"); ?>"></script>
 	<script src="<?php $this->options->themeUrl("assets/js/progress.js"); ?>"></script>
 	<script>
-		var pgid = 0
-		$(document).pjax('a[href^="<?php Helper::options()->siteUrl()?>"]:not(a[target="_blank"], a[no-pjax], a[href^="<?php Helper::options()->siteUrl()?>/admin"])',
-		{
-    		container: '#pjax-container',
-    		fragment: '#pjax-container',
-    		timeout: 8000
-		}).on('pjax:send', function() {
-			pgid = start_progress()
-			$(".black-cover").fadeIn(400)
-			$('html,body').animate({ scrollTop: $('html').offset().top}, 500)
+		(function () {
+			var siteUrl = '<?php Helper::options()->siteUrl(); ?>';
+			var rewrite = <?php echo $this->options->rewrite ? 'true' : 'false'; ?>;
+			var pgid = 0;
+			var cover = document.querySelector('.black-cover');
 
-			destroy()
-		}).on('pjax:complete', function() {
-			$(".black-cover").fadeOut(400)
-			stop_progress(pgid)
-			init()
-			if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
-			
-		})
-		$("#search").submit(function() {
-			var att = $(this).serializeArray()
-			for(var i in att){
-				if(att[i].name=="s"){
-					$.pjax({url: <?php if ($this->options->rewrite): ?>"<?php $this->options->siteUrl(); ?>search/"+att[i].value+"/"<?php else: ?>"<?php $this->options->siteUrl(); ?>index.php/search/"+att[i].value+"/"<?php endif; ?>, container: '#pjax-container',fragment: '#pjax-container',timeout:8000})
-				}
+			function showCover(show) {
+				if (cover) cover.style.display = show ? 'block' : 'none';
 			}
-			return false
-		})
+
+			function load(url, push) {
+				pgid = start_progress();
+				showCover(true);
+				window.scrollTo(0, 0);
+				destroyViewer();
+				fetch(url)
+					.then(function (res) { return res.text(); })
+					.then(function (html) {
+						var doc = new DOMParser().parseFromString(html, 'text/html');
+						var next = doc.querySelector('#pjax-container');
+						var cur = document.querySelector('#pjax-container');
+						if (next && cur) cur.innerHTML = next.innerHTML;
+						if (push) history.pushState({ url: url }, '', url);
+						showCover(false);
+						stop_progress(pgid);
+						init();
+						if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
+						var t = doc.querySelector('title');
+						if (t) document.title = t.textContent;
+					})
+					.catch(function () {
+						showCover(false);
+						stop_progress(pgid);
+					});
+			}
+
+			document.addEventListener('click', function (e) {
+				var a = e.target.closest('a[href]');
+				if (!a) return;
+				if (a.target === '_blank' || a.hasAttribute('no-pjax')) return;
+				if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+				var href = a.getAttribute('href');
+				if (!href || href.indexOf(siteUrl) !== 0) return;
+				if (href.indexOf(siteUrl + '/admin') === 0) return;
+				e.preventDefault();
+				load(href, true);
+			});
+
+			var search = document.getElementById('search');
+			if (search) {
+				search.addEventListener('submit', function (e) {
+					e.preventDefault();
+					var input = search.querySelector('input[name="s"]');
+					var kw = input ? input.value : '';
+					var url = rewrite ? (siteUrl + 'search/' + encodeURIComponent(kw) + '/') : (siteUrl + 'index.php/search/' + encodeURIComponent(kw) + '/');
+					load(url, true);
+				});
+			}
+
+			window.addEventListener('popstate', function (e) {
+				load((e.state && e.state.url) || location.href, false);
+			});
+		})();
 	</script>
 	<div class="black-cover" style="display: none;"></div>
 	<?php endif; ?>
@@ -283,7 +326,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 id="msgMain" class="modal-title"></h5>
-					<button type="button" class="close" aria-label="Close" onclick="$('#modal-notification').hide('normal');">
+					<button type="button" class="close" aria-label="Close" onclick="hideNotification()">
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>
@@ -292,11 +335,23 @@
 		</div>
 	</div>
 	<script>
-		function alert(main,detail){
-			$("#msgMain").html(main)
-			if(detail) $("#msgDetail").html(detail)
-			else $("#msgDetail").html("")
-			$("#modal-notification").show("normal");
+		function hideNotification() {
+			var modal = document.getElementById('modal-notification');
+			if (modal) {
+				modal.classList.remove('show');
+				modal.style.display = 'none';
+			}
+		}
+		function alert(main, detail) {
+			var modal = document.getElementById('modal-notification');
+			var mainEl = document.getElementById('msgMain');
+			var detailEl = document.getElementById('msgDetail');
+			if (mainEl) mainEl.innerHTML = main;
+			if (detailEl) detailEl.innerHTML = detail || '';
+			if (modal) {
+				modal.style.display = 'block';
+				modal.classList.add('show');
+			}
 		}
 		init()
 	</script>

@@ -112,83 +112,84 @@
 <?php if($this->options->Pjax=="1"): ?>
 <script>
 	function focusToComment(username){
-		var comments = $("#comments").children("div")
-		getcomments = function(eles){
-			var comlist = []
-			var childrenlist = []
+		var roots = document.querySelectorAll('#comments > div');
+		function getcomments(eles){
+			var comlist = [];
+			var childrenlist = [];
 			for(var p = 0; p<eles.length; p++){
-				var ele = $(eles[p])
-				var lis = ele.children("ol").children("li")
+				var lis = eles[p].querySelectorAll(':scope > ol > li');
 				for(var j = 0; j<lis.length; j++){
-					var h5 = $(lis[j]).children("div[id^='comment']").children(".comment-item").children(".comment-body").children(".comment-head").children("h5")
-					var name
+					var h5 = lis[j].querySelectorAll(':scope > div[id^="comment"] > .comment-item > .comment-body > .comment-head > h5');
 					for(var i = 0; i<h5.length; i++){
-						name = h5[i].innerText
-						name = $.trim(name.split("·")[0])
+						var name = h5[i].innerText.split("·")[0].trim();
 						if(name==username){
-							comlist.push(parseInt($(lis[j]).attr("id").split("-")[2]))
+							comlist.push(parseInt(lis[j].id.split("-")[2]));
 						}
 					}
-					var child = $(lis[j]).children(".comment-children")
-					if(child.length>0){
-						childrenlist.push(child)
+					var child = lis[j].querySelector(':scope > .comment-children');
+					if(child){
+						childrenlist.push(child);
 					}
 				}
 			}
 			if(childrenlist.length>0){
-				return comlist.concat(getcomments(childrenlist))
+				return comlist.concat(getcomments(childrenlist));
 			}else{
-				return comlist
+				return comlist;
 			}
 		}
-		var commentIds = getcomments(comments)
-		var commentId = Math.max(...commentIds)
+		var commentIds = getcomments(roots);
+		var commentId = Math.max.apply(null, commentIds);
 		if(commentId!=-Infinity){
-			$('html,body').animate({ scrollTop: $('#comment-'+commentId).offset().top-100}, 500)
-			setTimeout(() => {
-				$('#comment-'+commentId).fadeToggle(90);
-				$('#comment-'+commentId).fadeToggle(110);
-			}, 500);
+			var target = document.getElementById('comment-'+commentId);
+			if(target){
+				window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 100, behavior: 'smooth' });
+				setTimeout(function(){
+					target.style.display = 'none';
+					setTimeout(function(){ target.style.display = ''; }, 90);
+				}, 500);
+			}
 		}
 	}
 	function bindsubmit(){
-		$("#comment-form").submit(function() {
-			var pgid = start_progress()
-			$("#add-comment-button").attr("disabled",true)
-			var data = $(this).serializeArray()
+		var form = document.getElementById("comment-form");
+		if(!form) return;
+		form.addEventListener("submit", function(e) {
+			e.preventDefault();
+			var pgid = start_progress();
+			var btn = document.getElementById("add-comment-button");
+			if(btn) btn.disabled = true;
+			var data = new FormData(form);
 			var rubbish = <?php echo Typecho_Common::shuffleScriptVar(
-            $this->security->getToken(clear_urlcan($this->request->getRequestUrl()))); ?>
-            data.push({"name":"_","value":rubbish})
-			$.ajax({
-            url: $(this).attr("action"),
-            type: $(this).attr("method"),
-            data: data,
-            complete: function(){
-            	$("#add-comment-button").attr("disabled",false)
-				stop_progress(pgid)
-            },
-            error: function() {
-                alert("网络请求错误","请重新尝试提交评论")
-            },
-            success: function(html) {
-            	var newdocument = new DOMParser().parseFromString(html, "text/html")
-            	if(newdocument.title == "Error"){
-            		var error = $.trim(newdocument.getElementsByClassName("container")[0].innerText)
-            		alert("评论提交错误",error)
-            	}else{
-            		$("#comments").html(newdocument.getElementById("comments").innerHTML)
-            		bindsubmit()
-					var authorName = $("#author").val() ? $("#author").val() : $("a[href$='profile.php']").text()
-					if(authorName){
-						focusToComment(authorName)
+            $this->security->getToken(clear_urlcan($this->request->getRequestUrl()))); ?>;
+			data.append("_", rubbish);
+			fetch(form.getAttribute("action"), { method: form.getAttribute("method") || "POST", body: data })
+				.then(function(res) { return res.text(); })
+				.then(function(html) {
+					var newdocument = new DOMParser().parseFromString(html, "text/html");
+					if(newdocument.title == "Error"){
+						var container = newdocument.getElementsByClassName("container")[0];
+						var error = container ? container.innerText.trim() : "";
+						alert("评论提交错误", error);
+					}else{
+						var newComments = newdocument.getElementById("comments");
+						var curComments = document.getElementById("comments");
+						if(newComments && curComments) curComments.innerHTML = newComments.innerHTML;
+						bindsubmit();
+						var authorInput = document.getElementById("author");
+						var authorName = authorInput && authorInput.value ? authorInput.value : (document.querySelector("a[href$='profile.php']") ? document.querySelector("a[href$='profile.php']").innerText : "");
+						if(authorName) focusToComment(authorName);
 					}
-            	}
-            }
-        	})
-        	return false;
-		})
+				})
+				.catch(function() {
+					alert("网络请求错误", "请重新尝试提交评论");
+				})
+				.finally(function() {
+					if(btn) btn.disabled = false;
+					stop_progress(pgid);
+				});
+		});
 	}
-
 	bindsubmit()
 	var rubbishScripts = new DOMParser().parseFromString(`<?php echo $this->pluginHandle()->header("", $this);?>`, "text/html").getElementsByTagName("script")
 	var script
