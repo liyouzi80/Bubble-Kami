@@ -959,3 +959,136 @@ main > .section-hero:not([style*="100vh"]) {
     display: none !important;
   }
 }
+
+/* ================================================
+   十、上一篇 / 下一篇 与 相关文章
+   ================================================ */
+
+/* 上一篇 / 下一篇 */
+.post-pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.9rem 1.2rem;
+  max-width: 660px;
+  margin: 0.5rem auto 0;
+  padding: 1.2rem 1.6rem 1.6rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.post-pager-item {
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.post-pager-next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.post-pager-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--stone);
+}
+
+.post-pager-link {
+  color: var(--brand) !important;
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.45;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.post-pager-link:hover {
+  text-decoration: underline;
+}
+
+.post-pager-none {
+  color: var(--stone);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+/* 相关文章 */
+.related-posts-card .section {
+  padding-top: 1.6rem !important;
+  padding-bottom: 1.4rem !important;
+}
+
+.related-posts-card .container {
+  max-width: 660px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.related-posts-title {
+  font-size: 1.15rem !important;
+  margin: 0 0 0.9rem !important;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.related-posts-title i {
+  color: var(--brand);
+  opacity: 0.8;
+  margin-right: 0.45rem;
+}
+
+.related-posts-list {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+}
+
+.related-posts-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.related-posts-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.related-posts-link {
+  color: var(--dark-warm) !important;
+  text-decoration: none !important;
+  line-height: 1.5;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.related-posts-link:hover {
+  color: var(--brand) !important;
+}
+
+.related-posts-date {
+  color: var(--stone);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+  .post-pager {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+
+  .post-pager-next {
+    text-align: left;
+    align-items: flex-start;
+  }
+}

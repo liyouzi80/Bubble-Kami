@@ -116,11 +116,22 @@
 							</div>
 						</div>
 					</section>
+					<nav class="post-pager" aria-label="文章导航">
+						<div class="post-pager-item post-pager-prev">
+							<span class="post-pager-label">上一篇</span>
+							<?php $this->thePrev('%s', '<span class="post-pager-none">已经是第一篇</span>', array('tagClass' => 'post-pager-link')); ?>
+						</div>
+						<div class="post-pager-item post-pager-next">
+							<span class="post-pager-label">下一篇</span>
+							<?php $this->theNext('%s', '<span class="post-pager-none">已经是最后一篇</span>', array('tagClass' => 'post-pager-link')); ?>
+						</div>
+					</nav>
 				</div>
 				<div class="card shadow content-card">
 					<!-- Comment -->
 					<?php if (!$this->hidden && $this->allow('comment')) $this->need('comments.php'); ?>
 				</div>
+				<?php relatedPosts($this, 5); ?>
 			</div>
 		</section>
 <?php $this->need('footer.php'); ?>

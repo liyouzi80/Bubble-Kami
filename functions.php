@@ -128,6 +128,57 @@ function printToggleButton($that) {
 	<?php }
 }
 
+function relatedPosts($that, $limit = 5) {
+	$mids = array();
+	if (!empty($that->tags)) {
+		foreach ($that->tags as $tag) {
+			$mids[] = $tag['mid'];
+		}
+	}
+	if (empty($mids) && !empty($that->categories)) {
+		foreach ($that->categories as $cat) {
+			$mids[] = $cat['mid'];
+		}
+	}
+	if (empty($mids)) {
+		return;
+	}
+	$mids = array_unique($mids);
+
+	$tagParams = array();
+	foreach ($mids as $mid) {
+		$tagParams[] = array('mid' => $mid);
+	}
+
+	$related = $that->widget('Widget_Contents_Related', array(
+		'cid' => $that->cid,
+		'type' => 'post',
+		'tags' => $tagParams,
+		'limit' => $limit,
+	));
+
+	if (!$related->have()) {
+		return;
+	}
+	?>
+	<div class="card shadow content-card related-posts-card">
+		<section class="section">
+			<div class="container">
+				<h3 class="related-posts-title"><i class="fa fa-link" aria-hidden="true"></i> 相关文章</h3>
+				<ul class="related-posts-list">
+					<?php while ($related->next()): ?>
+					<li class="related-posts-item">
+						<a class="related-posts-link" href="<?php $related->permalink(); ?>"><?php $related->title(); ?></a>
+						<span class="related-posts-date"><?php $related->date('Y-m-d'); ?></span>
+					</li>
+					<?php endwhile; ?>
+				</ul>
+			</div>
+		</section>
+	</div>
+	<?php
+}
+
 function printBackground($url) {
 	_e('<div ');
 	if ($url == '') _e('class="shape shape-style-1 shape-primary"');
