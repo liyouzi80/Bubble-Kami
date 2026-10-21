@@ -112,14 +112,23 @@
 		}
 	</script>
 <script>
-	// 深色模式切换（月亮/太阳图标由 CSS [data-theme] 控制）
+	// 明暗模式切换（按钮文字「明/暗」随当前模式变化）
 	(function () {
 		var toggle = document.getElementById('theme-toggle');
 		if (!toggle) return;
+		var text = toggle.querySelector('.theme-toggle-text');
+		function isDark() {
+			return document.documentElement.getAttribute('data-theme') === 'dark';
+		}
+		function render() {
+			if (text) text.textContent = isDark() ? '明' : '暗';
+		}
+		render();
 		toggle.addEventListener('click', function () {
-			var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+			var next = isDark() ? 'light' : 'dark';
 			document.documentElement.setAttribute('data-theme', next);
 			try { localStorage.setItem('theme', next); } catch (e) {}
+			render();
 		});
 	})();
 </script>

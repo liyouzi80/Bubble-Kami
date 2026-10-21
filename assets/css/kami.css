@@ -1109,19 +1109,10 @@ main > .section-hero:not([style*="100vh"]) {
   font-size: 0.95rem;
 }
 
-/* 主题切换图标（内联 SVG，替代 FontAwesome 缺失的 moon/sun）：浅色显示月亮，深色显示太阳 */
-.navbar .theme-toggle .theme-icon {
-  display: block;
-  vertical-align: middle;
-}
-.navbar .theme-toggle .theme-icon-sun {
-  display: none;
-}
-:root[data-theme="dark"] .navbar .theme-toggle .theme-icon-moon {
-  display: none;
-}
-:root[data-theme="dark"] .navbar .theme-toggle .theme-icon-sun {
-  display: block;
+/* 主题切换按钮文字 */
+.navbar .theme-toggle .theme-toggle-text {
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* 深色主题令牌（暖黑 + 浅蓝点缀，延续暖色纸感） */
