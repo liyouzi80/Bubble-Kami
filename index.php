@@ -22,7 +22,7 @@
 							<div class="index-avatar-container">
 								<img src="<?php
 									if ($this->options->avatarUrl == '') {
-										$this->options->themeUrl("images/avatar.png");
+										themeAsset("images/avatar.png");
 									} else {
 										$this->options->avatarUrl();
 									}

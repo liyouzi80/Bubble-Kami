@@ -207,9 +207,6 @@
 			parseBblink()
 			<?php if($this->options->Pjax): ?>
 			<?php $this->options->pjaxcomp() ?>
-			try{
-				window.onload()
-			}catch{}
 			<?php endif; ?>
 			setTimeout(initViewer, 300);
 		}
