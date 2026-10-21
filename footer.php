@@ -200,6 +200,7 @@
 			$(".black-cover").fadeOut(400)
 			stop_progress(pgid)
 			init()
+			if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
 			
 		})
 		$("#search").submit(function() {
@@ -254,6 +255,11 @@
 		init()
 	</script>
 	
+	<!-- 简繁转换（自托管） -->
+	<script src="<?php $this->options->themeUrl("assets/js/tw-cn.js"); ?>"></script>
+	<script>
+		translateInitilization();
+	</script>
 	<!-- Typecho footer -->
 	<?php $this->footer(); ?>
 	</body>

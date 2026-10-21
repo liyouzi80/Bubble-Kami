@@ -97,6 +97,9 @@
 							<a class="nav-link" href="<?php $this->options->siteUrl(); ?>">首页</a>
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
+						</li>
+						<li class="nav-item">
 						<?php
 							$this->widget('Widget_Contents_Page_List')->to($pages);
 							while($pages->next()):
