@@ -22,16 +22,16 @@
 			<?php if ($this->options->footerWidget) { ?>
 			<div class="row">
 				<div class="col-md-4 widget">
-					<h5>最新评论</h5>
+					<h5><i class="fa fa-comments-o" aria-hidden="true"></i>最新评论</h5>
 					<?php $comments_recent = $this->widget('Widget_Comments_Recent', 'pageSize=5');
 						if ($comments_recent->have())
 						{
-							_e('<ul>');
+							_e('<ul class="footer-list">');
 							while($comments_recent->next())
 							{
-								_e('<li><a href="' . "$comments_recent->permalink" . '" class="footer-link">' . "$comments_recent->author" . ': ');
+								_e('<li><a href="' . htmlspecialchars($comments_recent->permalink, ENT_QUOTES, 'UTF-8') . '" class="footer-link"><span class="footer-comment-author">' . htmlspecialchars($comments_recent->author, ENT_QUOTES, 'UTF-8') . '</span>：');
 								$comments_recent->excerpt(35, '...');
-								_e('</a></li>');
+								_e('</a><span class="footer-comment-time">'); $comments_recent->date('m-d'); _e('</span></li>');
 							}
 							_e('</ul>');
 						}
@@ -42,12 +42,12 @@
 					?>
 				</div>
 				<div class="col-md-4 widget">
-					<h5>最新文章</h5>
-					<ul><?php $this->widget('Widget_Contents_Post_Recent', 'pageSize=6')->parse('<li><a href="{permalink}" class="footer-link">{title}</a></li>'); ?></ul>
+					<h5><i class="fa fa-file-text-o" aria-hidden="true"></i>最新文章</h5>
+					<ul class="footer-list"><?php $this->widget('Widget_Contents_Post_Recent', 'pageSize=6')->parse('<li><a href="{permalink}" class="footer-link">{title}</a></li>'); ?></ul>
 				</div>
 				<div class="col-md-4 widget">
-					<h5>近期归档</h5>
-					<ul><?php $this->widget('Widget_Contents_Post_Date', 'limit=6&type=year&month=Y-M')->parse('<li><a href="{permalink}" class="footer-link">{date}</a></li>'); ?></ul>
+					<h5><i class="fa fa-archive" aria-hidden="true"></i>近期归档</h5>
+					<ul class="footer-list"><?php $this->widget('Widget_Contents_Post_Date', 'limit=6&type=month&format=Y-m')->parse('<li><a href="{permalink}" class="footer-link">{date}</a></li>'); ?></ul>
 				</div>
 			</div>
 			<hr/>

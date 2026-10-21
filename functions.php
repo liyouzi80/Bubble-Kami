@@ -12,8 +12,6 @@ function themeConfig($form) {
 	$form->addInput($indexImage);
 	$randomImage = new Typecho_Widget_Helper_Form_Element_Textarea('randomImage', NULL, '', _t('随机背景图像地址'), _t('在这里填入一个或多个图片 URL 地址，每行一个，<strong>请勿包含多余字符</strong>，以设定网站文章页、独立页面以及其他页面的头图，设定后将随机显示，留空则使用默认紫色渐变背景'));
 	$form->addInput($randomImage);
-	$bubbleShow = new Typecho_Widget_Helper_Form_Element_Radio('bubbleShow', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('背景气泡'), _t('选择是否在首页以及文章页顶部背景处显示半透明气泡'));
-	$form->addInput($bubbleShow);
 	$footerText = new Typecho_Widget_Helper_Form_Element_Text('footerText', NULL, 'Powered by <a href="https://typecho.org/" class="footer-link">Typecho</a> · Theme by <a href="https://github.com/liyouzi80/typecho-Bubble" class="footer-link">Bubble Kami</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
 	$form->addInput($footerText);
 	$footerWidget = new Typecho_Widget_Helper_Form_Element_Radio('footerWidget', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('页脚小工具'), _t('选择是否在页面底部显示“最新评论”、“最新文章”等栏目'));
@@ -95,24 +93,23 @@ function printAricle($that, $flag) { ?>
 		<section class="section">
 			<div class="container">
 				<div class="content">
-					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h1>
+					<h2><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h2>
 					<div class="list-object">
 						<span class="list-tag"><i class="fa fa-calendar-o" aria-hidden="true"></i> <time datetime="<?php $that->date('c'); ?>"><?php $that->date();?></time></span>
+						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 						<?php if (hasViewsPlugin()): ?>
 						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php Views_Plugin::theViews();?> 次阅读</span>
 						<?php endif; ?>
 						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
+					</div>
+					<div class="list-object list-object-meta">
 						<?php printCategory($that, 1); ?>
 						<?php printTag($that, 1); ?>
-						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 					</div>
-					<?php $that->content(''); ?>
-					<br/>
-					<a href="<?php $that->permalink() ?>">
-						<button class="btn btn-icon btn-3 btn-outline-primary" type="button">
-							<span class="btn-inner--icon"><i class="fa fa-play" aria-hidden="true"></i></span>
-							<span class="btn-inner--text">继续阅读</span>
-						</button>
+					<div class="list-excerpt"><?php $that->excerpt(200, '…'); ?></div>
+					<a class="btn btn-icon btn-3 btn-outline-primary" href="<?php $that->permalink() ?>">
+						<span class="btn-inner--icon"><i class="fa fa-play" aria-hidden="true"></i></span>
+						<span class="btn-inner--text">继续阅读</span>
 					</a>
 				</div>
 			</div>
@@ -130,23 +127,11 @@ function printToggleButton($that) {
 	<?php }
 }
 
-function printBackground($url, $show) {
+function printBackground($url) {
 	_e('<div ');
 	if ($url == '') _e('class="shape shape-style-1 shape-primary"');
 	else _e('class="shape shape-style-1 shape-image" style="background-image: url(' . "$url" . ')"');
-	_e('>');
-	if ($show)
-		_e('<span class="span-150"></span>
-			<span class="span-50"></span>
-			<span class="span-50"></span>
-			<span class="span-75"></span>
-			<span class="span-100"></span>
-			<span class="span-75"></span>
-			<span class="span-50"></span>
-			<span class="span-100"></span>
-			<span class="span-50"></span>
-			<span class="span-100"></span>');
-	_e('</div>');
+	_e('></div>');
 }
 
 function getRandomImage($str)
@@ -206,7 +191,7 @@ function getCatalog() {
 					$index .= '</li>';
 				}
 			}
-			$index .= '<li><a name="dl-' . $catalog_item['count'] . '" href="javascript:jumpto('.$catalog_item['count'].')">'.$catalog_item['text'].'</a>';
+			$index .= '<li><a name="dl-' . $catalog_item['count'] . '" href="#cl-' . $catalog_item['count'] . '">'.$catalog_item['text'].'</a>';
 			$prev_depth = $catalog_item['depth'];
 		}
 		for ($i=0; $i<=$to_depth; $i++) {

@@ -6,10 +6,10 @@
 	<main>
 
 		<?php if($this->options->toc): ?>
-		<div class="card shadow border-0 bg-secondary toc-container">
-			<a class="carousel-control-prev" id="toc-nomiao">
+		<div class="card shadow border-0 bg-secondary toc-container" id="toc-panel">
+			<button class="carousel-control-prev toc-toggle" id="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-panel" aria-label="展开/收起文章目录">
 				<i class="fa fa-chevron-left" aria-hidden="true"></i>
-			</a>
+			</button>
 			<div class="card-img container container-lg py-5 toc">
 				<strong>文章目录</strong>
 				<div class="toc-list">
@@ -18,49 +18,75 @@
 			</div>
 		</div>
 		<script>
-			var onshow = false;
-			function tocshow(){
-				if(onshow){
-					$(".toc-container").css("right",'-175px')
-					$(".toc-container i").removeClass("fa-chevron-right").addClass("fa-chevron-left")
-				}else{
-					$(".toc-container").css("right",'-5px')
-					$(".toc-container i").removeClass("fa-chevron-left").addClass("fa-chevron-right")
-				}
-				onshow = !onshow
-			}
-			function jumpto(num){
-				$('html,body').animate({ scrollTop: $('[name="cl-'+num+'"]').offset().top-120 }, 500)
-			}
-			$("#toc-nomiao").click(tocshow)
-			var nowtoc = "cl-1"
-			$(document).ready(function() { 
-				<?php if($this->options->toc_enable): ?>
-					tocshow()
-				<?php endif; ?>
-				$(document).scroll(function() {
-					for(var ele of $("*[name*='cl-']").get().reverse()){
-						if($(document).scrollTop() + 121 > $(ele).offset().top){
-							if(nowtoc != ele.name){
-								var tocele = $("*[name*='dl-" + nowtoc.replace("cl-","") + "']")
-								tocele.removeClass("located")
-								
+			(function () {
+				function initToc() {
+					var toc = document.getElementById('toc-panel');
+					var toggle = document.getElementById('toc-toggle');
+					var icon = toggle.querySelector('i');
+					var list = document.querySelector('.toc-list');
+					if (!toc || !toggle || !list) return;
+					var open = <?php echo ($this->options->toc_enable == '1') ? 'true' : 'false'; ?>;
 
-								tocele = $("*[name*='dl-" + ele.name.replace("cl-","") + "']")
-								tocele.addClass("located")
-								$(".toc-list").animate({scrollTop:$(".toc-list").scrollTop() -50 + tocele.position().top}, 80)
-								nowtoc = ele.name
+					function setOpen(next) {
+						open = next;
+						toc.classList.toggle('toc-open', open);
+						toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+						icon.classList.toggle('fa-chevron-left', !open);
+						icon.classList.toggle('fa-chevron-right', open);
+					}
+
+					toggle.addEventListener('click', function () { setOpen(!open); });
+
+					list.addEventListener('click', function (e) {
+						var a = e.target.closest('a[href^="#cl-"]');
+						if (!a) return;
+						e.preventDefault();
+						var target = document.querySelector('[name="' + a.getAttribute('href').slice(1) + '"]');
+						if (target) {
+							window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 120, behavior: 'smooth' });
+						}
+					});
+
+					var headings = Array.prototype.slice.call(document.querySelectorAll('[name^="cl-"]')).reverse();
+					var nowtoc = 'cl-1';
+
+					function onScroll() {
+						if (!headings.length) return;
+						for (var i = 0; i < headings.length; i++) {
+							var ele = headings[i];
+							if (ele.getBoundingClientRect().top < 121) {
+								if (nowtoc !== ele.getAttribute('name')) {
+									var prev = list.querySelector('[name="dl-' + nowtoc.replace('cl-', '') + '"]');
+									if (prev) prev.classList.remove('located');
+									var next = list.querySelector('[name="dl-' + ele.getAttribute('name').replace('cl-', '') + '"]');
+									if (next) {
+										next.classList.add('located');
+										list.scrollTop = list.scrollTop - 50 + next.getBoundingClientRect().top - list.getBoundingClientRect().top;
+									}
+									nowtoc = ele.getAttribute('name');
+								}
+								break;
 							}
-							break
 						}
 					}
-					//
-				})
-			});
+
+					if (window.__tocOnScroll) window.removeEventListener('scroll', window.__tocOnScroll);
+					window.__tocOnScroll = onScroll;
+					window.addEventListener('scroll', onScroll, { passive: true });
+
+					setOpen(open);
+				}
+
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', initToc);
+				} else {
+					initToc();
+				}
+			})();
 		</script>
 		<?php endif; ?>
 		<section class="section section-lg section-hero section-shaped">
-			<?php printBackground(getRandomImage($this->options->randomImage), $this->options->bubbleShow); ?>
+			<?php printBackground(getRandomImage($this->options->randomImage)); ?>
 			<div class="container shape-container d-flex align-items-center py-lg">
 				<div class="col px-0 text-center">
 					<div class="row align-items-center justify-content-center">

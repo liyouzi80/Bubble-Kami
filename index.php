@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.1.0
+ * @version 4.2.0
  * @link https://github.com/liyouzi80/typecho-Bubble
  */
 
@@ -14,7 +14,7 @@
 
 	<main>
 		<section class="section section-lg section-hero section-shaped" style="height: 100vh;">
-			<?php printBackground($this->options->indexImage, $this->options->bubbleShow); ?>
+			<?php printBackground($this->options->indexImage); ?>
 			<div class="container shape-container d-flex align-items-center py-lg">
 				<div class="col px-0">
 					<div class="row align-items-center justify-content-center">

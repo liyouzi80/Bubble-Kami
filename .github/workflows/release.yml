@@ -1,0 +1,54 @@
+name: Release
+
+# 当提交了新的主题版本号（index.php 中的 @version）时，自动创建 GitHub Release 并附带主题 zip。
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read theme version
+        id: version
+        run: |
+          VERSION=$(grep -oP '@version\s+\K[0-9]+\.[0-9]+\.[0-9]+' index.php | head -1)
+          if [ -z "$VERSION" ]; then
+            echo "未在 index.php 中找到 @version" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if release already exists
+        id: check
+        run: |
+          if git rev-parse -q --verify "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package theme
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          zip -r "bubble-kami-${{ steps.version.outputs.version }}.zip" . \
+            -x ".git/*" ".github/*" "*.zip"
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            "bubble-kami-${{ steps.version.outputs.version }}.zip" \
+            --title "Bubble Kami v${{ steps.version.outputs.version }}" \
+            --generate-notes

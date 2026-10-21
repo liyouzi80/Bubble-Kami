@@ -4,13 +4,11 @@ Typecho 清新风格响应式主题（社区维护的 Bubble 优化分支，内�
 
 化繁为简，如沐清风。
 
-Demo:  [https://tntofu.com/](https://tntofu.com/)
+Demo: [https://tntofu.com/](https://tntofu.com/)
 
-> 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。如使用过程中发现问题，欢迎提交 issue 或 PR。
+> 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。使用中如发现问题，欢迎提交 issue 或 PR。
 >
-> **与原版 Bubble 共存**：安装时请把主题目录命名为 `Bubble Kami`（解压后重命名文件夹），即可与原版 `Bubble` 并存、互不覆盖。
-
-如果觉得本主题还不错的话可以给个 star 哦，这是对开源主题作者们最大的鼓励。
+> **与原版 Bubble 共存**：安装时请将主题目录命名为 `Bubble Kami`（解压后重命名文件夹），即可与原版 `Bubble` 并存、互不覆盖。
 
 # 特性
 
@@ -27,164 +25,71 @@ Demo:  [https://tntofu.com/](https://tntofu.com/)
 + 兼容性：适配 Typecho 1.3.0 / PHP 8.x
 
 # 使用
+
 ## 安装
 
-在 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载 zip 源码，解压后将目录重命名为 `Bubble Kami`，移动到 Typecho 主题目录（`usr/themes/Bubble Kami`）。若希望与原版 `Bubble` 并存，请务必使用不同的目录名。
+从 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载最新 zip，解压后将目录重命名为 `Bubble Kami`，移动到 Typecho 主题目录 `usr/themes/Bubble Kami`，再到后台启用。若希望与原版 `Bubble` 并存，请务必使用不同的目录名。
 
 > 建议使用 Typecho 1.3.0 及以上版本（PHP 8.0+）。本主题已通过 1.3.0 的兼容性适配，理论上也兼容 1.1/1.2。
 
-## 设置
-
-主题设置页面位置：Typecho 后台->控制台->外观->设置外观。
-
 ## 更新
 
-本分支已移除原版的「一键自动更新」功能（该功能会向主题目录写入一个无需登录即可访问的更新脚本，存在安全风险）。
-
-请手动更新：从 Releases 下载新版 zip，删除旧主题目录后重新安装。
+本分支已移除原版的「一键自动更新」功能（该功能会向主题目录写入无需登录即可访问的更新脚本，存在安全风险），请手动更新：从 Releases 下载新版 zip，删除旧主题目录后重新安装。
 
 > 注意：由于 Typecho 的设计，更新后可能新增设置项；若不禁用主题再重新启用，新设置项会留空并可能导致异常。更新后请重启主题，或检查是否有留空的设置项（主要是选择型设置项）。
 
-### 站点副标题
+> **自动发布**：本仓库已配置 GitHub Actions，向 `main` 分支提交新的主题版本号（`index.php` 中的 `@version`）后，会自动创建对应版本的 Release 并附带主题 zip。
 
-该项用以设定首页的标题栏中站点标题后显示的文字。
+## 设置
 
-### 站点 LOGO
+主题设置页面：Typecho 后台 → 控制台 → 外观 → 设置外观。
 
-该项应为一个图片的 URL 地址，将显示在浏览器顶部标签标题左边。
+### 外观
 
-请勿使用相对地址。
++ **站点副标题**：首页标题栏中站点标题后显示的文字。
++ **站点 LOGO**：浏览器标签标题左侧显示的图片 URL（请勿使用相对地址）。
++ **站点头像**：首页大标题上方显示的图片 URL（请勿使用相对地址）。
++ **首页背景图像**：首页背景图片 URL，留空则使用默认紫色渐变背景（请勿使用相对地址）。
++ **随机背景图像地址**：文章页 / 独立页等页面的头图，每行一个 URL，从中随机抽取；留空则使用默认紫色渐变背景（请勿使用相对地址）。
++ **页脚左下角文字**：页脚说明文字（如 Copyright、备案信息），可含 HTML。
++ **站点创建时间**：格式如 `2012-11-17 00:00:00`，用于页脚显示「本站已运行 X 年 X 天」，留空则不显示。
++ **页脚小工具**：是否在页面底部显示「最新评论 / 最新文章 / 近期归档」。
++ **自定义 css**：自定义 css 代码，生效无需清空缓存。
 
-### 站点头像
+### 功能
 
-该项应为一个图片的 URL 地址，将显示在首页大标题上方。
-
-请勿使用相对地址。
-
-### 首页背景图像
-
-该项应为一个图片的 URL 地址，用以设定网站首页背景图片，留空则使用默认紫色渐变背景。
-
-请勿使用相对地址。
-
-### 随机背景图像地址
-
-该项应为一个或多个图片的 URL 地址，用以设定网站文章页、独立页面以及其他页面的头图，设定后将从给定的图片中随机抽取一个显示，留空则使用默认紫色渐变背景。
-
-URL 之间用换行隔开，即每行一个 URL，**请勿包含多余字符**。
-
-请勿使用相对地址。
-
-### 背景气泡
-
-该项用以选择是否在首页以及文章页顶部背景处显示半透明气泡。
-
-### 页脚左下角文字
-
-该项用以设定页脚左下角的说明文字，如 Copyright 和 备案信息。
-
-可添加 HTML 代码以实现更丰富的功能，如跳转链接等。
-
-### 站点创建时间
-
-该项用以设定站点创建时间（格式如 `2012-11-17 00:00:00`），用于在页脚显示「本站已运行 X 年 X 天」，留空则不显示。
-
-### 页脚小工具
-
-该项用以选择是否在页面底部显示“最新评论”、“最新文章”和“近期归档”。
-
-### 自定义 css
-
-该项用以提供自定义 css 接口，用户可以填入自己需要的 css 代码来改变主题外观，例如更改字体大小。
-
-自定义 css 的生效不需要清空缓存。
-
-### 全站 pjax 模式
-
-该项用以选择是否启用全站 pjax 模式提升用户访问体验。
-
-请注意：开启该功能后可能会导致站点一些功能不正常，例如如果您未使用主题自带数学公式渲染，而是选择使用其他插件实现该功能，则会导致无刷新打开页面时数学公式插件不工作，因此请仔细检查后决定是否开启该模式。
-
-如果您发现部分功能确实出现了问题，而您又希望开启该模式，则请查看“pjax 回调代码”一项的说明。
-
-### pjax 回调代码
-
-该项用以设定 pjax 渲染完毕后需执行的 JS 代码，以此解决上一项中提到的插件不工作之类的问题。
-
-例如您有一个叫做`myFunction()`的函数在其他插件中调用了，但您发现它在全站 pjax 模式下不工作，则您应该在该项中填入以下内容：
++ **全站 pjax 模式**：是否启用全站 pjax。开启后可能影响部分第三方插件（详见「pjax 回调代码」）。
++ **pjax 回调代码**：pjax 渲染完毕后执行的 JS，用于修复第三方插件在无刷新场景下的失效问题。例如：
 
 ```js
 myFunction();
 ```
 
-那么在 pjax 执行完毕之后会调用`myFunction()`，问题就解决了。
-
-### katex 数学公式渲染
-
-该项用以选择是否启用 katex 数学公式渲染。
-
-### prism.js 代码高亮
-
-该项用以选择是否启用 prism.js 代码高亮。
-
-### prism.js 行号显示
-
-该项用以选择代码高亮是否显示行号。
-
-### prism.js 高亮主题
-
-该项用以选择 prism.js 代码高亮的主题配色。
-
-### TOC 文章目录
-
-该项用以选择是否启用 TOC 文章目录功能。
-
-启用后将在文章页右侧显示一个可展开和关闭的 TOC 目录。
-
-### TOC 目录展开状态
-
-该项用以选择 TOC 目录栏是否默认展开。
++ **katex 数学公式渲染**：是否启用 KaTeX。
++ **prism.js 代码高亮**：是否启用 prism.js；可进一步选择是否显示行号、高亮主题配色。
++ **TOC 文章目录**：是否启用文章目录；可设置默认展开状态。
 
 ## 短代码
 
-*注意：若无法正常使用此功能，请尝试关闭第三方插件，如第三方文章编辑器。*
+*若无法正常使用，请尝试关闭第三方插件（如第三方文章编辑器）。*
 
 ### 高亮代码框
 
-标签名：
-
-+ `bbcode`：高亮代码框标签
-
-语法：
+标签：`bbcode`（`type` 取值 `success` / `danger` / `warning` / `secondary` / `info` / `default` / `primary`）。
 
 ```html
-<bbcode type="颜色类型">代码框内容</bbcode>
+<bbcode type="success">这是绿色高亮代码框</bbcode>
+<bbcode type="danger">这是红色高亮代码框</bbcode>
+<bbcode type="warning">这是橙色高亮代码框</bbcode>
+<bbcode type="secondary">这是灰色高亮代码框</bbcode>
+<bbcode type="info">这是蓝绿色高亮代码框</bbcode>
+<bbcode type="default">这是深蓝色高亮代码框</bbcode>
+<bbcode type="primary">这是紫色高亮代码框</bbcode>
 ```
-
-示例：
-
-```html
-<bbcode type="success">这是绿色高亮代码框，用以显示推荐信息</bbcode>
-<bbcode type="danger">这是红色高亮代码框，用以显示警告信息</bbcode>
-<bbcode type="warning">这是橙色高亮代码框，用以显示注意信息</bbcode>
-<bbcode type="secondary">这是灰色高亮代码框，用以显示引用信息</bbcode>
-<bbcode type="info">这是蓝绿色高亮代码框，用以显示高亮信息</bbcode>
-<bbcode type="default">这是深蓝色高亮代码框，用以显示高亮信息</bbcode>
-<bbcode type="primary">这是紫色高亮代码框，用以显示高亮信息</bbcode>
-```
-
-效果：
-
-![bbcode.png](https://i.loli.net/2020/04/07/VEk37bUuXc1lyf6.png)
 
 ### 友链
 
-标签名：
-
-+ `bblist`：友链列表标签
-+ `bblink`：友链项标签
-
-语法：
+标签：`bblist`（列表）、`bblink`（项）。
 
 ```html
 <bblist>
@@ -201,10 +106,6 @@ myFunction();
 </bblist>
 ```
 
-效果：
-
-![bblink.png](https://i.loli.net/2020/04/07/13ZtBldaNuxqrch.png)
-
 # 截图
 
 ![screenshot.png](./screenshot.png)
@@ -215,118 +116,48 @@ Open sourced under the MIT license.
 
 # 其他
 
-+ 主题由[三硝基豆腐](https://github.com/trinitrotofu)、[Rorical](https://github.com/Liupaperbox)和[Totorato](https://github.com/totorato)三人共同完成
-+ 基于[Argon Design System](https://www.creative-tim.com/product/argon-design-system)
-+ 评论模块中部分代码参照了 Typecho 官方主题 Default
-+ Rorical 的 Rorical 主题（同样基于 argon design system）：[https://github.com/Liupaperbox/Rorical](https://github.com/Rorical/Rorical)
-+ Totorator 的修改版 Bubble 主题：[https://github.com/totorato/Bubble](https://github.com/totorato/Bubble)
++ 原版主题由 [三硝基豆腐](https://github.com/trinitrotofu)、[Rorical](https://github.com/Liupaperbox) 和 [Totorato](https://github.com/totorato) 三人共同完成
++ 基于 [Argon Design System](https://www.creative-tim.com/product/argon-design-system)
++ 评论模块部分代码参照 Typecho 官方主题 Default
++ 相关主题：[Rorical](https://github.com/Liupaperbox/Rorical) · [Bubble（Totorato 修改版）](https://github.com/totorato/Bubble)
 
 # 更新历史
+
+## 4.2.0
+
++ 移除「背景气泡」设置项及其渲染逻辑
++ 新增 GitHub Actions 自动发布：提交新的 `@version` 后自动创建 Release 并附带 zip
++ 更新 README 文档
 
 ## 4.1.0
 
 + 适配 Typecho 1.3.0 / PHP 8.x
 + 移除存在安全隐患的「一键自动更新」功能
 + 移除失效的 Google Fonts 镜像，改用系统中文字体栈，避免渲染阻塞
-+ 简繁转换功能改为自托管脚本（原依赖第三方域名且已失效），默认简体，并适配 pjax
-+ 修复文章列表对第三方「Views」浏览统计插件的硬依赖（未安装时不再报错）
-+ 新增「站点创建时间」设置项，页脚运行时长改为可配置
-+ 新增 `lang`、Open Graph、`theme-color` 等元信息，优化 SEO 与社交分享
-+ 将 jQuery、viewer.js 等脚本从 `<head>` 移至页面底部，消除首屏渲染阻塞；新增 jsDelivr `preconnect`
-+ 对 `main.min.css` 做 CSS 树摇：移除未使用的 Bootstrap/Argon 组件（tooltip、popover、progress、dropdown、面包屑、轮播、日期选择器、滑块等），体积 234KB → 186KB
-+ 精简 FontAwesome：仅保留实际用到的 21 个图标并子集化字体（CSS 31KB + 字体 175KB → 约 8KB）
-+ 移除 Bootstrap JS 与 Popper.js，导航栏折叠改用原生 JS 实现（约 90KB）
-+ 正文图片懒加载（`loading="lazy"` / `decoding="async"`）
-+ 内置「Kami」纸质书质感外观（暖色墨蓝配色、衬线标题、打印与无障碍优化）作为默认样式
-+ 主题更名为 Bubble Kami，可与原版 Bubble 并存
-+ 清理重复的静态资源与无用文件
++ 简繁转换改为自托管脚本，默认简体，并适配 pjax
++ 修复文章列表对第三方 Views 浏览统计插件的硬依赖
++ 新增「站点创建时间」设置项
++ 新增 `lang`、Open Graph、`theme-color` 等元信息
++ 将 jQuery、viewer.js 等脚本移至页面底部，消除首屏渲染阻塞
++ `main.min.css` CSS 树摇（234KB → 186KB），移除未使用的组件
++ FontAwesome 子集化，仅保留 21 个图标（31KB+175KB → 约 8KB）
++ 移除 Bootstrap JS 与 Popper.js，导航栏折叠改用原生 JS（约 90KB）
++ 正文图片懒加载
++ 内置「Kami」纸质书质感外观作为默认样式
++ 主题更名为 Bubble Kami，可与原版并存
 
-## 4.0.1
+## 4.0.x
 
-+ 修复了副标题显示不正确的问题（于是 4.0.0 只存活了不到一个小时）
++ 4.0.1：修复副标题显示不正确的问题
++ 4.0.0：卡片式布局、TOC 目录、viewer.js 图片查看器、回到顶部、副标题设置（原版「自动更新」已在本分支移除）
 
-## 4.0.0
+## 3.x
 
-+ 更改页面布局为卡片式布局
-+ 新增自动更新功能
-+ 新增 TOC 目录功能
-+ 新增 viewer.js 图片查看器（点击放大）
-+ 新增回到顶部按钮
-+ 新增副标题设置功能
++ 3.0.3：优化 pjax 进度条、图片圆角、搜索框美化等
++ 3.0.2：首页壁纸全屏、翻页自动滚动
++ 3.0.1：修复评论卡托条、左上角标题颜色问题
++ 3.0.0：新增 pjax、ajax 评论、KaTeX、prism.js、短代码；采用 jsDelivr CDN
 
-
-## 3.0.3
-
-+ 优化 pjax 进度条显示
-+ 添加图片圆角
-+ 修改高分辨率内容卡片边距
-+ 美化搜索框
-
-## 3.0.2
-
-+ 调整首页壁纸全屏显示以美化高分屏显示效果
-+ 首页翻页自动滚动至文章列表
-
-## 3.0.1
-
-+ 修复评论卡托条问题
-+ 修复左上角标题颜色问题
-
-## 3.0.0
-
-+ 新增 pjax 支持、ajax 评论无刷新及其部分细节优化
-+ 新增 KaTeX 数学公式渲染
-+ 新增 prism.js 代码高亮
-+ 新增短代码功能（高亮代码框以及友链功能）
-+ 使用 jsdelivr CDN 加速静态文件加载
-+ 更新部分页面布局
-+ 文章列表采用分页导航栏代替翻页按钮
-+ 修正评论区头像被挤压的问题
-+ 修正评论卡由于采用 flex 而高度塌缩的问题
-
-注：此次更新主要由 Rorical 贡献代码，十分感谢
-
-## 2.3.0
-
-+ 支持自定义首页背景图像和其他页面标题栏背景图像随机显示
-+ 调整页面按钮样式
-+ 评论区布局调整
-+ 新增首页头像旋转特效
-+ 调整修复部分页面布局以及样式错误
-+ 更新截图
-
-## 2.2.2
-
-+ 调整内容页宽度
-+ 支持自定义页脚说明文字
-
-## 2.2.1
-
-+ 修复分类显示 Bug(issue #2)
-+ 规整代码
-
-## 2.2
-
-+ 优化内容宽度设定
-+ 更新换行规则，避免某单词或网址过长导致
-
-## 2.1
-
-+ 页脚显示“最新评论”、“最新文章”和“文章归档”
-+ 新增后下角快捷编辑按钮（需登录后显示），方便快速进入后台、编辑文章
-
-## 2.0
-
-+ 采用卡片式页面，提升美观性
-+ 美化顶部导航栏样式
-+ 新增后台设置 Logo 和 首页头像功能
-+ 美化文章列表和文章阅读页中文章状态标签（如分类、作者等）
-+ 美化评论区显示，添加博主标志，调整头像大小，提升布局美观性，解决评论卡片无法显示于子评论下方的问题，适配移动端，提升阅读舒适度
-+ 采用 font awesome 代替 nucleo 图标集，丰富图标种类
-+ 美化加密文章密码表单
-+ 调整隐藏/加密文章的评论卡显示机制
-+ 调整页面 title 显示机制
-
-## 2.0 之前
+## 2.x 及更早
 
 原版的早期更新历史，详见原仓库提交记录。
