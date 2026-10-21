@@ -40,8 +40,9 @@ jobs:
       - name: Package theme
         if: steps.check.outputs.exists == 'false'
         run: |
-          zip -r "bubble-kami-${{ steps.version.outputs.version }}.zip" . \
-            -x ".git/*" ".github/*" "*.zip"
+          mkdir -p Bubble-Kami
+          rsync -a --exclude='.git' --exclude='.github' --exclude='*.zip' --exclude='Bubble-Kami' ./ Bubble-Kami/
+          zip -r "bubble-kami-${{ steps.version.outputs.version }}.zip" Bubble-Kami
 
       - name: Create GitHub Release
         if: steps.check.outputs.exists == 'false'

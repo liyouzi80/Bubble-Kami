@@ -8,7 +8,7 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 
 > 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。使用中如发现问题，欢迎提交 issue 或 PR。
 >
-> **与原版 Bubble 共存**：安装时请将主题目录命名为 `Bubble Kami`（解压后重命名文件夹），即可与原版 `Bubble` 并存、互不覆盖。
+> **与原版 Bubble 共存**：本主题目录名为 `Bubble-Kami`，与原版 `Bubble` 不同名，可直接并存、互不覆盖。
 
 # 特性
 
@@ -28,7 +28,7 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 
 ## 安装
 
-从 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载最新 zip，解压后将目录重命名为 `Bubble Kami`，移动到 Typecho 主题目录 `usr/themes/Bubble Kami`，再到后台启用。若希望与原版 `Bubble` 并存，请务必使用不同的目录名。
+从 [Releases](https://github.com/liyouzi80/Bubble-Kami/releases) 下载最新 zip，解压后得到 `Bubble-Kami` 目录，移动到 Typecho 主题目录 `usr/themes/` 下，再到后台启用。
 
 > 建议使用 Typecho 1.3.0 及以上版本（PHP 8.0+）。本主题已通过 1.3.0 的兼容性适配，理论上也兼容 1.1/1.2。
 
