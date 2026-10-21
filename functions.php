@@ -275,6 +275,16 @@ function lazyLoadImages($content) {
 	}, $content);
 }
 
+/**
+ * 输出带版本号的主题静态资源 URL，用于浏览器缓存更新。
+ * 基于文件修改时间自动生成版本号，文件更新后旧缓存自动失效。
+ */
+function themeAsset($path) {
+	$file = __DIR__ . '/' . ltrim($path, '/');
+	$v = is_file($file) ? filemtime($file) : '1';
+	echo Helper::options()->themeUrl($path) . '?v=' . $v;
+}
+
 function themeInit($archive) {
 	if ($archive->is('single')) {
 		$archive->content = createCatalog($archive->content);

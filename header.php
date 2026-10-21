@@ -11,7 +11,7 @@
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
 	<meta property="og:url" content="<?php $this->request->getRequestUrl(); ?>">
-	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { $this->options->themeUrl('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
+	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { themeAsset('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
 	<title><?php $this->archiveTitle(array(
 			'category'  =>  _t('%s 下的文章'),
 			'search'    =>  _t('包含关键字 %s 的文章'),
@@ -24,20 +24,20 @@
 
 	<!-- Favicon -->
 	<?php if ($this->options->logoUrl == ''): ?>
-	<link href="<?php $this->options->themeUrl("images/logo.webp"); ?>" rel="icon" type="image/webp">
-	<link href="<?php $this->options->themeUrl("images/logo.png"); ?>" rel="icon" type="image/png">
+	<link href="<?php themeAsset("images/logo.webp"); ?>" rel="icon" type="image/webp">
+	<link href="<?php themeAsset("images/logo.png"); ?>" rel="icon" type="image/png">
 	<?php else: ?>
 	<link href="<?php $this->options->logoUrl(); ?>" rel="icon" type="image/png">
 	<?php endif; ?>
 
 	<!-- FontAwesome -->
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/font-awesome.min.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/font-awesome.min.css"); ?>" rel="stylesheet">
 
 	<!-- Main CSS -->
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/main.min.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/main.min.css"); ?>" rel="stylesheet">
 
 	<!-- Kami 风格（内置默认外观） -->
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/kami.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/kami.css"); ?>" rel="stylesheet">
 
 	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
 	<style>
@@ -46,20 +46,20 @@
 
 	<!-- KaTeX CSS -->
 	<?php if ($this->options->katex): ?>
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/katex.min.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/katex.min.css"); ?>" rel="stylesheet">
 	<?php endif; ?>
 
 	<!-- PrismJS CSS -->
 	<?php if ($this->options->prismjs): ?>
 	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.20.0/themes/<?php $this->options->prismTheme(); ?>.css" />
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/prism-toolbar.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/prism-toolbar.css"); ?>" rel="stylesheet">
 		<?php if ($this->options->prismLine): ?>
 		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.20.0/plugins/line-numbers/prism-line-numbers.css" />
 		<?php endif; ?>
 	<?php endif; ?>
 
 	<!-- Viewer CSS -->
-	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/viewer.min.css"); ?>" rel="stylesheet">
+	<link type="text/css" href="<?php themeAsset("assets/css/viewer.min.css"); ?>" rel="stylesheet">
 	
 	<!-- Custom CSS -->
 	<?php if ($this->options->customCss): ?>
@@ -131,7 +131,8 @@
 						</li>
 						<li class="nav-item">
 							<button class="nav-link theme-toggle" id="theme-toggle" type="button" aria-label="切换深色模式">
-								<i class="fa fa-moon-o" aria-hidden="true"></i>
+								<svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+								<svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
 							</button>
 						</li>
 

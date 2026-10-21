@@ -87,11 +87,11 @@
 		</button>
 	</a>
 	<!-- Viewer.js Plugin -->
-	<script src="<?php $this->options->themeUrl("assets/js/viewer.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/viewer.min.js"); ?>"></script>
 	<!-- Headroom（导航栏滚动隐藏） -->
-	<script src="<?php $this->options->themeUrl("assets/js/headroom.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
-	<script src="<?php $this->options->themeUrl("assets/js/bbrender.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/bbrender.js"); ?>"></script>
 	<script>
 		// 导航栏折叠（原生实现，替代 Bootstrap collapse）
 		document.addEventListener('click', function (e) {
@@ -112,23 +112,14 @@
 		}
 	</script>
 <script>
-	// 深色模式切换
+	// 深色模式切换（月亮/太阳图标由 CSS [data-theme] 控制）
 	(function () {
 		var toggle = document.getElementById('theme-toggle');
 		if (!toggle) return;
-		var icon = toggle.querySelector('i');
-		function currentTheme() {
-			return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-		}
-		function updateIcon() {
-			if (icon) icon.className = currentTheme() === 'dark' ? 'fa fa-sun-o' : 'fa fa-moon-o';
-		}
-		updateIcon();
 		toggle.addEventListener('click', function () {
-			var next = currentTheme() === 'dark' ? 'light' : 'dark';
+			var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
 			document.documentElement.setAttribute('data-theme', next);
 			try { localStorage.setItem('theme', next); } catch (e) {}
-			updateIcon();
 		});
 	})();
 </script>
@@ -236,7 +227,7 @@
 		}
 	</script>
 	<?php if($this->options->Pjax): ?>
-	<script src="<?php $this->options->themeUrl("assets/js/progress.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
 	<script>
 		(function () {
 			var siteUrl = '<?php Helper::options()->siteUrl(); ?>';
@@ -306,18 +297,18 @@
 	<?php endif; ?>
 	<!-- KaTeX JS -->
 	<?php if($this->options->katex): ?>
-	<script src="<?php $this->options->themeUrl("assets/js/katex.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/auto-render.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/katex.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/auto-render.min.js"); ?>"></script>
 	<?php endif; ?>
 	<!-- Prism JS -->
 	<?php if($this->options->prismjs): ?>
-	<script src="<?php $this->options->themeUrl("assets/js/prism-core.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/prism-autoloader.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/prism-toolbar.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/prism-show-language.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/prism-copy-to-clipboard.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/prism-core.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/prism-autoloader.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/prism-toolbar.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/prism-show-language.min.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/prism-copy-to-clipboard.min.js"); ?>"></script>
 	<?php if($this->options->prismLine): ?>
-		<script src="<?php $this->options->themeUrl("assets/js/prism-line-numbers.min.js"); ?>"></script>
+		<script src="<?php themeAsset("assets/js/prism-line-numbers.min.js"); ?>"></script>
 	<?php endif; ?>
 	<?php endif; ?>
 	<!-- Alert -->
@@ -357,7 +348,7 @@
 	</script>
 	
 	<!-- 简繁转换（自托管） -->
-	<script src="<?php $this->options->themeUrl("assets/js/tw-cn.js"); ?>"></script>
+	<script src="<?php themeAsset("assets/js/tw-cn.js"); ?>"></script>
 	<script>
 		translateInitilization();
 	</script>
