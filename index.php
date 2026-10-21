@@ -1,11 +1,11 @@
 <?php
 /**
  * Typecho 极简风格响应式主题
- * 
+ *
  * @package Bubble
- * @author TriNitroTofu, Rorical, Boshi
- * @version 4.0.1
- * @link https://github.com/trinitrotofu/Bubble
+ * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
+ * @version 4.1.0
+ * @link https://github.com/liyouzi80/typecho-Bubble
  */
 
 	if (!defined('__TYPECHO_ROOT_DIR__')) exit;

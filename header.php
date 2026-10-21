@@ -1,9 +1,15 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="theme-color" content="#5e72e4">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
+	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
+	<meta property="og:url" content="<?php $this->request->getRequestUrl(); ?>">
+	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { $this->options->themeUrl('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
 	<title><?php $this->archiveTitle(array(
 			'category'  =>  _t('%s 下的文章'),
 			'search'    =>  _t('包含关键字 %s 的文章'),
@@ -23,14 +29,16 @@
 		}
 	?>" rel="icon" type="image/png">
 
-	<!-- Fonts -->
-	<link rel="stylesheet" href="https://fonts.googleapis.cn/css2?family=Noto+Serif+SC:wght@500&display=swap">
-
 	<!-- FontAwesome -->
 	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/font-awesome.min.css"); ?>" rel="stylesheet">
 
 	<!-- Main CSS -->
 	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/main.min.css"); ?>" rel="stylesheet">
+
+	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif; }
+	</style>
 
 	<!-- KaTeX CSS -->
 	<?php if ($this->options->katex): ?>
@@ -89,9 +97,6 @@
 							<a class="nav-link" href="<?php $this->options->siteUrl(); ?>">首页</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
-						</li>
-						<li class="nav-item">
 						<?php
 							$this->widget('Widget_Contents_Page_List')->to($pages);
 							while($pages->next()):
@@ -106,7 +111,7 @@
 									<div class="input-group-prepend">
 										<span class="input-group-text"><i class="fa fa-search"></i></span>
 									</div>
-									<input type="text" name="s" class="form-control" placeholder="搜点什么……" type="text" autocomplete="off">
+									<input type="text" name="s" class="form-control" placeholder="搜点什么……" autocomplete="off">
 								</div>
 							</form>
 						</li>

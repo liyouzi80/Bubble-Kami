@@ -231,11 +231,11 @@
 	<?php endif; ?>
 	<?php endif; ?>
 	<!-- Alert -->
-	<div id="modal-notification" class="modal fade show" id="modal-notification" style="z-index: 102;display: none;">
+	<div id="modal-notification" class="modal fade" style="z-index: 102;display: none;">
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 id="msgMain" class="modal-title" id="mySmallModalLabel"></h5>
+					<h5 id="msgMain" class="modal-title"></h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#modal-notification').hide('normal');">
 						<span aria-hidden="true">×</span>
 					</button>
@@ -254,19 +254,7 @@
 		init()
 	</script>
 	
-	<!--- 简繁转换开始 --->
-<script type="text/javascript" src="https://muyiluling.com/usr/uploads/html/tw_cn.js"></script>
-<script type="text/javascript">
-var defaultEncoding = 1; //默认是否繁体，0-简体，1-繁体
-var translateDelay = 0; //延迟时间,若不在</body>前, 要设定延迟翻译时间, 如100表示100ms,默认为0
-var cookieDomain = "https://muyiluling.com/";    //Cookie地址, 一定要设定, 通常为你的网址
-var msgToTraditionalChinese = "简/繁"; //默认切换为繁体时显示的中文字符
-var msgToSimplifiedChinese = "简/繁"; //默认切换为简体时显示的中文字符
-var translateButtonId = "translateLink"; //默认互换id
-translateInitilization();
-</script>
-<!--- 简繁转换结束 --->
-<!-- Typecho footer -->
+	<!-- Typecho footer -->
 	<?php $this->footer(); ?>
 	</body>
 </html>

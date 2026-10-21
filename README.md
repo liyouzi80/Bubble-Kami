@@ -6,6 +6,8 @@ Typecho 清新风格响应式主题。
 
 Demo:  [https://tntofu.com/](https://tntofu.com/)
 
+> 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。如使用过程中发现问题，欢迎提交 issue 或 PR。
+
 如果觉得本主题还不错的话可以给个 star 哦，这是对开源主题作者们最大的鼓励。
 
 # 特性
@@ -25,7 +27,9 @@ Demo:  [https://tntofu.com/](https://tntofu.com/)
 # 使用
 ## 安装
 
-在 [Releases](https://github.com/trinitrotofu/Bubble/releases) 下载 zip 源码，解压后移动到 Typecho 主题目录。
+在 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载 zip 源码，解压后移动到 Typecho 主题目录（`usr/themes/Bubble`）。
+
+> 建议使用 Typecho 1.3.0 及以上版本（PHP 8.0+）。本主题已通过 1.3.0 的兼容性适配，理论上也兼容 1.1/1.2。
 
 ## 设置
 
@@ -33,13 +37,9 @@ Demo:  [https://tntofu.com/](https://tntofu.com/)
 
 ## 更新
 
-主题有自动检查更新功能，并且能够一键安装更新。
+本分支已移除原版的「一键自动更新」功能（该功能会向主题目录写入一个无需登录即可访问的更新脚本，存在安全风险）。
 
-自动更新按钮设置在主题设置页面中。
-
-自动更新将从 jsdelivr 的 CDN 上下载最新版本的主题以替换旧版本主题。
-
-你也可以手动更新，手动更新步骤为：删除旧版本，并安装新版本。
+请手动更新：从 Releases 下载新版 zip，删除旧主题目录后重新安装。
 
 请注意，由于 Typecho 本身设计的原因，主题更新后可能会添加新的设置项，如果不禁用主题并重新启用（通过启用其他主题），新设置项将被留空并可能导致 Bug，所以请在更新后重启主题，或者请仔细检查是否有留空的设置项（这里主要指选择型设置项，文本类设置项似乎没这个问题）。
 
@@ -82,6 +82,10 @@ URL 之间用换行隔开，即每行一个 URL，**请勿包含多余字符**�
 该项用以设定页脚左下角的说明文字，如 Copyright 和 备案信息。
 
 可添加 HTML 代码以实现更丰富的功能，如跳转链接等。
+
+### 站点创建时间
+
+该项用以设定站点创建时间（格式如 `2012-11-17 00:00:00`），用于在页脚显示「本站已运行 X 年 X 天」，留空则不显示。
 
 ### 页脚小工具
 
@@ -216,6 +220,17 @@ Open sourced under the MIT license.
 + Totorator 的修改版 Bubble 主题：[https://github.com/totorato/Bubble](https://github.com/totorato/Bubble)
 
 # 更新历史
+
+## 4.1.0
+
++ 适配 Typecho 1.3.0 / PHP 8.x
++ 移除存在安全隐患的「一键自动更新」功能
++ 移除失效的 Google Fonts 镜像，改用系统中文字体栈，避免渲染阻塞
++ 移除第三方「简繁转换」脚本（原域名已失效，且引入外部远程脚本）
++ 修复文章列表对第三方「Views」浏览统计插件的硬依赖（未安装时不再报错）
++ 新增「站点创建时间」设置项，页脚运行时长改为可配置
++ 新增 `lang`、Open Graph、`theme-color` 等元信息，优化 SEO 与社交分享
++ 清理重复的静态资源与无用文件
 
 ## 4.0.1
 

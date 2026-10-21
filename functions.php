@@ -1,183 +1,7 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
 function themeConfig($form) {
-	Typecho_Widget::widget('Widget_Themes_List')->to($themes);
-	foreach ($themes -> stack as $key => $value){
-		if($value["activated"]==1){
-			break;
-		}
-	}
-	
-	if(!file_exists("themeupdater.php")){
-		$updater = fopen("themeupdater.php", "w");
-		$txt = '
-		<html>
-			<head>
-				<title>Updater</title>
-				<meta charset="UTF-8">
-				<style>
-					html {
-						padding: 50px 10px;
-						font-size: 16px;
-						line-height: 1.4;
-						color: #666;
-						background: #F6F6F3;
-						-webkit-text-size-adjust: 100%;
-						-ms-text-size-adjust: 100%;
-					}
-
-					html,
-					input { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
-					body {
-						max-width: 500px;
-						max-height: 30px;
-						padding: 30px 20px;
-						margin: 0 auto;
-						background: #FFF;
-					}
-					ul {
-						padding: 0 0 0 40px;
-					}
-					.container {
-						max-width: 380px;
-						_width: 380px;
-						margin: 0 auto;
-					}
-				</style>
-			</head>
-			<body>
-				<div class="container">
-				<?php
-				function getJsonRequest($url){
-					$ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL, $url);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-					$output = curl_exec($ch);
-					curl_close($ch);
-					$output = json_decode($output,true);
-					return $output;
-				}
-				function deldir($dir) {
-					$dh=opendir($dir);
-					while ($file=readdir($dh)) {
-						if($file!="." && $file!="..") {
-							$fullpath=$dir."/".$file;
-							if(!is_dir($fullpath)) {
-								unlink($fullpath);
-							} else {
-								deldir($fullpath);
-							}
-						}
-					}
-					closedir($dh);
-					if(rmdir($dir)) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-				function getRequest($url){
-					$ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL, $url);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-					$output = curl_exec($ch);
-					curl_close($ch);
-					return $output;
-				}
-				$dir = "../usr/themes/Bubble";
-
-				try{
-					$version = getJsonRequest("https://data.jsdelivr.com/v1/package/resolve/gh/trinitrotofu/Bubble")["version"];
-					$files = getJsonRequest("https://data.jsdelivr.com/v1/package/gh/trinitrotofu/Bubble@" . $version . "/flat")["files"];
-					if(file_exists($dir)) deldir($dir);
-
-					foreach ($files as $key => $value){
-						$filecontent = getRequest("https://cdn.jsdelivr.net/gh/trinitrotofu/Bubble@" . $version . "/" .$value["name"]);
-						if (!file_exists(dirname($dir.$value["name"]))){
-							mkdir(dirname($dir.$value["name"]),0755,true);
-						}
-						$fileobj = fopen($dir.$value["name"], "w");
-						fwrite($fileobj, $filecontent);
-						fclose($fileobj);
-					}
-					
-					echo "主题更新成功！即将返回主题页面。";
-					echo \'<meta http-equiv="refresh" content="3;url=themes.php">\';
-					@unlink ("themeupdater.php");  
-				}catch(Exception $e){
-					echo "更新失败！请查看错误信息或者手动更新。<br>";
-					echo $e;
-				}
-				?>
-				</div>
-			</body>
-		</html>';
-		fwrite($updater, $txt);
-		fclose($updater);
-	}
-	
-	echo '<script>
-		var version = "' . $value["version"] . '"
-		function toNum(a){
-			var a=a.toString();
-			var c=a.split('.');
-			var num_place=["","0","00","000","0000"],r=num_place.reverse();
-			for (var i=0;i<c.length;i++){ 
-				var len=c[i].length;	   
-				c[i]=r[len]+c[i];  
-			} 
-			var res = c.join(""); 
-			return res; 
-		} 
-		
-	</script>';
-	
-	echo 
-	'
-	<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
-	<ul class="typecho-option typecho-option-submit">
-		<li>
-			<label class="typecho-label">
-				主题更新
-			</label>
-		</li>
-		<li>
-			<p class="description" id="update-dec">
-				正在检查更新...
-			</p>
-		</li>
-		<li hidden id="update-btn-li">
-			<button type="button" class="btn default" id="update-btn">
-			</button>
-		</li>
-	</ul>
-	<script>
-		$.ajax({
-		url: "https://data.jsdelivr.com/v1/package/resolve/gh/trinitrotofu/Bubble",
-		dataType: "json",
-		timeout: 10000,
-		success: function(data) {
-			var releaseVersion = data["version"]
-			$("#update-btn-li").show()
-			$("#update-dec").html("")
-
-			$("#update-btn").html("最新版本号为" + releaseVersion + "，当前版本为" + version + "，" + (toNum(releaseVersion) > toNum(version) ? "你正在使用旧版本主题。点击更新" : "你已更新至最新版本"));
-			if (toNum(releaseVersion) > toNum(version)) {
-				$("#update-btn").click(function() {
-					window.location.href = "themeupdater.php"
-				});
-			}
-		},
-		error: function() {
-			$("#update-dec").html("检查更新程序出错！")
-		}
-	});
-	</script>';
-
 	$subtitle = new Typecho_Widget_Helper_Form_Element_Text('subtitle', NULL, '', _t('站点副标题'), _t('在这里填入站点副标题，以在网站标题后显示'));
 	$form->addInput($subtitle);
 	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, '', _t('站点 LOGO 地址'), _t('在这里填入一个图片 URL 地址，以在网站标题前加上一个 LOGO'));
@@ -190,10 +14,12 @@ function themeConfig($form) {
 	$form->addInput($randomImage);
 	$bubbleShow = new Typecho_Widget_Helper_Form_Element_Radio('bubbleShow', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('背景气泡'), _t('选择是否在首页以及文章页顶部背景处显示半透明气泡'));
 	$form->addInput($bubbleShow);
-	$footerText = new Typecho_Widget_Helper_Form_Element_Text('footerText', NULL, 'Powered by <a href="http://typecho.org/" class="footer-link">Typecho</a> | Theme by <a href="https://github.com/trinitrotofu/Bubble" class="footer-link">Bubble</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
+	$footerText = new Typecho_Widget_Helper_Form_Element_Text('footerText', NULL, 'Powered by <a href="https://typecho.org/" class="footer-link">Typecho</a> · Theme by <a href="https://github.com/liyouzi80/typecho-Bubble" class="footer-link">Bubble</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
 	$form->addInput($footerText);
 	$footerWidget = new Typecho_Widget_Helper_Form_Element_Radio('footerWidget', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('页脚小工具'), _t('选择是否在页面底部显示“最新评论”、“最新文章”等栏目'));
 	$form->addInput($footerWidget);
+	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于在页脚显示“本站已运行 X 年 X 天”，留空则不显示'));
+	$form->addInput($siteCreateDate);
 	$customCss = new Typecho_Widget_Helper_Form_Element_Textarea('customCss', NULL, '', _t('自定义 css'), _t('在这里填入所需要的 css，以实现自定义页面样式，如调整字体大小等'));
 	$form->addInput($customCss);
 	$Pjax = new Typecho_Widget_Helper_Form_Element_Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
@@ -254,15 +80,27 @@ function printTag($that, $icon = 0) { ?>
 	</span>
 <?php }
 
+function printSticky($that) {
+	if (!empty($that->order)) {
+		echo ' <span class="badge badge-danger badge-pill">置顶</span>';
+	}
+}
+
+function hasViewsPlugin() {
+	return class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews');
+}
+
 function printAricle($that, $flag) { ?>
 	<div class="card shadow content-card list-card <?php if ($flag): ?>content-card-head<?php endif; ?>">
 		<section class="section">
 			<div class="container">
 				<div class="content">
-					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->sticky();$that->title() ?></a></h1>
+					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h1>
 					<div class="list-object">
 						<span class="list-tag"><i class="fa fa-calendar-o" aria-hidden="true"></i> <time datetime="<?php $that->date('c'); ?>"><?php $that->date();?></time></span>
-						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php Views_Plugin::theViews();?> 次阅读</span>
+						<?php if (hasViewsPlugin()): ?>
+						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php Views_Plugin::theViews();?> 次阅读</span>
+						<?php endif; ?>
 						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
 						<?php printCategory($that, 1); ?>
 						<?php printTag($that, 1); ?>
@@ -384,49 +222,52 @@ function themeInit($archive) {
 	}
 }
 
-// 设置时区
-date_default_timezone_set('Asia/Shanghai');
 /**
-
- * 秒转时间，格式 年 月 日 时 分 秒
- *
+ * 计算站点运行时长，格式 年 天 时 分
+ * 站点创建时间可在主题设置中配置，留空则不显示
  */
-function
-getBuildTime
-(
-) {
-    // 在下面按格式输入本站创建的时间
-    $site_create_time = strtotime('2012-11-17 00:00:00');
-    $time = time() - $site_create_time;
-    if (is_numeric($time)) {
-        $value = array(
-            "years" => 0, "days" => 0, "hours" => 0,
-            "minutes" => 0, "seconds" => 0,
-        );
-        if ($time >= 31556926) {
-            $value["years"] = floor($time / 31556926);
-            $time = ($time % 31556926);
-        }
-        if ($time >= 86400) {
-            $value["days"] = floor($time / 86400);
-            $time = ($time % 86400);
-        }
-        if ($time >= 3600) {
-            $value["hours"] = floor($time / 3600);
-            $time = ($time % 3600);
-        }
-        if ($time >= 60) {
-            $value["minutes"] = floor($time / 60);
-            $time = ($time % 60);
-        }
-        $value["seconds"] = floor($time);
- 
-        echo '<span class="btime">'."距今已有".$value['years'].
-        '年'.$value['days'].
-        '天'.$value['hours'].
-        '小时'.$value['minutes'].
-        '分</span>';
-    } else {
-        echo '';
-    }
+function getBuildTime()
+{
+	$site_create_date = Helper::options()->siteCreateDate;
+	if (empty($site_create_date)) {
+		return;
+	}
+
+	$site_create_time = strtotime($site_create_date);
+	if (empty($site_create_time)) {
+		return;
+	}
+
+	$time = time() - $site_create_time;
+	if (is_numeric($time)) {
+		$value = array(
+			"years" => 0, "days" => 0, "hours" => 0,
+			"minutes" => 0, "seconds" => 0,
+		);
+		if ($time >= 31556926) {
+			$value["years"] = floor($time / 31556926);
+			$time = ($time % 31556926);
+		}
+		if ($time >= 86400) {
+			$value["days"] = floor($time / 86400);
+			$time = ($time % 86400);
+		}
+		if ($time >= 3600) {
+			$value["hours"] = floor($time / 3600);
+			$time = ($time % 3600);
+		}
+		if ($time >= 60) {
+			$value["minutes"] = floor($time / 60);
+			$time = ($time % 60);
+		}
+		$value["seconds"] = floor($time);
+
+		echo '<span class="btime">'." 距今已有 ".$value['years'].
+		' 年 '.$value['days'].
+		' 天 '.$value['hours'].
+		' 小时 '.$value['minutes'].
+		' 分</span>';
+	} else {
+		echo '';
+	}
 }
