@@ -23,13 +23,12 @@
 	?></title>
 
 	<!-- Favicon -->
-	<link href="<?php
-		if ($this->options->logoUrl == '') {
-			$this->options->themeUrl("images/logo.png");
-		} else {
-			$this->options->logoUrl();
-		}
-	?>" rel="icon" type="image/png">
+	<?php if ($this->options->logoUrl == ''): ?>
+	<link href="<?php $this->options->themeUrl("images/logo.webp"); ?>" rel="icon" type="image/webp">
+	<link href="<?php $this->options->themeUrl("images/logo.png"); ?>" rel="icon" type="image/png">
+	<?php else: ?>
+	<link href="<?php $this->options->logoUrl(); ?>" rel="icon" type="image/png">
+	<?php endif; ?>
 
 	<!-- FontAwesome -->
 	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/font-awesome.min.css"); ?>" rel="stylesheet">

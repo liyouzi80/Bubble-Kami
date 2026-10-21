@@ -253,10 +253,33 @@ function getCatalog() {
 	echo $index;
 }
 
+function lazyLoadImages($content) {
+	if (empty($content) || strpos($content, '<img') === false) {
+		return $content;
+	}
+	return preg_replace_callback('/<img\b([^>]*)>/i', function ($m) {
+		$attrs = $m[1];
+		$selfclose = '';
+		if (substr($attrs, -1) === '/') {
+			$attrs = rtrim(substr($attrs, 0, -1));
+			$selfclose = ' /';
+		}
+		$add = '';
+		if (stripos($attrs, 'loading=') === false) {
+			$add .= ' loading="lazy"';
+		}
+		if (stripos($attrs, 'decoding=') === false) {
+			$add .= ' decoding="async"';
+		}
+		return '<img' . $attrs . $add . $selfclose . '>';
+	}, $content);
+}
+
 function themeInit($archive) {
 	if ($archive->is('single')) {
 		$archive->content = createCatalog($archive->content);
 	}
+	$archive->content = lazyLoadImages($archive->content);
 }
 
 /**
