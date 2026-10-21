@@ -93,23 +93,24 @@ function printAricle($that, $flag) { ?>
 		<section class="section">
 			<div class="container">
 				<div class="content">
-					<h2><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h2>
+					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h1>
 					<div class="list-object">
 						<span class="list-tag"><i class="fa fa-calendar-o" aria-hidden="true"></i> <time datetime="<?php $that->date('c'); ?>"><?php $that->date();?></time></span>
-						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 						<?php if (hasViewsPlugin()): ?>
 						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php Views_Plugin::theViews();?> 次阅读</span>
 						<?php endif; ?>
 						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
-					</div>
-					<div class="list-object list-object-meta">
 						<?php printCategory($that, 1); ?>
 						<?php printTag($that, 1); ?>
+						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 					</div>
-					<div class="list-excerpt"><?php $that->excerpt(200, '…'); ?></div>
-					<a class="btn btn-icon btn-3 btn-outline-primary" href="<?php $that->permalink() ?>">
-						<span class="btn-inner--icon"><i class="fa fa-play" aria-hidden="true"></i></span>
-						<span class="btn-inner--text">继续阅读</span>
+					<?php $that->content(''); ?>
+					<br/>
+					<a href="<?php $that->permalink() ?>">
+						<button class="btn btn-icon btn-3 btn-outline-primary" type="button">
+							<span class="btn-inner--icon"><i class="fa fa-play" aria-hidden="true"></i></span>
+							<span class="btn-inner--text">继续阅读</span>
+						</button>
 					</a>
 				</div>
 			</div>

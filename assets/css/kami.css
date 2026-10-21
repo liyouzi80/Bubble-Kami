@@ -69,7 +69,7 @@ body {
   color: #fff !important;
 }
 
-h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5, .list-card .content h1 {
   font-family: var(--serif) !important;
   color: var(--near-black) !important;
   font-weight: 500 !important;
@@ -275,22 +275,20 @@ main > .section-hero:not([style*="100vh"]) {
   padding-right: 1.6rem !important;
 }
 
-.list-card .content h2 {
+.list-card .content h1 {
   font-size: 1.5rem !important;
   line-height: 1.3 !important;
-  margin-top: 0 !important;
   margin-bottom: 0.6rem !important;
-  padding-bottom: 0 !important;
   border-bottom: 1px solid transparent !important;
 }
 
-.list-card .content h2 a {
+.list-card .content h1 a {
   color: var(--near-black) !important;
   text-decoration: none !important;
   transition: color 0.2s ease;
 }
 
-.list-card .content h2 a:hover {
+.list-card .content h1 a:hover {
   color: var(--brand) !important;
 }
 
@@ -301,10 +299,6 @@ main > .section-hero:not([style*="100vh"]) {
   flex-wrap: wrap;
   gap: 0.4rem 1.2rem;
   align-items: center;
-}
-
-.list-object.list-object-meta {
-  margin-bottom: 0.7rem !important;
 }
 
 .list-object > * {
@@ -355,12 +349,6 @@ main > .section-hero:not([style*="100vh"]) {
   margin-bottom: 0.5rem !important;
 }
 
-.list-excerpt {
-  color: var(--dark-warm) !important;
-  line-height: 1.55 !important;
-  margin-bottom: 0.5rem !important;
-}
-
 /* 继续阅读 */
 .list-card .btn-outline-primary {
   border: none !important;
@@ -385,7 +373,7 @@ main > .section-hero:not([style*="100vh"]) {
 }
 
 /* 置顶标记 */
-.content-card-head .content h2 span[style*="color:red"] {
+.content-card-head .content h1 span[style*="color:red"] {
   color: #8B4513 !important;
   font-size: 0.8em;
   opacity: 0.85;
@@ -879,18 +867,6 @@ main > .section-hero:not([style*="100vh"]) {
 
 .footer-list li:last-child {
   margin-bottom: 0 !important;
-}
-
-.footer-comment-author {
-  color: var(--near-black);
-  font-weight: 500;
-}
-
-.footer-comment-time {
-  display: block;
-  font-size: 0.78rem;
-  color: var(--stone);
-  margin-top: 2px;
 }
 
 /* ================================================

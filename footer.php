@@ -22,16 +22,16 @@
 			<?php if ($this->options->footerWidget) { ?>
 			<div class="row">
 				<div class="col-md-4 widget">
-					<h5><i class="fa fa-comments-o" aria-hidden="true"></i>最新评论</h5>
+					<h5>最新评论</h5>
 					<?php $comments_recent = $this->widget('Widget_Comments_Recent', 'pageSize=5');
 						if ($comments_recent->have())
 						{
-							_e('<ul class="footer-list">');
+							_e('<ul>');
 							while($comments_recent->next())
 							{
-								_e('<li><a href="' . htmlspecialchars($comments_recent->permalink, ENT_QUOTES, 'UTF-8') . '" class="footer-link"><span class="footer-comment-author">' . htmlspecialchars($comments_recent->author, ENT_QUOTES, 'UTF-8') . '</span>：');
+								_e('<li><a href="' . "$comments_recent->permalink" . '" class="footer-link">' . "$comments_recent->author" . ': ');
 								$comments_recent->excerpt(35, '...');
-								_e('</a><span class="footer-comment-time">'); $comments_recent->date('m-d'); _e('</span></li>');
+								_e('</a></li>');
 							}
 							_e('</ul>');
 						}
