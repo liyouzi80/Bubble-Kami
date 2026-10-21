@@ -1092,3 +1092,90 @@ main > .section-hero:not([style*="100vh"]) {
     align-items: flex-start;
   }
 }
+
+/* ================================================
+   十一、深色模式
+   ================================================ */
+
+/* 主题切换按钮（随导航栏文字颜色，去掉按钮默认样式） */
+.navbar .theme-toggle {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  padding: 0.5rem 0.6rem;
+  line-height: 1;
+  font-size: 0.95rem;
+}
+
+/* 深色主题令牌（暖黑 + 浅蓝点缀，延续暖色纸感） */
+:root[data-theme="dark"] {
+  --parchment: #1b1a18;
+  --ivory: #242220;
+  --brand: #8fb3e0;
+  --warm-sand: #34312c;
+
+  --near-black: #e8e6dc;
+  --dark-warm: #c6c3ba;
+  --olive: #a9a69d;
+  --stone: #87847c;
+
+  --border: #35332e;
+  --border-soft: #2c2a26;
+
+  --nav-bg: #121110;
+}
+
+/* 列表徽章：浅底改深底 */
+:root[data-theme="dark"] .list-tag .badge,
+:root[data-theme="dark"] .list-tag [class^="badge-"] {
+  background-color: #2c2b27 !important;
+}
+
+/* 引用块 / 链接下边框 / 高亮 / 选中：品牌蓝 rgba 换成浅蓝 rgba */
+:root[data-theme="dark"] .content blockquote {
+  background: rgba(143, 179, 224, 0.06) !important;
+}
+
+:root[data-theme="dark"] .content a {
+  border-bottom-color: rgba(143, 179, 224, 0.35) !important;
+}
+
+:root[data-theme="dark"] .content mark {
+  background: rgba(143, 179, 224, 0.18) !important;
+}
+
+:root[data-theme="dark"] ::selection {
+  background-color: rgba(143, 179, 224, 0.28);
+}
+
+/* 提交按钮 / 分页激活项：brand 变浅后，白字需深一点的蓝底 */
+:root[data-theme="dark"] #comment-form #add-comment-button,
+:root[data-theme="dark"] #comment-form .btn-outline-success {
+  background: #3d5a80 !important;
+  border-color: #3d5a80 !important;
+}
+
+:root[data-theme="dark"] .page-nav .pagination .active a {
+  background-color: #3d5a80 !important;
+  border-color: #3d5a80 !important;
+}
+
+/* 通知弹窗 */
+:root[data-theme="dark"] .modal-content {
+  background-color: #242220 !important;
+  border-color: #35332e !important;
+}
+
+:root[data-theme="dark"] .modal-header {
+  border-bottom-color: #35332e !important;
+}
+
+:root[data-theme="dark"] .modal-title,
+:root[data-theme="dark"] .modal-body {
+  color: var(--dark-warm) !important;
+}
+
+:root[data-theme="dark"] .modal-header .close {
+  color: var(--stone) !important;
+}

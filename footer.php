@@ -114,6 +114,27 @@
 			}).init();
 		}
 	</script>
+<script>
+	// 深色模式切换
+	(function () {
+		var toggle = document.getElementById('theme-toggle');
+		if (!toggle) return;
+		var icon = toggle.querySelector('i');
+		function currentTheme() {
+			return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+		}
+		function updateIcon() {
+			if (icon) icon.className = currentTheme() === 'dark' ? 'fa fa-sun-o' : 'fa fa-moon-o';
+		}
+		updateIcon();
+		toggle.addEventListener('click', function () {
+			var next = currentTheme() === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', next);
+			try { localStorage.setItem('theme', next); } catch (e) {}
+			updateIcon();
+		});
+	})();
+</script>
 	<!-- scrollup -->
 	<script>
 		$(function(){
