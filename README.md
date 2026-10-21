@@ -13,9 +13,12 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 # 特性
 
 + 清新界面：基于 argon design system 的卡片式布局，内置「Kami」暖色墨蓝、衬线标题的纸质书质感外观
++ 暗黑模式：跟随系统主题，支持手动切换
 + 人性化设计：登录后显示后台管理按钮，布局自适应
 + 流畅体验：支持全站 pjax、ajax 评论无刷新
-+ 性能优化：静态资源自托管，`main.min.css` 经 CSS 树摇压缩，FontAwesome 子集化为 21 个图标，脚本移至页面底部、正文图片懒加载
++ 文章导航：上一篇 / 下一篇 + 相关文章推荐
++ SEO 优化：内置 JSON-LD 结构化数据（Article + BreadcrumbList）
++ 性能优化：静态资源自托管，`main.min.css` 经 CSS 树摇压缩，FontAwesome 子集化为 21 个图标，移除 jQuery 依赖，脚本移至页面底部、正文图片懒加载与 WebP 响应式图片
 + 简繁转换：自托管脚本，一键切换简体 / 繁体，适配 pjax
 + 代码高亮：自带 prism.js，主题丰富，解析迅速
 + 数学公式：自带 KaTeX 渲染，相比 MathJax 更轻量
@@ -127,6 +130,11 @@ Open sourced under the MIT license.
 
 + 移除「背景气泡」设置项及其渲染逻辑
 + 新增 GitHub Actions 自动发布：提交新的 `@version` 后自动创建 Release 并附带 zip
++ 新增暗黑模式（跟随系统 + 手动切换）
++ 新增上一篇 / 下一篇导航与相关文章
++ 新增 JSON-LD 结构化数据（Article + BreadcrumbList）
++ 移除 jQuery 依赖，pjax / 评论 / 图片查看器 / 进度条改为原生 JS
++ 正文图片懒加载与 WebP 响应式图片
 + 更新 README 文档
 
 ## 4.1.0
