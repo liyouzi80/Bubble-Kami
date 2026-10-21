@@ -5,6 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="theme-color" content="#5e72e4">
+	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
@@ -35,6 +36,9 @@
 	<!-- Main CSS -->
 	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/main.min.css"); ?>" rel="stylesheet">
 
+	<!-- Kami 风格（内置默认外观） -->
+	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/kami.css"); ?>" rel="stylesheet">
+
 	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
 	<style>
 		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif; }
@@ -57,16 +61,10 @@
 	<!-- Viewer CSS -->
 	<link type="text/css" href="<?php $this->options->themeUrl("assets/css/viewer.min.css"); ?>" rel="stylesheet">
 	
-	<!-- Jquery -->
-	<script src="<?php $this->options->themeUrl("assets/js/jquery.min.js"); ?>"></script>
-
 	<!-- Custom CSS -->
 	<?php if ($this->options->customCss): ?>
 	<style type="text/css"><?php $this->options->customCss(); ?></style>
 	<?php endif; ?>
-	<!-- Viewer.js Plugin -->
-    <script src="<?php $this->options->themeUrl("assets/js/viewer.min.js"); ?>"></script>
-    <script src="<?php $this->options->themeUrl("assets/js/jquery-viewer.min.js"); ?>"></script>
 	<!-- Typecho header -->
 	<?php $this->header(); ?>
 </head>

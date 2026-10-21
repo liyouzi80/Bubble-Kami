@@ -1,12 +1,14 @@
-# Bubble
+# Bubble Kami
 
-Typecho 清新风格响应式主题。
+Typecho 清新风格响应式主题（社区维护的 Bubble 优化分支，内置「Kami」纸质书质感外观）。
 
 化繁为简，如沐清风。
 
 Demo:  [https://tntofu.com/](https://tntofu.com/)
 
 > 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。如使用过程中发现问题，欢迎提交 issue 或 PR。
+>
+> **与原版 Bubble 共存**：安装时请把主题目录命名为 `Bubble Kami`（解压后重命名文件夹），即可与原版 `Bubble` 并存、互不覆盖。
 
 如果觉得本主题还不错的话可以给个 star 哦，这是对开源主题作者们最大的鼓励。
 
@@ -27,7 +29,7 @@ Demo:  [https://tntofu.com/](https://tntofu.com/)
 # 使用
 ## 安装
 
-在 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载 zip 源码，解压后移动到 Typecho 主题目录（`usr/themes/Bubble`）。
+在 [Releases](https://github.com/liyouzi80/typecho-Bubble/releases) 下载 zip 源码，解压后将目录重命名为 `Bubble Kami`，移动到 Typecho 主题目录（`usr/themes/Bubble Kami`）。若希望与原版 `Bubble` 并存，请务必使用不同的目录名。
 
 > 建议使用 Typecho 1.3.0 及以上版本（PHP 8.0+）。本主题已通过 1.3.0 的兼容性适配，理论上也兼容 1.1/1.2。
 
@@ -230,6 +232,13 @@ Open sourced under the MIT license.
 + 修复文章列表对第三方「Views」浏览统计插件的硬依赖（未安装时不再报错）
 + 新增「站点创建时间」设置项，页脚运行时长改为可配置
 + 新增 `lang`、Open Graph、`theme-color` 等元信息，优化 SEO 与社交分享
++ 将 jQuery、viewer.js 等脚本从 `<head>` 移至页面底部，消除首屏渲染阻塞；新增 jsDelivr `preconnect`
++ 对 `main.min.css` 做 CSS 树摇：移除未使用的 Bootstrap/Argon 组件（tooltip、popover、progress、dropdown、面包屑、轮播、日期选择器、滑块等），体积 234KB → 186KB
++ 精简 FontAwesome：仅保留实际用到的 21 个图标并子集化字体（CSS 31KB + 字体 175KB → 约 8KB）
++ 移除 Bootstrap JS 与 Popper.js，导航栏折叠改用原生 JS 实现（约 90KB）
++ 正文图片懒加载（`loading="lazy"` / `decoding="async"`）
++ 内置「Kami」纸质书质感外观（暖色墨蓝配色、衬线标题、打印与无障碍优化）作为默认样式
++ 主题更名为 Bubble Kami，可与原版 Bubble 并存
 + 清理重复的静态资源与无用文件
 
 ## 4.0.1

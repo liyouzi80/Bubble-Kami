@@ -87,13 +87,33 @@
 		</button>
 	</a>
 	<!-- Core -->
-	<script src="<?php $this->options->themeUrl("assets/js/popper.min.js"); ?>"></script>
-	<script src="<?php $this->options->themeUrl("assets/js/bootstrap.min.js"); ?>"></script>
-	<!-- Optional plugins -->
+	<script src="<?php $this->options->themeUrl("assets/js/jquery.min.js"); ?>"></script>
+	<!-- Viewer.js Plugin -->
+	<script src="<?php $this->options->themeUrl("assets/js/viewer.min.js"); ?>"></script>
+	<script src="<?php $this->options->themeUrl("assets/js/jquery-viewer.min.js"); ?>"></script>
+	<!-- Headroom（导航栏滚动隐藏） -->
 	<script src="<?php $this->options->themeUrl("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
-	<script src="<?php $this->options->themeUrl("assets/js/argon.min.js"); ?>"></script>
 	<script src="<?php $this->options->themeUrl("assets/js/bbrender.js"); ?>"></script>
+	<script>
+		// 导航栏折叠（原生实现，替代 Bootstrap collapse）
+		document.addEventListener('click', function (e) {
+			var toggler = e.target.closest('[data-toggle="collapse"]');
+			if (!toggler) return;
+			var target = document.querySelector(toggler.getAttribute('data-target'));
+			if (!target) return;
+			var expanded = toggler.getAttribute('aria-expanded') === 'true';
+			toggler.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+			target.classList.toggle('show', !expanded);
+		});
+		// Headroom：滚动时隐藏/显示导航栏
+		if (window.Headroom && document.querySelector('#navbar-main.headroom')) {
+			new Headroom(document.querySelector('#navbar-main'), {
+				offset: 300,
+				tolerance: { up: 30, down: 30 }
+			}).init();
+		}
+	</script>
 	<!-- scrollup -->
 	<script>
 		$(function(){
@@ -132,6 +152,11 @@
 	
 	<script>
 		function init(){
+			// 图片懒加载：正文图片延迟加载，减轻首屏压力
+			document.querySelectorAll('.content img').forEach(function(img){
+				if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+				if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+			});
 			<?php if($this->options->prismjs and $this->options->prismLine): ?>
 			var pres = document.querySelectorAll('pre');
 			var lineNumberClassName = 'line-numbers';

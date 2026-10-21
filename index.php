@@ -2,7 +2,7 @@
 /**
  * Typecho 极简风格响应式主题
  *
- * @package Bubble
+ * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
  * @version 4.1.0
  * @link https://github.com/liyouzi80/typecho-Bubble
