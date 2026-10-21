@@ -1,17 +1,11 @@
 <?php function threadedComments($comments, $options) {
-		$commentLevelClass = $comments->_levels > 0 ? ' comment-child' : ' comment-parent';
+		$commentLevelClass = $comments->_levels > 0 ? 'comment-child' : 'comment-parent';
 ?>
- 
+
 <li id="li-<?php $comments->theId(); ?>">
 	<div id="<?php $comments->theId(); ?>">
 		<div  class="comment-item">
-			<div class="<?php 
-				if ($comments->_levels > 0) {
-						echo 'comment-child';
-				} else {
-						echo 'comment-parent';
-				}
-			?>">
+			<div class="<?php echo $commentLevelClass; ?>">
 				<?php $comments->gravatar(80, ''); ?>
 			</div>
 			<div class="comment-body">

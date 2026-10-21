@@ -262,7 +262,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h5 id="msgMain" class="modal-title"></h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#modal-notification').hide('normal');">
+					<button type="button" class="close" aria-label="Close" onclick="$('#modal-notification').hide('normal');">
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>

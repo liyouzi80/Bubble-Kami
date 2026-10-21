@@ -34,8 +34,9 @@
 @import "custom/mixins";
 
 // Bootstrap components
-// 已按主题实际使用裁剪：移除 dropdown / button-group / custom-forms / breadcrumb /
-// jumbotron / progress / media / list-group / tooltip / popover（如需恢复请取消注释）
+// 已按主题实际使用裁剪，以下组件的源码已删除：dropdown / button-group / custom-forms /
+// breadcrumb / jumbotron / progress / media / list-group / tooltip / popover。
+// 如需恢复，请从 Argon Design System 上游补回对应文件后在此重新 @import。
 
 @import "bootstrap/root";
 @import "bootstrap/reboot";
@@ -61,8 +62,9 @@
 @import "bootstrap/print";
 
 // Custom components
-// 已裁剪：accordion / carousel / custom-forms / dropdown / list-group / popover /
-// progress / separator（如需恢复请取消注释）
+// 已裁剪，以下组件的源码已删除：accordion / carousel / custom-forms / dropdown /
+// list-group / popover / progress / separator。
+// 如需恢复，请从 Argon Design System 上游补回对应文件后在此重新 @import。
 
 @import "custom/reboot.scss";
 @import "custom/global.scss";
@@ -87,6 +89,7 @@
 @import "custom/type.scss";
 
 // Vendor
-// 已裁剪：bootstrap-datepicker / nouislider（如需恢复请取消注释）
+// 已裁剪，以下组件的源码已删除：bootstrap-datepicker / nouislider。
+// 如需恢复，请从 Argon Design System 上游补回对应文件后在此重新 @import。
 
 @import "custom/vendor/headroom.scss";
