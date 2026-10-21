@@ -65,6 +65,38 @@
 	<?php if ($this->options->customCss): ?>
 	<style type="text/css"><?php $this->options->customCss(); ?></style>
 	<?php endif; ?>
+	<!-- JSON-LD 结构化数据 -->
+	<?php if ($this->is('single')): ?>
+	<?php
+	$ldAuthor = $this->author ? $this->author->screenName : '';
+	$ldArticle = array(
+		'@context' => 'https://schema.org',
+		'@type' => 'Article',
+		'headline' => $this->title,
+		'url' => $this->permalink,
+		'datePublished' => date('c', $this->created),
+		'dateModified' => date('c', $this->modified),
+		'author' => array('@type' => 'Person', 'name' => $ldAuthor),
+		'publisher' => array('@type' => 'Organization', 'name' => $this->options->title),
+		'mainEntityOfPage' => array('@type' => 'WebPage', '@id' => $this->permalink),
+	);
+	$ldBreadcrumb = array(
+		'@context' => 'https://schema.org',
+		'@type' => 'BreadcrumbList',
+		'itemListElement' => array(
+			array('@type' => 'ListItem', 'position' => 1, 'name' => '首页', 'item' => $this->options->index),
+		),
+	);
+	$ldPos = 2;
+	if ($this->is('post') && !empty($this->categories)) {
+		$ldBreadcrumb['itemListElement'][] = array('@type' => 'ListItem', 'position' => $ldPos, 'name' => $this->categories[0]['name'], 'item' => $this->categories[0]['permalink']);
+		$ldPos++;
+	}
+	$ldBreadcrumb['itemListElement'][] = array('@type' => 'ListItem', 'position' => $ldPos, 'name' => $this->title);
+	?>
+	<script type="application/ld+json"><?php echo json_encode($ldArticle, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
+	<script type="application/ld+json"><?php echo json_encode($ldBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
+	<?php endif; ?>
 	<!-- Typecho header -->
 	<?php $this->header(); ?>
 </head>
