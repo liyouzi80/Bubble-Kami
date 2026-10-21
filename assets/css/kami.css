@@ -57,16 +57,21 @@ body {
   color: #fff !important;
 }
 
-.headroom--not-top a,
-.headroom--not-top .navbar-brand,
-.headroom--not-top .nav-link,
-.headroom--not-top .navbar-nav > li > a {
+/* 站点名始终显示在深色导航条上，保持白色 */
+.headroom--not-top .navbar-brand {
   color: #fff !important;
 }
 
-.headroom--not-top .navbar_search_container .form-control,
-.headroom--not-top .navbar_search_container .form-control::placeholder {
-  color: #fff !important;
+/* 桌面端导航横向展开（白字压在深色导航条上）时，滚动后链接转白；
+   移动端折叠面板是白底，链接保持默认深色，避免白字看不清 */
+@media (min-width: 992px) {
+  .headroom--not-top a,
+  .headroom--not-top .nav-link,
+  .headroom--not-top .navbar-nav > li > a,
+  .headroom--not-top .navbar_search_container .form-control,
+  .headroom--not-top .navbar_search_container .form-control::placeholder {
+    color: #fff !important;
+  }
 }
 
 h1, h2, h3, h4, h5, .list-card .content h1 {
@@ -130,6 +135,23 @@ button:focus-visible,
 .navbar_search_container .form-control::placeholder {
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.85rem;
+}
+
+/* 移动端：折叠面板是白底，搜索框文字/边框改为深色，避免白字看不清 */
+@media (max-width: 991.98px) {
+  .navbar_search_container .input-group {
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+  }
+  .navbar_search_container .input-group:focus-within {
+    border-bottom-color: var(--brand);
+  }
+  .navbar_search_container .input-group-prepend .input-group-text {
+    color: var(--stone);
+  }
+  .navbar_search_container .form-control,
+  .navbar_search_container .form-control::placeholder {
+    color: var(--dark-warm) !important;
+  }
 }
 
 /* ================================================
