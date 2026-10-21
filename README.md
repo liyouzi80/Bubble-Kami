@@ -13,7 +13,6 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 # 特性
 
 + 清新界面：基于 argon design system 的卡片式布局，内置「Kami」暖色墨蓝、衬线标题的纸质书质感外观
-+ 暗黑模式：跟随系统主题，支持手动切换
 + 人性化设计：登录后显示后台管理按钮，布局自适应
 + 流畅体验：支持全站 pjax、ajax 评论无刷新
 + 文章导航：上一篇 / 下一篇 + 相关文章推荐
@@ -130,7 +129,6 @@ Open sourced under the MIT license.
 
 + 移除「背景气泡」设置项及其渲染逻辑
 + 新增 GitHub Actions 自动发布：提交新的 `@version` 后自动创建 Release 并附带 zip
-+ 新增暗黑模式（跟随系统 + 手动切换）
 + 新增上一篇 / 下一篇导航与相关文章
 + 新增 JSON-LD 结构化数据（Article + BreadcrumbList）
 + 移除 jQuery 依赖，pjax / 评论 / 图片查看器 / 进度条改为原生 JS

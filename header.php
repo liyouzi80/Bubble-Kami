@@ -5,7 +5,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="theme-color" content="#5e72e4">
-	<script>(function(){try{var t=localStorage.getItem('theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}})();</script>
 	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
@@ -128,11 +127,6 @@
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
-						</li>
-						<li class="nav-item">
-							<button class="nav-link theme-toggle" id="theme-toggle" type="button" aria-label="切换明暗模式">
-								<span class="theme-toggle-text">暗</span>
-							</button>
 						</li>
 
 						<li class="nav-item">
