@@ -125,6 +125,14 @@ Open sourced under the MIT license.
 
 # 更新历史
 
+## 4.2.1
+
++ 新增 Speculation Rules API 悬停预取，配合 pjax 让站内导航近乎零延迟
++ 首屏正文图片 `fetchpriority="high"`，优化 LCP 关键渲染路径
++ 提示弹窗改用原生 `<dialog>`，替代 Bootstrap modal
++ pjax 切换加入 View Transitions 视图过渡（自动降级、尊重 `prefers-reduced-motion`）
++ CSS 现代化增量：标题 `text-wrap: balance`、正文 `text-wrap: pretty`、`:has()` 评论层级、容器查询
+
 ## 4.2.0
 
 + 移除「背景气泡」设置项及其渲染逻辑

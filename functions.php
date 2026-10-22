@@ -257,7 +257,8 @@ function lazyLoadImages($content) {
 	if (empty($content) || strpos($content, '<img') === false) {
 		return $content;
 	}
-	return preg_replace_callback('/<img\b([^>]*)>/i', function ($m) {
+	$first = true;
+	return preg_replace_callback('/<img\b([^>]*)>/i', function ($m) use (&$first) {
 		$attrs = $m[1];
 		$selfclose = '';
 		if (substr($attrs, -1) === '/') {
@@ -265,11 +266,22 @@ function lazyLoadImages($content) {
 			$selfclose = ' /';
 		}
 		$add = '';
-		if (stripos($attrs, 'loading=') === false) {
-			$add .= ' loading="lazy"';
-		}
-		if (stripos($attrs, 'decoding=') === false) {
-			$add .= ' decoding="async"';
+		// 首张正文图片通常是首屏 LCP：优先加载、不懒加载；其余图片懒加载
+		if ($first) {
+			$first = false;
+			if (stripos($attrs, 'fetchpriority=') === false) {
+				$add .= ' fetchpriority="high"';
+			}
+			if (stripos($attrs, 'decoding=') === false) {
+				$add .= ' decoding="async"';
+			}
+		} else {
+			if (stripos($attrs, 'loading=') === false) {
+				$add .= ' loading="lazy"';
+			}
+			if (stripos($attrs, 'decoding=') === false) {
+				$add .= ' decoding="async"';
+			}
 		}
 		return '<img' . $attrs . $add . $selfclose . '>';
 	}, $content);

@@ -96,6 +96,23 @@
 	<script type="application/ld+json"><?php echo json_encode($ldArticle, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<script type="application/ld+json"><?php echo json_encode($ldBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<?php endif; ?>
+	<!-- Speculation Rules：悬停预取同源页面，配合 pjax 让导航近乎零延迟 -->
+	<script type="speculationrules">
+	{
+		"prefetch": [
+			{
+				"source": "document",
+				"where": {
+					"and": [
+						{ "href_matches": "/*" },
+						{ "not": { "selector_matches": "[no-pjax], [target='_blank']" } }
+					]
+				},
+				"eagerness": "moderate"
+			}
+		]
+	}
+	</script>
 	<!-- Typecho header -->
 	<?php $this->header(); ?>
 </head>

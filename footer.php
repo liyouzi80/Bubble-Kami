@@ -70,10 +70,10 @@
 							</li>
 						<?php endwhile; ?>
 						<?php if($this->user->hasLogin()): ?>
-							<li class="nav-item"><a class="nav-link" href="<?php $this->options->adminUrl(); ?>">进入后台(<?php $this->user->screenName(); ?>)</a></li>
-							<li class="nav-item"><a class="nav-link" href="<?php $this->options->logoutUrl(); ?>">退出</a></li>
+							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->adminUrl(); ?>">进入后台(<?php $this->user->screenName(); ?>)</a></li>
+							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->logoutUrl(); ?>">退出</a></li>
 						<?php else: ?>
-							<li class="nav-item"><a class="nav-link" href="<?php $this->options->adminUrl('login.php'); ?>">登录</a></li>
+							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->adminUrl('login.php'); ?>">登录</a></li>
 						<?php endif; ?>
 					</ul>
 				</div>
@@ -226,7 +226,9 @@
 
 			function load(url, push) {
 				pgid = start_progress();
-				showCover(true);
+				// 支持原生视图过渡时用它做交叉淡入，否则回退到黑色遮罩
+				var useVT = !!(document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+				if (!useVT) showCover(true);
 				window.scrollTo(0, 0);
 				destroyViewer();
 				fetch(url)
@@ -235,14 +237,28 @@
 						var doc = new DOMParser().parseFromString(html, 'text/html');
 						var next = doc.querySelector('#pjax-container');
 						var cur = document.querySelector('#pjax-container');
-						if (next && cur) cur.innerHTML = next.innerHTML;
-						if (push) history.pushState({ url: url }, '', url);
-						showCover(false);
-						stop_progress(pgid);
-						init();
-						if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
-						var t = doc.querySelector('title');
-						if (t) document.title = t.textContent;
+						function apply() {
+							if (next && cur) cur.innerHTML = next.innerHTML;
+							if (push) history.pushState({ url: url }, '', url);
+							init();
+							if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
+							var t = doc.querySelector('title');
+							if (t) document.title = t.textContent;
+						}
+						function finish() {
+							if (!useVT) showCover(false);
+							stop_progress(pgid);
+						}
+						if (useVT) {
+							try {
+								document.startViewTransition(apply);
+							} catch (e) {
+								apply();
+							}
+						} else {
+							apply();
+						}
+						finish();
 					})
 					.catch(function () {
 						showCover(false);
@@ -296,38 +312,28 @@
 		<script src="<?php themeAsset("assets/js/prism-line-numbers.min.js"); ?>"></script>
 	<?php endif; ?>
 	<?php endif; ?>
-	<!-- Alert -->
-	<div id="modal-notification" class="modal fade" style="z-index: 102;display: none;">
-		<div class="modal-dialog modal-sm">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 id="msgMain" class="modal-title"></h5>
-					<button type="button" class="close" aria-label="Close" onclick="hideNotification()">
-						<span aria-hidden="true">×</span>
-					</button>
-				</div>
-				<div id="msgDetail" class="modal-body"></div>
-			</div>
+	<!-- Alert（原生 <dialog>，替代 Bootstrap modal） -->
+	<dialog id="modal-notification">
+		<div class="modal-header">
+			<h5 id="msgMain" class="modal-title"></h5>
+			<button type="button" class="close" aria-label="Close" onclick="hideNotification()">
+				<span aria-hidden="true">×</span>
+			</button>
 		</div>
-	</div>
+		<div id="msgDetail" class="modal-body"></div>
+	</dialog>
 	<script>
 		function hideNotification() {
-			var modal = document.getElementById('modal-notification');
-			if (modal) {
-				modal.classList.remove('show');
-				modal.style.display = 'none';
-			}
+			var dialog = document.getElementById('modal-notification');
+			if (dialog) dialog.close();
 		}
 		function alert(main, detail) {
-			var modal = document.getElementById('modal-notification');
+			var dialog = document.getElementById('modal-notification');
 			var mainEl = document.getElementById('msgMain');
 			var detailEl = document.getElementById('msgDetail');
 			if (mainEl) mainEl.innerHTML = main;
 			if (detailEl) detailEl.innerHTML = detail || '';
-			if (modal) {
-				modal.style.display = 'block';
-				modal.classList.add('show');
-			}
+			if (dialog && !dialog.open) dialog.showModal();
 		}
 		init()
 	</script>

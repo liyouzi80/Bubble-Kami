@@ -79,6 +79,7 @@ h1, h2, h3, h4, h5, .list-card .content h1 {
   color: var(--near-black) !important;
   font-weight: 500 !important;
   letter-spacing: 0 !important;
+  text-wrap: balance;
 }
 
 /* 选中文字的颜色，读起来更有质感，不用浏览器默认的刺眼蓝 */
@@ -475,6 +476,7 @@ main > .section-hero:not([style*="100vh"]) {
   text-justify: inter-ideograph;
   word-break: normal;
   overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
 /* 引用块：墨蓝左边框 + 极淡底色 */
@@ -1113,5 +1115,47 @@ main > .section-hero:not([style*="100vh"]) {
   .post-pager-next {
     text-align: left;
     align-items: flex-start;
+  }
+}
+
+/* ================================================
+   现代化增量（4.2.1）
+   ================================================ */
+
+/* 原生 <dialog> 弹窗（替代 Bootstrap modal） */
+dialog#modal-notification {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0;
+  width: min(92vw, 22rem);
+  background: var(--ivory);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+dialog#modal-notification::backdrop {
+  background: rgba(0, 0, 0, 0.42);
+}
+dialog#modal-notification .modal-header {
+  border-bottom: 1px solid var(--border-soft);
+}
+dialog#modal-notification .modal-body {
+  color: var(--dark-warm);
+}
+
+/* :has() 渐进增强：有子回复的评论，作者名左侧加竖线，标明「此楼有回复」 */
+#comments li:has(> .comment-children) > div[id^="comment"] .comment-head {
+  border-left: 3px solid var(--brand);
+  padding-left: 0.6rem;
+}
+
+/* 容器查询：相关文章卡片按自身宽度自适应，而非仅依赖视口 */
+.related-posts-card {
+  container-type: inline-size;
+}
+@container (max-width: 400px) {
+  .related-posts-title {
+    font-size: 1.05rem !important;
+  }
+  .related-posts-date {
+    font-size: 0.72rem;
   }
 }
