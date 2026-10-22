@@ -12,7 +12,7 @@
 	$this->need('header.php');
 ?>
 
-	<main>
+	<main id="main" tabindex="-1">
 		<section class="section section-lg section-hero section-shaped" style="height: 100vh;">
 			<?php printBackground($this->options->indexImage); ?>
 			<div class="container shape-container d-flex align-items-center py-lg">

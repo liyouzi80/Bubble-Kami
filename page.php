@@ -3,7 +3,7 @@
 	$this->need('header.php');
 ?>
 
-	<main>
+	<main id="main" tabindex="-1">
 		<section class="section section-lg section-hero section-shaped">
 			<!-- Background circles -->
 			<?php printBackground(getRandomImage($this->options->randomImage)); ?>

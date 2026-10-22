@@ -132,6 +132,7 @@ Open sourced under the MIT license.
 + 提示弹窗改用原生 `<dialog>`，替代 Bootstrap modal
 + pjax 切换加入 View Transitions 视图过渡（自动降级、尊重 `prefers-reduced-motion`）
 + CSS 现代化增量：标题 `text-wrap: balance`、正文 `text-wrap: pretty`、`:has()` 评论层级、容器查询
++ 设计打磨：暖棕阴影、平滑锚点滚动、按压反馈、`<dialog>` 弹入动画、纸面噪点质感、跳过导航链接、全面减动效兜底
 
 ## 4.2.0
 

@@ -3,7 +3,7 @@
 	$this->need('header.php');
 ?>
 
-	<main>
+	<main id="main" tabindex="-1">
 
 		<?php if($this->options->toc): ?>
 		<div class="card shadow border-0 bg-secondary toc-container" id="toc-panel">

@@ -228,10 +228,13 @@ main > .section-hero:not([style*="100vh"])::after {
   }
 }
 
-/* 尊重「减少动态效果」的系统设置，避免对动效敏感的读者不适 */
+/* 尊重「减少动态效果」的系统设置：关闭全部过渡与动画 */
 @media (prefers-reduced-motion: reduce) {
-  .section-hero::after {
-    animation: none;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -242,14 +245,14 @@ main > .section-hero:not([style*="100vh"]) {
 
 .index-avatar {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2),
-              0 4px 24px rgba(0, 0, 0, 0.05) !important;
+              0 4px 24px rgba(80, 66, 45, 0.08) !important;
   border: none !important;
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .index-avatar:hover {
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5),
-              0 8px 32px rgba(0, 0, 0, 0.1) !important;
+              0 8px 32px rgba(80, 66, 45, 0.14) !important;
 }
 
 .section-hero .lead {
@@ -276,15 +279,15 @@ main > .section-hero:not([style*="100vh"]) {
 
 .list-card {
   background-color: var(--ivory) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 0 4px 24px rgba(80, 66, 45, 0.05) !important;
   border: 0.5px solid var(--border) !important;
   border-radius: 8px !important;
   margin-bottom: 0.8rem !important;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .list-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 8px 32px rgba(80, 66, 45, 0.09) !important;
   transform: translateY(-2px);
 }
 
@@ -381,7 +384,7 @@ main > .section-hero:not([style*="100vh"]) {
   letter-spacing: 0.05em;
   box-shadow: none !important;
   margin-top: 0.4rem;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   font-size: 0.88rem;
   font-weight: 500;
 }
@@ -428,7 +431,7 @@ main > .section-hero:not([style*="100vh"]) {
 .post-card,
 .content-card:not(.list-card) {
   background-color: var(--ivory) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 0 4px 24px rgba(80, 66, 45, 0.05) !important;
   border: 0.5px solid var(--border) !important;
   border-radius: 8px !important;
 }
@@ -816,7 +819,7 @@ main > .section-hero:not([style*="100vh"]) {
   border-radius: 8px !important;
   box-shadow: none !important;
   letter-spacing: 0.04em;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 #comment-form #add-comment-button:hover,
@@ -1158,4 +1161,67 @@ dialog#modal-notification .modal-body {
   .related-posts-date {
     font-size: 0.72rem;
   }
+}
+
+/* ================================================
+   设计打磨（4.2.1 · Editorial Luxury 细化）
+   ================================================ */
+
+/* 平滑锚点滚动（目录 / 回复跳转更顺滑）；pjax 内部已显式 instant 覆盖 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 键盘可达性：跳过导航，直达正文 */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 99999;
+  padding: 0.6rem 1.1rem;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 0 0 8px 0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+.skip-link:focus {
+  left: 0;
+  color: #fff;
+}
+
+/* 原生 <dialog> 弹出动画：scale + opacity，含 backdrop 淡入 */
+@keyframes dialog-pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+dialog#modal-notification[open] {
+  animation: dialog-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes dialog-backdrop-in {
+  from { opacity: 0; }
+}
+dialog#modal-notification[open]::backdrop {
+  animation: dialog-backdrop-in 0.25s ease;
+}
+
+/* 交互按压反馈：轻微下沉，模拟物理触感 */
+.list-card .btn-outline-primary:active,
+#comment-form #add-comment-button:active,
+#comment-form .btn-outline-success:active,
+.navbar-toggler:active,
+#scrollbtn:active {
+  transform: scale(0.97);
+}
+
+/* 纸质书颗粒感：固定、指针穿透、极淡噪点，打破纯平数码感 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }

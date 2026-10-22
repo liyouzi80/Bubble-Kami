@@ -229,7 +229,7 @@
 				// 支持原生视图过渡时用它做交叉淡入，否则回退到黑色遮罩
 				var useVT = !!(document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 				if (!useVT) showCover(true);
-				window.scrollTo(0, 0);
+				window.scrollTo({ top: 0, behavior: 'instant' });
 				destroyViewer();
 				fetch(url)
 					.then(function (res) { return res.text(); })

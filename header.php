@@ -117,6 +117,7 @@
 	<?php $this->header(); ?>
 </head>
 <body>
+	<a class="skip-link" href="#main">跳到正文</a>
 	<header class="header-global">
 		<nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-transparent navbar-light headroom">
 			<div class="container">
