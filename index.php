@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.2.1
+ * @version 4.2.2
  * @link https://github.com/liyouzi80/typecho-Bubble
  */
 
@@ -39,8 +39,30 @@
 		<section class="section section-components bg-secondary content-card-container">
 			<div class="container container-lg py-5 align-items-center content-card-container">
 				<!-- Article list -->
-				<?php $first_flag = true; ?>
+				<?php
+					$stickyIds = ((int)$this->_currentPage === 1) ? getThemeStickyCids($this->options) : array();
+					$first_flag = true;
+					foreach ($stickyIds as $stickyCid):
+						$stickyArchive = null;
+						$GLOBALS['kamiLoadingSticky'] = true;
+						try {
+							$this->widget('Widget_Archive@kamiSticky' . $stickyCid, 'pageSize=1&type=post', 'cid=' . $stickyCid)->to($stickyArchive);
+							if ($stickyArchive && $stickyArchive->have()) {
+								while ($stickyArchive->next()) {
+									if ($stickyArchive->status !== 'publish') continue;
+									printAricle($stickyArchive, $first_flag, true);
+									$first_flag = false;
+								}
+							}
+						} catch (Throwable $e) {
+							// 忽略已删除或不可公开访问的置顶文章，首页其他内容照常显示。
+						} finally {
+							unset($GLOBALS['kamiLoadingSticky']);
+						}
+					endforeach;
+				?>
 				<?php while($this->next()): ?>
+					<?php if (in_array((int)$this->cid, $stickyIds, true)) continue; ?>
 					<?php printAricle($this, $first_flag); $first_flag = false; ?>
 				<?php endwhile; ?>
 				<!-- Toggle page -->

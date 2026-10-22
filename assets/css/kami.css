@@ -1225,3 +1225,139 @@ body::after {
   opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
+
+
+/* ------------------------------------------------
+   首页摘要与文章网格优化（基于真实站点布局）
+   ------------------------------------------------ */
+/* Bubble Kami · muyiluling.com 首页与文章页改造
+   将此文件追加到 assets/css/kami.css 末尾。
+   同时需在 functions.php 的 printAricle() 中把 content('') 改为 excerpt(220, '…')，
+   见 bubble-kami-improvements.patch。
+*/
+
+/* 首页卡片网格：首篇通栏，余下文章双列 */
+#main > .section-components.content-card-container:has(.list-card) > .container.container-lg.content-card-container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1.1rem;
+  padding-top: 3rem !important;
+  padding-bottom: 4rem !important;
+}
+
+#main > .section-components.content-card-container:has(.list-card) > .container > .list-card {
+  width: 100%;
+  margin: 0 !important;
+  min-width: 0;
+}
+
+#main > .section-components.content-card-container:has(.list-card) > .container > .list-card.content-card-head,
+#main > .section-components.content-card-container:has(.list-card) > .container > section.section {
+  grid-column: 1 / -1;
+  padding-top: 1.2rem !important;
+}
+
+/* 首篇作为精选文章，保留主题的暖纸底、墨蓝强调色与 8px 圆角 */
+#main > .section-components.content-card-container:has(.list-card) .list-card.content-card-head {
+  border-top: 2px solid var(--brand) !important;
+  box-shadow: 0 8px 30px rgba(80, 66, 45, 0.075) !important;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card.content-card-head::before {
+  content: '最新文章';
+  display: inline-block;
+  margin: 1.2rem 1.6rem 0;
+  color: var(--brand);
+  font: 500 0.72rem/1.4 var(--sans);
+  letter-spacing: 0.08em;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card.content-card-head .content h1 {
+  font-size: clamp(1.7rem, 3vw, 2.15rem) !important;
+}
+
+/* 双列卡片中元信息自然换行，摘要高度一致 */
+#main > .section-components.content-card-container:has(.list-card) .list-card:not(.content-card-head) .list-object {
+  gap: 0.35rem 0.8rem;
+  margin-bottom: 0.8rem !important;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card:not(.content-card-head) .content h1 {
+  font-size: 1.25rem !important;
+  line-height: 1.55 !important;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card .content p {
+  font-size: 0.98rem !important;
+  line-height: 1.8 !important;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card .content > br {
+  display: none;
+}
+
+#main > .section-components.content-card-container:has(.list-card) .list-card .btn-outline-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+  padding: 0.45rem 0.8rem !important;
+  border: 1px solid var(--brand) !important;
+  border-radius: 6px;
+  color: var(--brand) !important;
+}
+
+/* 文章页：保留现有头图、TOC 与卡片，只让正文更适合长文 */
+#main .content-card:not(.list-card) .content {
+  max-width: 700px;
+}
+
+#main .content-card:not(.list-card) .content h1 {
+  line-height: 1.45 !important;
+  padding-bottom: 0.8rem;
+}
+
+#main .content-card:not(.list-card) .content h2,
+#main .content-card:not(.list-card) .content h3 {
+  scroll-margin-top: 6rem;
+}
+
+#main .content-card:not(.list-card) .content p {
+  max-width: 68ch;
+}
+
+#main .post-pager {
+  max-width: 700px;
+}
+
+@media (max-width: 767.98px) {
+  #main > .section-components.content-card-container:has(.list-card) > .container.container-lg.content-card-container {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
+    padding-top: 1.6rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  #main > .section-components.content-card-container:has(.list-card) > .container > .list-card.content-card-head,
+  #main > .section-components.content-card-container:has(.list-card) > .container > section.section {
+    grid-column: auto;
+  }
+
+  #main > .section-components.content-card-container:has(.list-card) .list-card.content-card-head::before {
+    margin-left: 1.1rem;
+  }
+}
+
+/* 主题内置首页置顶：延续纸面与墨蓝配色，避免默认红色徽标突兀。 */
+#main .list-card.is-sticky {
+  border-top: 2px solid var(--brand) !important;
+}
+
+#main .list-card .badge-danger.badge-pill {
+  background: #f6f0df !important;
+  border: 1px solid #d9c9a2;
+  color: #80652e !important;
+}

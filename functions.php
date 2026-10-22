@@ -18,6 +18,10 @@ function themeConfig($form) {
 	$form->addInput($footerWidget);
 	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于在页脚显示“本站已运行 X 年 X 天”，留空则不显示'));
 	$form->addInput($siteCreateDate);
+	$stickyCids = new Typecho_Widget_Helper_Form_Element_Text('stickyCids', NULL, '', _t('首页置顶文章 CID'), _t('输入文章 CID，多个以英文逗号分隔；按输入顺序显示在首页最前面。留空则不置顶。'));
+	$form->addInput($stickyCids);
+	$viewsEnabled = new Typecho_Widget_Helper_Form_Element_Radio('viewsEnabled', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('文章阅读数'), _t('内置阅读数统计，无需 Views 插件；已有 views 数据会保留。'));
+	$form->addInput($viewsEnabled);
 	$customCss = new Typecho_Widget_Helper_Form_Element_Textarea('customCss', NULL, '', _t('自定义 css'), _t('在这里填入所需要的 css，以实现自定义页面样式，如调整字体大小等'));
 	$form->addInput($customCss);
 	$Pjax = new Typecho_Widget_Helper_Form_Element_Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
@@ -78,33 +82,99 @@ function printTag($that, $icon = 0) { ?>
 	</span>
 <?php }
 
-function printSticky($that) {
-	if (!empty($that->order)) {
+function getThemeStickyCids($options = null) {
+	if ($options === null) {
+		$options = Helper::options();
+	}
+	$value = isset($options->stickyCids) ? (string)$options->stickyCids : '';
+	$ids = preg_split('/[^0-9]+/', $value, -1, PREG_SPLIT_NO_EMPTY);
+	return array_values(array_unique(array_filter(array_map('intval', $ids))));
+}
+
+function isThemeSticky($that) {
+	$cid = isset($that->cid) ? (int)$that->cid : 0;
+	return !empty($that->order) || ($cid > 0 && in_array($cid, getThemeStickyCids(), true));
+}
+
+function printSticky($that, $force = false) {
+	if ($force || isThemeSticky($that)) {
 		echo ' <span class="badge badge-danger badge-pill">置顶</span>';
 	}
 }
 
-function hasViewsPlugin() {
-	return class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews');
+function themeViewsEnabled($options = null) {
+	if ($options === null) {
+		$options = Helper::options();
+	}
+	return !isset($options->viewsEnabled) || (string)$options->viewsEnabled !== '0';
 }
 
-function printAricle($that, $flag) { ?>
-	<div class="card shadow content-card list-card <?php if ($flag): ?>content-card-head<?php endif; ?>">
+/**
+ * 确保 contents.views 字段存在。兼容旧 Views 插件创建的字段，失败时不影响页面渲染。
+ */
+function ensureThemeViewsColumn() {
+	static $ready = null;
+	if ($ready !== null) {
+		return $ready;
+	}
+	try {
+		$db = Typecho_Db::get();
+		$db->fetchRow($db->select('views')->from('table.contents')->limit(1));
+		$ready = true;
+	} catch (Throwable $e) {
+		try {
+			$db = Typecho_Db::get();
+			$prefix = $db->getPrefix();
+			$db->query('ALTER TABLE `' . $prefix . 'contents` ADD `views` INT(10) NOT NULL DEFAULT 0');
+			$ready = true;
+		} catch (Throwable $migrationError) {
+			$ready = false;
+		}
+	}
+	return $ready;
+}
+
+function getPostViews($that) {
+	if (!themeViewsEnabled() || !ensureThemeViewsColumn()) {
+		return null;
+	}
+	$views = isset($that->views) ? (int)$that->views : 0;
+	$cid = isset($that->cid) ? (int)$that->cid : 0;
+	$fresh = false;
+	if ($cid > 0 && method_exists($that, 'is') && $that->is('single')) {
+		try {
+			$row = Typecho_Db::get()->fetchRow(Typecho_Db::get()->select('views')->from('table.contents')->where('cid = ?', $cid));
+			if ($row && isset($row['views'])) {
+				$views = (int)$row['views'];
+				$fresh = true;
+			}
+		} catch (Throwable $e) {
+			// 回退到当前文章对象中已有的阅读数。
+		}
+	}
+	if (!$fresh && $cid > 0 && !empty($GLOBALS['kamiViewsIncrementedCid']) && (int)$GLOBALS['kamiViewsIncrementedCid'] === $cid) {
+		$views++;
+	}
+	return max(0, $views);
+}
+
+function printAricle($that, $flag, $forceSticky = false) { ?>
+	<div class="card shadow content-card list-card <?php if ($flag): ?>content-card-head<?php endif; ?><?php if ($forceSticky || isThemeSticky($that)): ?> is-sticky<?php endif; ?>">
 		<section class="section">
 			<div class="container">
 				<div class="content">
-					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that); ?></a></h1>
+					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that, $forceSticky); ?></a></h1>
 					<div class="list-object">
 						<span class="list-tag"><i class="fa fa-calendar-o" aria-hidden="true"></i> <time datetime="<?php $that->date('c'); ?>"><?php $that->date();?></time></span>
-						<?php if (hasViewsPlugin()): ?>
-						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php Views_Plugin::theViews();?> 次阅读</span>
+						<?php $views = getPostViews($that); if ($views !== null): ?>
+						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php echo number_format($views); ?> 次阅读</span>
 						<?php endif; ?>
 						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
 						<?php printCategory($that, 1); ?>
 						<?php printTag($that, 1); ?>
 						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 					</div>
-					<?php $that->content(''); ?>
+					<?php $that->excerpt(220, '…'); ?>
 					<br/>
 					<a href="<?php $that->permalink() ?>">
 						<button class="btn btn-icon btn-3 btn-outline-primary" type="button">
@@ -300,6 +370,22 @@ function themeAsset($path) {
 function themeInit($archive) {
 	if ($archive->is('single')) {
 		$archive->content = createCatalog($archive->content);
+		if (empty($GLOBALS['kamiLoadingSticky']) && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
+			&& (!isset($archive->status) || $archive->status === 'publish')
+			&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
+		) {
+			$cid = (int)$archive->cid;
+			if ($cid > 0) {
+				try {
+					$db = Typecho_Db::get();
+					$prefix = $db->getPrefix();
+					$db->query('UPDATE `' . $prefix . 'contents` SET `views` = `views` + 1 WHERE `cid` = ' . $cid);
+					$GLOBALS['kamiViewsIncrementedCid'] = $cid;
+				} catch (Throwable $e) {
+					// 阅读数统计失败时继续正常渲染文章。
+				}
+			}
+		}
 	}
 	$archive->content = lazyLoadImages($archive->content);
 }
