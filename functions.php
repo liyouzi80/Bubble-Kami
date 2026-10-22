@@ -368,26 +368,29 @@ function themeAsset($path) {
 }
 
 function themeInit($archive) {
-	if ($archive->is('single')) {
-		$archive->content = createCatalog($archive->content);
-		if (empty($GLOBALS['kamiLoadingSticky']) && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
-			&& (!isset($archive->status) || $archive->status === 'publish')
-			&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
-		) {
-			$cid = (int)$archive->cid;
-			if ($cid > 0) {
-				try {
-					$db = Typecho_Db::get();
-					$prefix = $db->getPrefix();
-					$db->query('UPDATE `' . $prefix . 'contents` SET `views` = `views` + 1 WHERE `cid` = ' . $cid);
-					$GLOBALS['kamiViewsIncrementedCid'] = $cid;
-				} catch (Throwable $e) {
-					// 阅读数统计失败时继续正常渲染文章。
-				}
+ if (!$archive->is('single')) {
+		return;
+ }
+
+ $archive->content = createCatalog($archive->content);
+	if (empty($GLOBALS['kamiLoadingSticky']) && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
+		&& (!isset($archive->status) || $archive->status === 'publish')
+		&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
+	) {
+		$cid = (int)$archive->cid;
+		if ($cid > 0) {
+			try {
+				$db = Typecho_Db::get();
+				$prefix = $db->getPrefix();
+				$db->query('UPDATE `' . $prefix . 'contents` SET `views` = `views` + 1 WHERE `cid` = ' . $cid);
+				$GLOBALS['kamiViewsIncrementedCid'] = $cid;
+			} catch (Throwable $e) {
+				// 阅读数统计失败时继续正常渲染文章。
 			}
 		}
 	}
-	$archive->content = lazyLoadImages($archive->content);
+
+ $archive->content = lazyLoadImages($archive->content);
 }
 
 /**
