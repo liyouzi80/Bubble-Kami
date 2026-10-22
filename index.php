@@ -40,7 +40,7 @@
 			<div class="container container-lg py-5 align-items-center content-card-container">
 				<!-- Article list -->
 				<?php
-					$stickyIds = ((int)$this->_currentPage === 1) ? getThemeStickyCids($this->options) : array();
+					$stickyIds = ($this->is('index') && (int)$this->_currentPage === 1) ? getThemeStickyCids($this->options) : array();
 					$first_flag = true;
 					foreach ($stickyIds as $stickyCid):
 						$stickyArchive = null;
