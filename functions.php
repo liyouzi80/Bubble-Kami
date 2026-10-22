@@ -2,6 +2,7 @@
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 function themeConfig($form) {
+	themeConfigSeedBackup();
 	$subtitle = new Typecho_Widget_Helper_Form_Element_Text('subtitle', NULL, '', _t('站点副标题'), _t('在这里填入站点副标题，以在网站标题后显示'));
 	$form->addInput($subtitle);
 	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, '', _t('站点 LOGO 地址'), _t('在这里填入一个图片 URL 地址，以在网站标题前加上一个 LOGO'));
@@ -58,6 +59,84 @@ function themeConfig($form) {
 		),
 		'0', _t('默认 TOC 目录展开状态'), _t('选择打开文章时 TOC 目录的展开状态'));
 	$form->addInput($toc_enable);
+}
+
+/**
+ * Typecho 会把主题设置存在 `theme:{目录名}` 这一行里；切换到其它主题时
+ * `changeTheme()` 会删除该行，导致切回来时设置全部丢失。这里把设置额外
+ * 镜像到固定的 `bubblekami:config`，切换主题时它不会被删除，切回时再据此恢复。
+ *
+ * 注意：该函数一旦定义，Typecho 就不再自行写入 `theme:{目录名}`，
+ * 因此这里需要同时维护「备份键」和「当前主题键」两处。
+ */
+function themeConfigHandle($settings, $isInit = false) {
+	$themeKey = 'theme:' . basename(dirname(__FILE__));
+	$backupKey = 'bubblekami:config';
+	$settings = is_array($settings) ? $settings : array();
+	$json = json_encode($settings, JSON_UNESCAPED_UNICODE);
+
+	if ($isInit) {
+		// 启用/切回本主题：不要用默认值覆盖已保存的配置，改用备份恢复。
+		$backup = themeOptionRead($backupKey);
+		if ($backup !== null && $backup !== '') {
+			$json = $backup;
+		}
+	} else {
+		// 后台保存：同时更新备份与当前主题配置。
+		themeOptionWrite($backupKey, $json);
+	}
+
+	themeOptionWrite($themeKey, $json);
+}
+
+/**
+ * 读取 options 表中的一行（不存在或读取失败时返回 null）。
+ */
+function themeOptionRead($name) {
+	try {
+		$db = Typecho_Db::get();
+		$row = $db->fetchRow($db->select('value')->from('table.options')->where('name = ?', $name));
+		if ($row && isset($row['value'])) {
+			return $row['value'];
+		}
+	} catch (Throwable $e) {
+		// 读取失败按不存在处理，不影响页面渲染。
+	}
+	return null;
+}
+
+/**
+ * 写入 options 表中的一行（存在则更新，否则插入）。失败返回 false 但不影响页面渲染。
+ */
+function themeOptionWrite($name, $value) {
+	try {
+		$db = Typecho_Db::get();
+		$exists = $db->fetchRow($db->select('name')->from('table.options')->where('name = ?', $name));
+		if ($exists) {
+			$db->query($db->update('table.options')->rows(array('value' => $value))->where('name = ?', $name));
+		} else {
+			$db->query($db->insert('table.options')->rows(array('name' => $name, 'value' => $value, 'user' => 0)));
+		}
+		return true;
+	} catch (Throwable $e) {
+		return false;
+	}
+}
+
+/**
+ * 首次启用新版后，把旧的 `theme:{目录名}` 配置镜像到备份键，之后切换主题即可保留配置。
+ * 幂等：备份已存在时直接返回。
+ */
+function themeConfigSeedBackup() {
+	$backupKey = 'bubblekami:config';
+	$backup = themeOptionRead($backupKey);
+	if ($backup !== null && $backup !== '') {
+		return;
+	}
+	$current = themeOptionRead('theme:' . basename(dirname(__FILE__)));
+	if ($current !== null && $current !== '') {
+		themeOptionWrite($backupKey, $current);
+	}
 }
 
 function printCategory($that, $icon = 0) { ?>
@@ -158,7 +237,7 @@ function getPostViews($that) {
 	return max(0, $views);
 }
 
-function printAricle($that, $flag, $forceSticky = false) { ?>
+function printArticle($that, $flag, $forceSticky = false) { ?>
 	<div class="card shadow content-card list-card <?php if ($flag): ?>content-card-head<?php endif; ?><?php if ($forceSticky || isThemeSticky($that)): ?> is-sticky<?php endif; ?>">
 		<section class="section">
 			<div class="container">
@@ -263,15 +342,6 @@ function getRandomImage($str)
 	return $arr[rand(0, sizeof($arr) - 1)];
 }
 
-function clear_urlcan($url)
-{
-	$rstr='';
-	$tmparr=parse_url($url);
-	$rstr=empty($tmparr['scheme'])?'http://':$tmparr['scheme'].'://';
-	$rstr.=$tmparr['host'].$tmparr['path'];
-	return $rstr;
-}
-
 function createCatalog($obj) {
 	global $catalog;
 	global $catalog_count;
@@ -362,17 +432,21 @@ function lazyLoadImages($content) {
  * 基于文件修改时间自动生成版本号，文件更新后旧缓存自动失效。
  */
 function themeAsset($path) {
+	static $cache = array();
 	$file = __DIR__ . '/' . ltrim($path, '/');
-	$v = is_file($file) ? filemtime($file) : '1';
-	echo Helper::options()->themeUrl($path) . '?v=' . $v;
+	if (!array_key_exists($path, $cache)) {
+		$cache[$path] = is_file($file) ? filemtime($file) : '1';
+	}
+	echo Helper::options()->themeUrl($path) . '?v=' . $cache[$path];
 }
 
 function themeInit($archive) {
- if (!$archive->is('single')) {
+	themeConfigSeedBackup();
+	if (!$archive->is('single')) {
 		return;
- }
+	}
 
- $archive->content = createCatalog($archive->content);
+	$archive->content = createCatalog($archive->content);
 	if (empty($GLOBALS['kamiLoadingSticky']) && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
 		&& (!isset($archive->status) || $archive->status === 'publish')
 		&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
@@ -390,7 +464,7 @@ function themeInit($archive) {
 		}
 	}
 
- $archive->content = lazyLoadImages($archive->content);
+	$archive->content = lazyLoadImages($archive->content);
 }
 
 /**

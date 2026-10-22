@@ -92,208 +92,8 @@
 	<script src="<?php themeAsset("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
 	<script src="<?php themeAsset("assets/js/bbrender.js"); ?>"></script>
-	<script>
-		// 导航栏折叠（原生实现，替代 Bootstrap collapse）
-		document.addEventListener('click', function (e) {
-			var toggler = e.target.closest('[data-toggle="collapse"]');
-			if (!toggler) return;
-			var target = document.querySelector(toggler.getAttribute('data-target'));
-			if (!target) return;
-			var expanded = toggler.getAttribute('aria-expanded') === 'true';
-			toggler.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-			target.classList.toggle('show', !expanded);
-		});
-		// Headroom：滚动时隐藏/显示导航栏
-		if (window.Headroom && document.querySelector('#navbar-main.headroom')) {
-			new Headroom(document.querySelector('#navbar-main'), {
-				offset: 300,
-				tolerance: { up: 30, down: 30 }
-			}).init();
-		}
-	</script>
-	<!-- scrollup -->
-	<script>
-		(function () {
-			var scrollup = document.getElementById('scrollup');
-			var scrollbtn = document.getElementById('scrollbtn');
-			var adminbtn = document.getElementById('adminbtn');
-			if (!scrollup || !scrollbtn) return;
-
-			function positionScrollBtn() {
-				var bottom = 25;
-				if (adminbtn) {
-					var cs = getComputedStyle(adminbtn);
-					var b = parseInt(cs.bottom, 10) + parseInt(cs.height, 10) + 25;
-					if (!isNaN(b)) bottom = b;
-				}
-				scrollbtn.style.bottom = bottom + 'px';
-			}
-
-			positionScrollBtn();
-
-			var resizeTimer;
-			window.addEventListener('resize', function () {
-				if (!adminbtn) return;
-				clearTimeout(resizeTimer);
-				resizeTimer = setTimeout(positionScrollBtn, 250);
-			});
-
-			var scrollLock = 0;
-
-			function toggleVisible() {
-				if (window.pageYOffset > 500) scrollup.style.display = 'block';
-				else scrollup.style.display = 'none';
-			}
-
-			if (window.pageYOffset > 500) scrollup.style.display = 'block';
-			window.addEventListener('scroll', function () {
-				if (!scrollLock) toggleVisible();
-			}, { passive: true });
-
-			scrollup.addEventListener('click', function (e) {
-				e.preventDefault();
-				scrollLock = 1;
-				scrollup.style.display = 'none';
-				window.scrollTo({ top: 0, behavior: 'smooth' });
-				setTimeout(function () { scrollLock = 0; }, 500);
-			});
-		})();
-	</script>
-	<!-- Pjax -->
-	<script>
-		function initViewer() {
-			if (!window.Viewer) return;
-			document.querySelectorAll('.content').forEach(function (el) {
-				if (el.__viewer) return;
-				el.__viewer = new Viewer(el, { url: 'src' });
-			});
-		}
-
-		function destroyViewer() {
-			document.querySelectorAll('.content').forEach(function (el) {
-				if (el.__viewer) {
-					el.__viewer.destroy();
-					el.__viewer = null;
-				}
-			});
-		}
-
-		function init(){
-			// 图片懒加载：正文图片延迟加载，减轻首屏压力
-			document.querySelectorAll('.content img').forEach(function(img){
-				if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
-				if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
-			});
-			<?php if($this->options->prismjs and $this->options->prismLine): ?>
-			var pres = document.querySelectorAll('pre');
-			var lineNumberClassName = 'line-numbers';
-			pres.forEach(function (item, index) {
-				item.className = item.className == '' ? lineNumberClassName : item.className + ' ' + lineNumberClassName;
-			});
-			Prism.highlightAll(false,null);
-			<?php endif; ?>
-
-			<?php if($this->options->katex): ?>
-			try{
-				renderMathInElement(document.body,{
-					delimiters: [
-						{left: "$$", right: "$$", display: true},
-						{left: "$", right: "$", display: false}
-					]
-				})
-			}catch{}
-			<?php endif; ?>
-			parseBbcode()
-			parseBblink()
-			<?php if($this->options->Pjax): ?>
-			<?php $this->options->pjaxcomp() ?>
-			<?php endif; ?>
-			setTimeout(initViewer, 300);
-		}
-	</script>
 	<?php if($this->options->Pjax): ?>
 	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
-	<script>
-		(function () {
-			var siteUrl = '<?php Helper::options()->siteUrl(); ?>';
-			var rewrite = <?php echo $this->options->rewrite ? 'true' : 'false'; ?>;
-			var pgid = 0;
-			var cover = document.querySelector('.black-cover');
-
-			function showCover(show) {
-				if (cover) cover.style.display = show ? 'block' : 'none';
-			}
-
-			function load(url, push) {
-				pgid = start_progress();
-				// 支持原生视图过渡时用它做交叉淡入，否则回退到黑色遮罩
-				var useVT = !!(document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-				if (!useVT) showCover(true);
-				window.scrollTo({ top: 0, behavior: 'instant' });
-				destroyViewer();
-				fetch(url)
-					.then(function (res) { return res.text(); })
-					.then(function (html) {
-						var doc = new DOMParser().parseFromString(html, 'text/html');
-						var next = doc.querySelector('#pjax-container');
-						var cur = document.querySelector('#pjax-container');
-						function apply() {
-							if (next && cur) cur.innerHTML = next.innerHTML;
-							if (push) history.pushState({ url: url }, '', url);
-							init();
-							if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
-							var t = doc.querySelector('title');
-							if (t) document.title = t.textContent;
-						}
-						function finish() {
-							if (!useVT) showCover(false);
-							stop_progress(pgid);
-						}
-						if (useVT) {
-							try {
-								document.startViewTransition(apply);
-							} catch (e) {
-								apply();
-							}
-						} else {
-							apply();
-						}
-						finish();
-					})
-					.catch(function () {
-						showCover(false);
-						stop_progress(pgid);
-					});
-			}
-
-			document.addEventListener('click', function (e) {
-				var a = e.target.closest('a[href]');
-				if (!a) return;
-				if (a.target === '_blank' || a.hasAttribute('no-pjax')) return;
-				if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-				var href = a.getAttribute('href');
-				if (!href || href.indexOf(siteUrl) !== 0) return;
-				if (href.indexOf(siteUrl + '/admin') === 0) return;
-				e.preventDefault();
-				load(href, true);
-			});
-
-			var search = document.getElementById('search');
-			if (search) {
-				search.addEventListener('submit', function (e) {
-					e.preventDefault();
-					var input = search.querySelector('input[name="s"]');
-					var kw = input ? input.value : '';
-					var url = rewrite ? (siteUrl + 'search/' + encodeURIComponent(kw) + '/') : (siteUrl + 'index.php/search/' + encodeURIComponent(kw) + '/');
-					load(url, true);
-				});
-			}
-
-			window.addEventListener('popstate', function (e) {
-				load((e.state && e.state.url) || location.href, false);
-			});
-		})();
-	</script>
 	<div class="black-cover" style="display: none;"></div>
 	<?php endif; ?>
 	<!-- KaTeX JS -->
@@ -322,21 +122,19 @@
 		</div>
 		<div id="msgDetail" class="modal-body"></div>
 	</dialog>
+	<!-- 主题运行时配置：站点地址 / pjax / 语法高亮等开关，供 theme.js 读取 -->
 	<script>
-		function hideNotification() {
-			var dialog = document.getElementById('modal-notification');
-			if (dialog) dialog.close();
-		}
-		function alert(main, detail) {
-			var dialog = document.getElementById('modal-notification');
-			var mainEl = document.getElementById('msgMain');
-			var detailEl = document.getElementById('msgDetail');
-			if (mainEl) mainEl.innerHTML = main;
-			if (detailEl) detailEl.innerHTML = detail || '';
-			if (dialog && !dialog.open) dialog.showModal();
-		}
-		init()
+		window.BB = window.BB || {};
+		window.BB.siteUrl = <?php echo json_encode(Helper::options()->siteUrl()); ?>;
+		window.BB.rewrite = <?php echo $this->options->rewrite ? 'true' : 'false'; ?>;
+		window.BB.pjax = <?php echo $this->options->Pjax ? 'true' : 'false'; ?>;
+		window.BB.prismjs = <?php echo $this->options->prismjs ? 'true' : 'false'; ?>;
+		window.BB.prismLine = <?php echo $this->options->prismLine ? 'true' : 'false'; ?>;
+		window.BB.katex = <?php echo $this->options->katex ? 'true' : 'false'; ?>;
+		window.BB.pjaxcomp = <?php echo json_encode((string)$this->options->pjaxcomp); ?>;
 	</script>
+	<!-- 主题脚本：导航折叠 / headroom / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->
+	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>
 	
 	<!-- 简繁转换（自托管） -->
 	<script src="<?php themeAsset("assets/js/tw-cn.js"); ?>"></script>

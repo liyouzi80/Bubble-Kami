@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.2.2
+ * @version 4.2.3
  * @link https://github.com/liyouzi80/typecho-Bubble
  */
 
@@ -50,7 +50,7 @@
 							if ($stickyArchive && $stickyArchive->have()) {
 								while ($stickyArchive->next()) {
 									if ($stickyArchive->status !== 'publish') continue;
-									printAricle($stickyArchive, $first_flag, true);
+									printArticle($stickyArchive, $first_flag, true);
 									$first_flag = false;
 								}
 							}
@@ -63,7 +63,7 @@
 				?>
 				<?php while($this->next()): ?>
 					<?php if (in_array((int)$this->cid, $stickyIds, true)) continue; ?>
-					<?php printAricle($this, $first_flag); $first_flag = false; ?>
+					<?php printArticle($this, $first_flag); $first_flag = false; ?>
 				<?php endwhile; ?>
 				<!-- Toggle page -->
 				<?php printToggleButton($this); ?>

@@ -5,7 +5,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="theme-color" content="#5e72e4">
-	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
@@ -50,10 +49,10 @@
 
 	<!-- PrismJS CSS -->
 	<?php if ($this->options->prismjs): ?>
-	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.20.0/themes/<?php $this->options->prismTheme(); ?>.css" />
+	<link rel="stylesheet" type="text/css" href="<?php themeAsset('assets/css/' . $this->options->prismTheme . '.css'); ?>" />
 	<link type="text/css" href="<?php themeAsset("assets/css/prism-toolbar.css"); ?>" rel="stylesheet">
 		<?php if ($this->options->prismLine): ?>
-		<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/prismjs@1.20.0/plugins/line-numbers/prism-line-numbers.css" />
+		<link rel="stylesheet" type="text/css" href="<?php themeAsset('assets/css/prism-line-numbers.css'); ?>" />
 		<?php endif; ?>
 	<?php endif; ?>
 

@@ -28,7 +28,7 @@
 				<?php if ($this->have()): ?>
 					<?php $first_flag = true; ?>
 					<?php while($this->next()): ?>
-						<?php printAricle($this, $first_flag); $first_flag = false; ?>
+						<?php printArticle($this, $first_flag); $first_flag = false; ?>
 					<?php endwhile; ?>
 					<!-- Toggle page -->
 					<?php printToggleButton($this); ?>

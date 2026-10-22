@@ -26,6 +26,7 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 + 自定义样式：支持用户添加 css，随意调整外观
 + 首页置顶：可按 CID 顺序将文章置于首页列表前面
 + 阅读数：主题内置浏览统计，可沿用 Views 插件已有数据
++ 配置持久化：切换主题后再切回，外观设置自动保留（需 Typecho 1.2+）
 + 兼容性：适配 Typecho 1.3.0 / PHP 8.x
 
 # 使用
@@ -40,7 +41,9 @@ Demo: [https://tntofu.com/](https://tntofu.com/)
 
 本分支已移除原版的「一键自动更新」功能（该功能会向主题目录写入无需登录即可访问的更新脚本，存在安全风险），请手动更新：从 Releases 下载新版 zip，删除旧主题目录后重新安装。
 
-> 注意：由于 Typecho 的设计，更新后可能新增设置项；若不禁用主题再重新启用，新设置项会留空并可能导致异常。更新后请重启主题，或检查是否有留空的设置项（主要是选择型设置项）。
+> 注意：更新后可能新增设置项，旧配置会保留；新增的选项（主要是选择型设置项）可能留空，请到「设置外观」确认一遍。
+
+> **配置持久化**：本主题会把外观设置额外镜像到独立的 `bubblekami:config`（不会被切换主题时删除），切换主题后再切回来，设置会自动恢复（需 Typecho 1.2+）。从旧版本升级后，请先访问一次前台页面（或在「设置外观」里保存一次），以生成配置备份；之后再切换主题即可无损。
 
 > **自动发布**：本仓库已配置 GitHub Actions，向 `main` 分支提交新的主题版本号（`index.php` 中的 `@version`）后，会自动创建对应版本的 Release 并附带主题 zip。
 
@@ -128,6 +131,13 @@ Open sourced under the MIT license.
 + 相关主题：[Rorical](https://github.com/Liupaperbox/Rorical) · [Bubble（Totorato 修改版）](https://github.com/totorato/Bubble)
 
 # 更新历史
+
+## 4.2.3
+
++ 新增配置持久化：切换主题后再切回，外观设置自动保留（需 Typecho 1.2+）。
++ PrismJS 高亮样式改为自托管，移除 jsDelivr CDN 依赖
++ 内联脚本抽取为 `assets/js/theme.js`（导航折叠 / 回到顶部 / pjax / 评论 / 弹窗），页面只保留一小段运行配置
++ `themeAsset` 增加文件修改时间缓存，`printAricle` 更名 `printArticle`，内联 `clear_urlcan`
 
 ## 4.2.2
 
