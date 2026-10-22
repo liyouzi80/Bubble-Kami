@@ -93,7 +93,7 @@
 						<h1 class="text-white"><?php $this->title() ?></h1>
 					</div>
 					<div class="row align-items-center justify-content-center">
-						<h5 class="text-white">于 <time datetime="<?php $this->date('c'); ?>"><?php $this->date(); ?></time> 由 <?php $this->author(); ?> 发布</h5>
+						<h5 class="text-white">于 <time datetime="<?php $this->date('c'); ?>"><?php $this->date(); ?></time> 由 <?php $this->author(); ?> 发布<?php $views = getPostViews($this); if ($views !== null): ?> · <i class="fa fa-eye" aria-hidden="true"></i> <?php echo number_format($views); ?> 次阅读<?php endif; ?></h5>
 					</div>
 				</div>
 			</div>
