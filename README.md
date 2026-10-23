@@ -130,6 +130,13 @@ Open sourced under the MIT license.
 
 # 更新历史
 
+## 4.2.4
+
++ 前端样式打磨：导航栏滚动状态兜底（IntersectionObserver 强制深色，修复无 hero 页面与 pjax 状态错位）、上一篇/下一篇两列对齐、卡片元信息降噪（去除作者与「无标签」徽章、「继续阅读」改纯文字箭头）
++ 性能：KaTeX / Prism / Viewer 改为按正文内容懒加载，散文页不再白下约 300KB 脚本；首页/归档卡片正文图片改为服务端懒加载
++ 首页 hero 顶部遮罩加重，`theme-color` 对齐品牌墨蓝 `#1B365D`
++ 标题衬线字体自托管 Noto Serif SC（500，unicode-range 切片，共 101 个 woff2），跨平台标题呈现统一
+
 ## 4.2.3
 
 + 新增配置持久化：切换主题后再切回，外观设置自动保留（需 Typecho 1.2+）。

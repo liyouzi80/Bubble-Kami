@@ -2,11 +2,9 @@
    Bubble Kami · 内置 Kami 风格（纸质书质感 · 暖色与墨蓝）
    源自「木易庐陵」自定义样式，已内置为主题默认外观。
 
-   字体说明：为兼顾加载速度，本主题不加载外部 webfont，
-   使用系统中文字体栈（衬线标题走 Songti/STSong/SimSun 等系统宋体）。
-   如需精确还原 Noto Serif SC，可在 header.php 的 <head> 中自行加入：
-     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500&display=swap">
+   字体说明：正文使用系统中文字体栈；标题衬线走自托管的
+   Noto Serif SC（500，unicode-range 切片，见 noto-serif-sc.css），
+   未覆盖的字符回落到 Songti/STSong/SimSun 等系统宋体。
    ================================================ */
 
 /* --- Kami 核心设计变量 --- */
@@ -51,14 +49,18 @@ body {
   background-color: var(--parchment) !important;
 }
 
-/* 滚动后的导航栏：深色背景与白色文字保持对比 */
-.headroom--not-top {
+/* 滚动后的导航栏：深色背景与白色文字保持对比。
+   .headroom--not-top 由 Headroom 控制；.nav-solid 是兜底类（theme.js 用 IntersectionObserver
+   在离开 hero 或无 hero 页面时强制深色，避免 pjax/headroom 状态错位导致白字压浅卡片） */
+.headroom--not-top,
+.nav-solid {
   background-color: var(--nav-bg) !important;
   color: #fff !important;
 }
 
 /* 站点名始终显示在深色导航条上，保持白色 */
-.headroom--not-top .navbar-brand {
+.headroom--not-top .navbar-brand,
+.nav-solid .navbar-brand {
   color: #fff !important;
 }
 
@@ -69,7 +71,12 @@ body {
   .headroom--not-top .nav-link,
   .headroom--not-top .navbar-nav > li > a,
   .headroom--not-top .navbar_search_container .form-control,
-  .headroom--not-top .navbar_search_container .form-control::placeholder {
+  .headroom--not-top .navbar_search_container .form-control::placeholder,
+  .nav-solid a,
+  .nav-solid .nav-link,
+  .nav-solid .navbar-nav > li > a,
+  .nav-solid .navbar_search_container .form-control,
+  .nav-solid .navbar_search_container .form-control::placeholder {
     color: #fff !important;
   }
 }
@@ -191,9 +198,9 @@ button:focus-visible,
   bottom: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.25) 0%,
-    rgba(0, 0, 0, 0.08) 45%,
-    rgba(0, 0, 0, 0.52) 100%
+    rgba(0, 0, 0, 0.5) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.62) 100%
   );
   z-index: 1;
   pointer-events: none;
@@ -398,11 +405,25 @@ main > .section-hero:not([style*="100vh"]) {
   opacity: 0.6;
 }
 
-/* 置顶标记 */
-.content-card-head .content h1 span[style*="color:red"] {
-  color: #8B4513 !important;
-  font-size: 0.8em;
-  opacity: 0.85;
+/* 继续阅读：去掉过时的 ▶ 三角按钮，改为克制的纯文字 + 箭头 */
+.continue-reading {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: var(--brand);
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+.continue-reading span {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.continue-reading:hover {
+  color: var(--near-black);
+  text-decoration: none;
+}
+.continue-reading:hover span {
+  transform: translateX(3px);
 }
 
 /* 分页器 */
@@ -994,10 +1015,9 @@ main > .section-hero:not([style*="100vh"]) {
 
 /* 上一篇 / 下一篇 */
 .post-pager {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.9rem 1.2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1.6rem;
   max-width: 660px;
   margin: 0.5rem auto 0;
   padding: 1.2rem 1.6rem 1.6rem;
@@ -1005,11 +1025,15 @@ main > .section-hero:not([style*="100vh"]) {
 }
 
 .post-pager-item {
-  flex: 1 1 220px;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   min-width: 0;
+}
+
+.post-pager-prev {
+  text-align: left;
+  align-items: flex-start;
 }
 
 .post-pager-next {
@@ -1111,10 +1135,12 @@ main > .section-hero:not([style*="100vh"]) {
 
 @media (max-width: 576px) {
   .post-pager {
+    grid-template-columns: 1fr;
     padding-left: 1.1rem;
     padding-right: 1.1rem;
   }
 
+  .post-pager-prev,
   .post-pager-next {
     text-align: left;
     align-items: flex-start;

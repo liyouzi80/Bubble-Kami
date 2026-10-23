@@ -14,6 +14,51 @@
 		target.classList.toggle('show', !expanded);
 	});
 
+	/* ---------- 按需加载脚本（带缓存与顺序保证） ---------- */
+	var scriptCache = {};
+	function loadScript(src, cb) {
+		if (!src) { if (cb) cb(); return; }
+		if (scriptCache[src] === 'loaded') { if (cb) cb(); return; }
+		if (scriptCache[src]) { scriptCache[src].push(cb); return; }
+		scriptCache[src] = [];
+		if (cb) scriptCache[src].push(cb);
+		var s = document.createElement('script');
+		s.src = src;
+		s.async = false;
+		s.onload = function () {
+			var q = scriptCache[src];
+			scriptCache[src] = 'loaded';
+			(q || []).forEach(function (f) { if (f) f(); });
+		};
+		s.onerror = function () { scriptCache[src] = 'loaded'; };
+		document.head.appendChild(s);
+	}
+	function loadScripts(urls, cb) {
+		var i = 0;
+		function next() {
+			if (i >= urls.length) { if (cb) cb(); return; }
+			loadScript(urls[i++], next);
+		}
+		next();
+	}
+
+	/* ---------- 导航栏兜底：离开 hero 或无 hero 页面强制深色，避免 pjax/headroom 状态错位 ---------- */
+	function setupNavSolid() {
+		var nav = document.querySelector('#navbar-main');
+		if (!nav) return;
+		var hero = document.querySelector('main .section-hero');
+		if (!hero) { nav.classList.add('nav-solid'); return; }
+		if (!window.IntersectionObserver) return;
+		if (window.__navSolidObserver) window.__navSolidObserver.disconnect();
+		window.__navSolidObserver = new IntersectionObserver(function (entries) {
+			entries.forEach(function (entry) {
+				nav.classList.toggle('nav-solid', !entry.isIntersecting);
+			});
+		}, { rootMargin: '-64px 0px 0px 0px', threshold: 0 });
+		window.__navSolidObserver.observe(hero);
+	}
+	setupNavSolid();
+
 	/* ---------- Headroom：滚动时隐藏/显示导航栏 ---------- */
 	if (window.Headroom && document.querySelector('#navbar-main.headroom')) {
 		new Headroom(document.querySelector('#navbar-main'), {
@@ -69,13 +114,22 @@
 		});
 	})();
 
-	/* ---------- 图片查看器 ---------- */
+	/* ---------- 图片查看器（有图才按需加载 Viewer.js） ---------- */
 	function initViewer() {
-		if (!window.Viewer) return;
-		document.querySelectorAll('.content').forEach(function (el) {
-			if (el.__viewer) return;
-			el.__viewer = new Viewer(el, { url: 'src' });
-		});
+		var targets = document.querySelectorAll('.content');
+		var hasImage = false;
+		targets.forEach(function (el) { if (el.querySelector('img')) hasImage = true; });
+		if (!hasImage) return;
+		function build() {
+			if (!window.Viewer) return;
+			targets.forEach(function (el) {
+				if (el.__viewer) return;
+				if (!el.querySelector('img')) return;
+				el.__viewer = new Viewer(el, { url: 'src' });
+			});
+		}
+		if (window.Viewer) { build(); }
+		else if (BB.viewerJs) { loadScript(BB.viewerJs, build); }
 	}
 
 	function destroyViewer() {
@@ -89,29 +143,50 @@
 
 	/* ---------- 页面渲染后统一初始化 ---------- */
 	function init() {
-		// 图片懒加载：正文图片延迟加载，减轻首屏压力
+		setupNavSolid();
+
+		// 图片懒加载：正文图片延迟加载（服务端已加 loading 属性，这里做兜底）
 		document.querySelectorAll('.content img').forEach(function (img) {
 			if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
 			if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
 		});
 
-		if (BB.prismjs && BB.prismLine) {
-			var lineNumberClassName = 'line-numbers';
-			document.querySelectorAll('pre').forEach(function (item) {
-				item.className = item.className === '' ? lineNumberClassName : item.className + ' ' + lineNumberClassName;
+		// Prism 按需加载：正文含代码块才拉取，避免无代码的散文页白下脚本
+		if (BB.prismjs && document.querySelector('pre, code[class*="language-"]')) {
+			var prismUrls = [
+				BB.prismJs.core,
+				BB.prismJs.autoloader,
+				BB.prismJs.toolbar,
+				BB.prismJs.showLanguage,
+				BB.prismJs.copy
+			];
+			if (BB.prismLine) prismUrls.push(BB.prismJs.lineNumbers);
+			loadScripts(prismUrls, function () {
+				if (!window.Prism) return;
+				if (BB.prismLine) {
+					var lineNumberClassName = 'line-numbers';
+					document.querySelectorAll('pre').forEach(function (item) {
+						item.className = item.className === '' ? lineNumberClassName : item.className + ' ' + lineNumberClassName;
+					});
+				}
+				Prism.highlightAll(false, null);
 			});
-			Prism.highlightAll(false, null);
 		}
 
-		if (BB.katex) {
-			try {
-				renderMathInElement(document.body, {
-					delimiters: [
-						{ left: "$$", right: "$$", display: true },
-						{ left: "$", right: "$", display: false }
-					]
-				});
-			} catch (e) {}
+		// KaTeX 按需加载：正文含 $ 数学定界符才拉取（katex.min.js 约 252KB，收益最大）
+		if (BB.katex && document.body.textContent.indexOf('$') !== -1) {
+			function renderKatex() {
+				try {
+					renderMathInElement(document.body, {
+						delimiters: [
+							{ left: "$$", right: "$$", display: true },
+							{ left: "$", right: "$", display: false }
+						]
+					});
+				} catch (e) {}
+			}
+			if (window.renderMathInElement) { renderKatex(); }
+			else { loadScripts([BB.katexJs, BB.autoRenderJs], renderKatex); }
 		}
 
 		parseBbcode();

@@ -155,8 +155,6 @@ function printTag($that, $icon = 0) { ?>
 			<?php foreach( $that->tags as $tags): ?>
 			<a href="<?php print($tags['permalink']) ?>" class="badge badge-success badge-pill"><?php print($tags['name']) ?></a>
 			<?php endforeach;?>
-		<?php else: ?>
-			<a class="badge badge-default badge-pill text-white">无标签</a>
 		<?php endif;?>
 	</span>
 <?php }
@@ -251,16 +249,9 @@ function printArticle($that, $flag, $forceSticky = false) { ?>
 						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
 						<?php printCategory($that, 1); ?>
 						<?php printTag($that, 1); ?>
-						<span class="list-tag"><i class="fa fa-user-o" aria-hidden="true"></i> <a class="badge badge-warning badge-pill" href="<?php $that->author->permalink(); ?>"><?php $that->author();?></a></span>
 					</div>
-					<?php $that->content(''); ?>
-					<br/>
-					<a href="<?php $that->permalink() ?>">
-						<button class="btn btn-icon btn-3 btn-outline-primary" type="button">
-							<span class="btn-inner--icon"><i class="fa fa-play" aria-hidden="true"></i></span>
-							<span class="btn-inner--text">继续阅读</span>
-						</button>
-					</a>
+					<?php echo lazyLoadImages($that->content(''), true); ?>
+					<a class="continue-reading" href="<?php $that->permalink() ?>">继续阅读 <span aria-hidden="true">→</span></a>
 				</div>
 			</div>
 		</section>
@@ -393,12 +384,12 @@ function getCatalog() {
 	echo $index;
 }
 
-function lazyLoadImages($content) {
+function lazyLoadImages($content, $allLazy = false) {
 	if (empty($content) || strpos($content, '<img') === false) {
 		return $content;
 	}
 	$first = true;
-	return preg_replace_callback('/<img\b([^>]*)>/i', function ($m) use (&$first) {
+	return preg_replace_callback('/<img\b([^>]*)>/i', function ($m) use (&$first, $allLazy) {
 		$attrs = $m[1];
 		$selfclose = '';
 		if (substr($attrs, -1) === '/') {
@@ -406,8 +397,8 @@ function lazyLoadImages($content) {
 			$selfclose = ' /';
 		}
 		$add = '';
-		// 首张正文图片通常是首屏 LCP：优先加载、不懒加载；其余图片懒加载
-		if ($first) {
+		if (!$allLazy && $first) {
+			// 单篇正文首张图通常是首屏 LCP：优先加载；其余懒加载
 			$first = false;
 			if (stripos($attrs, 'fetchpriority=') === false) {
 				$add .= ' fetchpriority="high"';
@@ -416,6 +407,7 @@ function lazyLoadImages($content) {
 				$add .= ' decoding="async"';
 			}
 		} else {
+			// 列表页（首页全文流）所有图片一律懒加载，避免十几篇正文的图片抢占首屏带宽
 			if (stripos($attrs, 'loading=') === false) {
 				$add .= ' loading="lazy"';
 			}

@@ -86,8 +86,6 @@
 			<span class="btn-inner--icon"><i class="fa fa-arrow-up" aria-hidden="true"></i></span>
 		</button>
 	</a>
-	<!-- Viewer.js Plugin -->
-	<script src="<?php themeAsset("assets/js/viewer.min.js"); ?>"></script>
 	<!-- Headroom（导航栏滚动隐藏） -->
 	<script src="<?php themeAsset("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
@@ -96,22 +94,7 @@
 	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
 	<div class="black-cover" style="display: none;"></div>
 	<?php endif; ?>
-	<!-- KaTeX JS -->
-	<?php if($this->options->katex): ?>
-	<script src="<?php themeAsset("assets/js/katex.min.js"); ?>"></script>
-	<script src="<?php themeAsset("assets/js/auto-render.min.js"); ?>"></script>
-	<?php endif; ?>
-	<!-- Prism JS -->
-	<?php if($this->options->prismjs): ?>
-	<script src="<?php themeAsset("assets/js/prism-core.min.js"); ?>"></script>
-	<script src="<?php themeAsset("assets/js/prism-autoloader.min.js"); ?>"></script>
-	<script src="<?php themeAsset("assets/js/prism-toolbar.min.js"); ?>"></script>
-	<script src="<?php themeAsset("assets/js/prism-show-language.min.js"); ?>"></script>
-	<script src="<?php themeAsset("assets/js/prism-copy-to-clipboard.min.js"); ?>"></script>
-	<?php if($this->options->prismLine): ?>
-		<script src="<?php themeAsset("assets/js/prism-line-numbers.min.js"); ?>"></script>
-	<?php endif; ?>
-	<?php endif; ?>
+	<!-- KaTeX / Prism / Viewer 的 JS 已改为按正文内容懒加载（见 theme.js），此处不再无条件输出 -->
 	<!-- Alert（原生 <dialog>，替代 Bootstrap modal） -->
 	<dialog id="modal-notification">
 		<div class="modal-header">
@@ -132,6 +115,18 @@
 		window.BB.prismLine = <?php echo $this->options->prismLine ? 'true' : 'false'; ?>;
 		window.BB.katex = <?php echo $this->options->katex ? 'true' : 'false'; ?>;
 		window.BB.pjaxcomp = <?php echo json_encode((string)$this->options->pjaxcomp); ?>;
+		// 按需加载的资源地址（带版本号），供 theme.js 在检测到对应内容时动态注入
+		window.BB.katexJs = "<?php themeAsset('assets/js/katex.min.js'); ?>";
+		window.BB.autoRenderJs = "<?php themeAsset('assets/js/auto-render.min.js'); ?>";
+		window.BB.viewerJs = "<?php themeAsset('assets/js/viewer.min.js'); ?>";
+		window.BB.prismJs = {
+			core: "<?php themeAsset('assets/js/prism-core.min.js'); ?>",
+			autoloader: "<?php themeAsset('assets/js/prism-autoloader.min.js'); ?>",
+			toolbar: "<?php themeAsset('assets/js/prism-toolbar.min.js'); ?>",
+			showLanguage: "<?php themeAsset('assets/js/prism-show-language.min.js'); ?>",
+			copy: "<?php themeAsset('assets/js/prism-copy-to-clipboard.min.js'); ?>",
+			lineNumbers: "<?php themeAsset('assets/js/prism-line-numbers.min.js'); ?>"
+		};
 	</script>
 	<!-- 主题脚本：导航折叠 / headroom / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->
 	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>

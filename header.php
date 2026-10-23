@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="theme-color" content="#5e72e4">
+	<meta name="theme-color" content="#1B365D">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
@@ -36,6 +36,9 @@
 
 	<!-- Kami 风格（内置默认外观） -->
 	<link type="text/css" href="<?php themeAsset("assets/css/kami.css"); ?>" rel="stylesheet">
+
+	<!-- 自托管 Noto Serif SC（500，unicode-range 切片，仅标题用） -->
+	<link type="text/css" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" rel="stylesheet">
 
 	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
 	<style>
