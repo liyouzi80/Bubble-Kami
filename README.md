@@ -4,8 +4,6 @@ Typecho 清新风格响应式主题（社区维护的 Bubble 优化分支，内�
 
 化繁为简，如沐清风。
 
-Demo: [https://tntofu.com/](https://tntofu.com/)
-
 > 本仓库为社区维护分支（原项目已停止维护），已适配 **Typecho 1.3.0 / PHP 8.x**，并移除了原版中存在安全隐患的自动更新器、失效的在线字体与第三方脚本。使用中如发现问题，欢迎提交 issue 或 PR。
 >
 > **与原版 Bubble 共存**：本主题目录名为 `Bubble-Kami`，与原版 `Bubble` 不同名，可直接并存、互不覆盖。
