@@ -127,11 +127,11 @@
 						</div>
 					</nav>
 				</div>
+				<?php relatedPosts($this, 5); ?>
 				<div class="card shadow content-card">
 					<!-- Comment -->
 					<?php if (!$this->hidden && $this->allow('comment')) $this->need('comments.php'); ?>
 				</div>
-				<?php relatedPosts($this, 5); ?>
 			</div>
 		</section>
 <?php $this->need('footer.php'); ?>

@@ -139,7 +139,8 @@ function themeConfigSeedBackup() {
 	}
 }
 
-function printCategory($that, $icon = 0) { ?>
+function printCategory($that, $icon = 0) {
+	if (empty($that->categories)) return; ?>
 	<span class="list-tag">
 		<?php if ($icon) { ?><i class="fa fa-folder-o" aria-hidden="true"></i><?php } ?>
 		<?php foreach( $that->categories as $categories): ?>
@@ -148,14 +149,13 @@ function printCategory($that, $icon = 0) { ?>
 	</span>
 <?php }
 
-function printTag($that, $icon = 0) { ?>
+function printTag($that, $icon = 0) {
+	if (empty($that->tags)) return; ?>
 	<span class="list-tag">
 		<?php if ($icon) { ?><i class="fa fa-tags" aria-hidden="true"></i><?php } ?>
-		<?php if (count($that->tags) > 0): ?>
-			<?php foreach( $that->tags as $tags): ?>
-			<a href="<?php print($tags['permalink']) ?>" class="badge badge-success badge-pill"><?php print($tags['name']) ?></a>
-			<?php endforeach;?>
-		<?php endif;?>
+		<?php foreach( $that->tags as $tags): ?>
+		<a href="<?php print($tags['permalink']) ?>" class="badge badge-success badge-pill"><?php print($tags['name']) ?></a>
+		<?php endforeach;?>
 	</span>
 <?php }
 
