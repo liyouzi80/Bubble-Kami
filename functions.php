@@ -242,13 +242,24 @@ function printArticle($that, $flag, $forceSticky = false) { ?>
 				<div class="content">
 					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?><?php printSticky($that, $forceSticky); ?></a></h1>
 					<div class="list-object">
-						<span class="list-tag"><i class="fa fa-calendar-o" aria-hidden="true"></i> <time datetime="<?php $that->date('c'); ?>"><?php $that->date();?></time></span>
+						<span class="list-tag"><time datetime="<?php $that->date('c'); ?>"><?php $that->date('Y.m.d'); ?></time></span>
 						<?php $views = getPostViews($that); if ($views !== null): ?>
-						<span class="list-tag"><i class="fa fa-eye" aria-hidden="true"></i> <?php echo number_format($views); ?> 次阅读</span>
+						<span class="list-tag">阅读 <?php echo number_format($views); ?></span>
 						<?php endif; ?>
-						<span class="list-tag"><i class="fa fa-comments-o" aria-hidden="true"></i> <?php $that->commentsNum('%d');?> 条评论</span>
-						<?php printCategory($that, 1); ?>
-						<?php printTag($that, 1); ?>
+						<?php if ((int)$that->commentsNum > 0): ?>
+						<span class="list-tag"><?php $that->commentsNum('%d'); ?> 条评论</span>
+						<?php endif; ?>
+						<?php if (!empty($that->categories)): ?>
+						<span class="list-tag list-cat">
+							<?php
+								$categoryLinks = array();
+								foreach ($that->categories as $category) {
+									$categoryLinks[] = '<a href="' . $category['permalink'] . '">' . $category['name'] . '</a>';
+								}
+								echo implode('、', $categoryLinks);
+							?>
+						</span>
+						<?php endif; ?>
 					</div>
 					<?php echo lazyLoadImages($that->content(''), true); ?>
 					<a class="continue-reading" href="<?php $that->permalink() ?>">继续阅读 <span aria-hidden="true">→</span></a>
@@ -309,7 +320,7 @@ function relatedPosts($that, $limit = 5) {
 					<?php while ($related->next()): ?>
 					<li class="related-posts-item">
 						<a class="related-posts-link" href="<?php $related->permalink(); ?>"><?php $related->title(); ?></a>
-						<span class="related-posts-date"><?php $related->date('Y-m-d'); ?></span>
+						<span class="related-posts-date"><?php $related->date('Y.m.d'); ?></span>
 					</li>
 					<?php endwhile; ?>
 				</ul>
