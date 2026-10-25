@@ -859,12 +859,67 @@ main > .section-hero:not([style*="100vh"]) {
   box-shadow: none !important;
   background: var(--ivory) !important;
   resize: vertical;
+  font-size: 0.95rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 #comment-form .form-control:focus {
   border-color: var(--brand) !important;
   box-shadow: 0 0 0 1px var(--brand) !important;
+}
+
+/* 游客评论：昵称/邮箱合并成一块输入面，去掉图标与输入框之间的分隔边框 */
+#comment-form .input-group {
+  margin-bottom: 1.25rem;
+  background: var(--ivory);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#comment-form .input-group:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+#comment-form .input-group-text {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--stone) !important;
+  padding: 0 0.2rem 0 0.9rem;
+  font-size: 0.95rem;
+}
+
+#comment-form .input-group .form-control {
+  min-height: 46px;
+  padding-left: 0.45rem;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#comment-form .input-group .form-control:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+#comment-form .input-group .form-control::placeholder {
+  color: #747268;
+  opacity: 1;
+}
+
+@media (max-width: 767.98px) {
+  #comment-form .input-group {
+    margin-bottom: 0.8rem;
+  }
+
+  /* iOS 对小于 16px 的输入框会自动放大页面，移动端统一到 16px */
+  #comment-form .form-control,
+  #comment-form .input-group-text {
+    font-size: 1rem;
+  }
 }
 
 #comment-form #textarea {

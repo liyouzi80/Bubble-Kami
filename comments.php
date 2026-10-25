@@ -66,21 +66,23 @@
     <?php else: ?>
         <div class="row">
             <div class="col-md-6">
-                <div class="input-group mb-4">
+                <label class="sr-only" for="author">昵称</label>
+                <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-user-o" aria-hidden="true"></i></span>
                     </div>
                     <input type="text" name="author" id="author" class="form-control"
-                           placeholder="名称" value="<?php $this->remember('author'); ?>" required />
+                           placeholder="昵称" autocomplete="name" value="<?php $this->remember('author'); ?>" required />
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="input-group mb-4">
+                <label class="sr-only" for="mail">邮箱（不会公开）</label>
+                <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-envelope-o" aria-hidden="true"></i></span>
                     </div>
                     <input type="email" name="mail" id="mail" class="form-control"
-                           placeholder="邮箱" value="<?php $this->remember('mail'); ?>"
+                           placeholder="邮箱（不会公开）" autocomplete="email" value="<?php $this->remember('mail'); ?>"
                            <?php if ($this->options->commentsRequireMail): ?>required<?php endif; ?> />
                 </div>
             </div>
