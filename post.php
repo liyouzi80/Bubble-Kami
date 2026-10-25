@@ -93,7 +93,33 @@
 						<h1 class="text-white"><?php $this->title() ?></h1>
 					</div>
 					<div class="row align-items-center justify-content-center">
-						<p class="text-white post-meta"><time datetime="<?php $this->date('c'); ?>"><?php $this->date('Y.m.d'); ?></time><?php $views = getPostViews($this); if ($views !== null): ?><span class="sep" aria-hidden="true">·</span>阅读 <?php echo number_format($views); ?><?php endif; ?></p>
+						<p class="text-white post-meta"><?php
+							$metaItems = array();
+							$metaItems[] = '<time datetime="' . $this->date->format('c') . '">' . $this->date->format('Y.m.d') . '</time>';
+
+							$views = getPostViews($this);
+							if ($views !== null) {
+								$metaItems[] = '阅读 ' . number_format($views);
+							}
+
+							if (!$this->hidden && !empty($this->categories)) {
+								$categoryLinks = array();
+								foreach ($this->categories as $metaCategory) {
+									$categoryLinks[] = '<a class="post-taxonomy" href="' . $metaCategory['permalink'] . '">' . $metaCategory['name'] . '</a>';
+								}
+								$metaItems[] = implode('、', $categoryLinks);
+							}
+
+							if (!$this->hidden && !empty($this->tags)) {
+								$tagLinks = array();
+								foreach ($this->tags as $metaTag) {
+									$tagLinks[] = '<a class="post-taxonomy post-tag" href="' . $metaTag['permalink'] . '">#' . $metaTag['name'] . '</a>';
+								}
+								$metaItems[] = implode(' ', $tagLinks);
+							}
+
+							echo implode('<span class="sep" aria-hidden="true">·</span>', $metaItems);
+						?></p>
 					</div>
 				</div>
 			</div>
@@ -106,13 +132,6 @@
 						<div class="container">
 							<div class="content">
 								<?php $this->content(); ?>
-								<?php if (!$this->hidden) { ?>
-								<hr/>
-								<ul>
-									<li>分类：<?php printCategory($this); ?></li>
-									<li>标签：<?php printTag($this); ?></li>
-								</ul>
-								<?php } ?>
 							</div>
 						</div>
 					</section>
