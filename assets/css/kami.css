@@ -12,6 +12,7 @@
   --parchment: #f5f4ed;
   --ivory: #faf9f5;
   --brand: #1B365D;
+  --vermilion: #a33a2a;
   --warm-sand: #e8e6dc;
 
   --near-black: #141413;
@@ -1313,8 +1314,43 @@ body::after {
   border-top: 2px solid var(--brand) !important;
 }
 
-#main .list-card .badge-danger.badge-pill {
-  background: #f6f0df !important;
-  border: 1px solid #d9c9a2;
-  color: #80652e !important;
+/* 置顶：朱砂红字，不再用徽标胶囊 */
+.list-card .sticky-label {
+  display: inline-block;
+  margin-left: 0.45em;
+  font-family: var(--sans);
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--vermilion) !important;
+  vertical-align: 0.1em;
+  white-space: nowrap;
+}
+
+/* 后台管理浮动按钮：跟随纸墨配色 */
+#adminbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(27, 54, 93, 0.24) !important;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.2s ease;
+}
+
+#adminbtn:hover {
+  background: #24476f !important;
+  box-shadow: 0 10px 28px rgba(27, 54, 93, 0.32) !important;
+}
+
+#adminbtn:active {
+  transform: scale(0.97);
+}
+
+#adminbtn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
 }

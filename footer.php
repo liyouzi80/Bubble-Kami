@@ -1,16 +1,12 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 		<?php if ($this->user->hasLogin()) { ?>
 			<?php if ($this->is('single')) { ?>
-			<a href="<?php $this->options->adminUrl(); ?>write-<?php echo $this->is('post')?'post':'page'; ?>.php?cid=<?php echo $this->cid;?>">
-				<button id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn">
-					<span class="btn-inner--icon"><i class="fa fa-pencil" aria-hidden="true"></i></span>
-				</button>
+			<a id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>write-<?php echo $this->is('post')?'post':'page'; ?>.php?cid=<?php echo $this->cid;?>" aria-label="编辑这篇文章" title="编辑这篇文章">
+				<span class="btn-inner--icon"><i class="fa fa-pencil" aria-hidden="true"></i></span>
 			</a>
 			<?php } else { ?>
-			<a href="<?php $this->options->adminUrl(); ?>">
-				<button id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn">
-					<span class="btn-inner--icon"><i class="fa fa-cogs" aria-hidden="true"></i></span>
-				</button>
+			<a id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>" aria-label="进入后台" title="进入后台">
+				<span class="btn-inner--icon"><i class="fa fa-cogs" aria-hidden="true"></i></span>
 			</a>
 			<?php } ?>
 		<?php } ?>
