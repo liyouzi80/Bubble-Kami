@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.2.4
+ * @version 4.2.5
  * @link https://github.com/liyouzi80/typecho-Bubble
  */
 

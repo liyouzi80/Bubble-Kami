@@ -131,8 +131,11 @@ Open sourced under the MIT license.
 
 # 更新历史
 
-## 未发布
+## 4.2.5
 
++ 首页卡片元信息降噪；文章页分类与标签并入 hero 元信息，meta 精简
++ 置顶标记改为朱砂红字，后台管理按钮跟随主题配色
++ 游客评论表单的昵称与邮箱输入优化
 + 修复页脚运行配置脚本的语法错误（`siteUrl()` 直接输出导致），pjax、图片查看器、Prism、KaTeX 按需加载恢复工作
 + pjax 切页后重新执行页内脚本，修复切页后 TOC 目录与 ajax 评论失效；附件链接与同页锚点不再被 pjax 拦截
 + 自托管 Prism 语言包（`assets/js/prism-components/`），修复除核心语言外无法高亮
