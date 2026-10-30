@@ -15,7 +15,7 @@ Typecho 清新风格响应式主题（社区维护的 Bubble 优化分支，内�
 + 流畅体验：支持全站 pjax、ajax 评论无刷新
 + 文章导航：上一篇 / 下一篇 + 相关文章推荐
 + SEO 优化：内置 JSON-LD 结构化数据（Article + BreadcrumbList）
-+ 性能优化：静态资源自托管，`main.min.css` 经 CSS 树摇压缩，FontAwesome 子集化为 21 个图标，移除 jQuery 依赖，脚本移至页面底部、正文图片懒加载与 WebP 响应式图片
++ 性能优化：静态资源自托管，`main.min.css` 按模板实际用到的 class 精简（约 42KB），FontAwesome 子集化为 21 个图标，移除 jQuery 依赖，脚本移至页面底部、正文图片懒加载与 WebP 响应式图片
 + 简繁转换：自托管脚本，一键切换简体 / 繁体，适配 pjax
 + 代码高亮：自带 prism.js，主题丰富，解析迅速
 + 数学公式：自带 KaTeX 渲染，相比 MathJax 更轻量
@@ -62,6 +62,7 @@ Typecho 清新风格响应式主题（社区维护的 Bubble 优化分支，内�
 + **首页置顶文章 CID**：填写文章 CID，多个 CID 用英文逗号分隔；按填写顺序展示在首页最前面。文章 CID 可在 Typecho 后台文章编辑页的地址中查看。
 + **文章阅读数**：开启后在首页文章卡片和文章页显示阅读数，并在打开文章时自动累加。已有 `views` 字段和数据会保留；如果字段不存在，主题会尝试自动创建。旧 Views 插件仍启用时会复用其计数，避免重复累加。
 + **自定义 css**：自定义 css 代码，生效无需清空缓存。
+  > `main.min.css` 只保留主题模板用到的 Bootstrap/Argon 样式（另保留 `alert-*`、`badge-*` 及所有元素样式）。如果在文章里手写了其它 Bootstrap class（如 `btn-warning`、`table-striped`、栅格 `col-sm-4` 等），需要在这里补上对应样式。
 
 ### 功能
 
@@ -129,6 +130,15 @@ Open sourced under the MIT license.
 + 相关主题：[Rorical](https://github.com/Liupaperbox/Rorical) · [Bubble（Totorato 修改版）](https://github.com/totorato/Bubble)
 
 # 更新历史
+
+## 未发布
+
++ 修复页脚运行配置脚本的语法错误（`siteUrl()` 直接输出导致），pjax、图片查看器、Prism、KaTeX 按需加载恢复工作
++ pjax 切页后重新执行页内脚本，修复切页后 TOC 目录与 ajax 评论失效；附件链接与同页锚点不再被 pjax 拦截
++ 自托管 Prism 语言包（`assets/js/prism-components/`），修复除核心语言外无法高亮
++ 开启 pjax 时不再输出 Speculation Rules 悬停预取（pjax 用不上，徒增请求）；预取请求不计入阅读数
++ `main.min.css` 按模板实际用到的 class 精简（186KB → 42KB，gzip 后 30KB → 9KB），可用 `tools/purge-css.js` 重新生成
++ 其它：随机头图兼容 `\r\n` 与空行、`og:url` 正确输出、导航与评论区 HTML 结构修正
 
 ## 4.2.4
 

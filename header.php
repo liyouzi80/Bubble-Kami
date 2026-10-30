@@ -98,7 +98,9 @@
 	<script type="application/ld+json"><?php echo json_encode($ldArticle, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<script type="application/ld+json"><?php echo json_encode($ldBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<?php endif; ?>
-	<!-- Speculation Rules：悬停预取同源页面，配合 pjax 让导航近乎零延迟 -->
+	<?php if (!$this->options->Pjax): ?>
+	<!-- Speculation Rules：悬停预取同源页面，让整页导航近乎零延迟。
+	     pjax 用 fetch 取页面，用不上浏览器的导航预取缓存，开启 pjax 时不输出，避免每次悬停多请求一遍 -->
 	<script type="speculationrules">
 	{
 		"prefetch": [
@@ -115,6 +117,7 @@
 		]
 	}
 	</script>
+	<?php endif; ?>
 	<!-- Typecho header -->
 	<?php $this->header(); ?>
 </head>
