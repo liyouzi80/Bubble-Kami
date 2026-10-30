@@ -129,6 +129,11 @@ function themeOptionWrite($name, $value) {
  */
 function themeConfigSeedBackup() {
 	$backupKey = 'bubblekami:config';
+	// Typecho 每次请求都会把 user=0 的 options 整表读入内存，先查内存，已有备份就不再额外查库
+	$options = Helper::options();
+	if (isset($options->{$backupKey}) && $options->{$backupKey} !== '') {
+		return;
+	}
 	$backup = themeOptionRead($backupKey);
 	if ($backup !== null && $backup !== '') {
 		return;
@@ -333,15 +338,16 @@ function relatedPosts($that, $limit = 5) {
 function printBackground($url) {
 	_e('<div ');
 	if ($url == '') _e('class="shape shape-style-1 shape-primary"');
-	else _e('class="shape shape-style-1 shape-image" style="background-image: url(' . "$url" . ')"');
+	else _e('class="shape shape-style-1 shape-image" style="background-image: url(\'' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '\')"');
 	_e('></div>');
 }
 
 function getRandomImage($str)
 {
-	if ($str == '') return '';
-	$arr = explode(PHP_EOL, $str);
-	return $arr[rand(0, sizeof($arr) - 1)];
+	// 后台 textarea 提交的是 \r\n，按任意换行切分并去掉空行，避免抽到空地址或带 \r 的 URL
+	$arr = array_values(array_filter(array_map('trim', preg_split('/\R/', (string)$str))));
+	if (empty($arr)) return '';
+	return $arr[mt_rand(0, count($arr) - 1)];
 }
 
 function createCatalog($obj) {
@@ -443,6 +449,18 @@ function themeAsset($path) {
 	echo Helper::options()->themeUrl($path) . '?v=' . $cache[$path];
 }
 
+/**
+ * 浏览器预取/预渲染（Speculation Rules、<link rel=prefetch>）发出的请求，用户未必真的打开页面，不计阅读数。
+ */
+function isThemePrefetchRequest() {
+	foreach (array('HTTP_SEC_PURPOSE', 'HTTP_PURPOSE', 'HTTP_X_PURPOSE', 'HTTP_X_MOZ') as $key) {
+		if (!empty($_SERVER[$key]) && stripos($_SERVER[$key], 'prefetch') !== false) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function themeInit($archive) {
 	themeConfigSeedBackup();
 	if (!$archive->is('single')) {
@@ -450,7 +468,7 @@ function themeInit($archive) {
 	}
 
 	$archive->content = createCatalog($archive->content);
-	if (empty($GLOBALS['kamiLoadingSticky']) && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
+	if (empty($GLOBALS['kamiLoadingSticky']) && !isThemePrefetchRequest() && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
 		&& (!isset($archive->status) || $archive->status === 'publish')
 		&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
 	) {

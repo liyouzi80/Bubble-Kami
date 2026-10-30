@@ -8,7 +8,7 @@
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
-	<meta property="og:url" content="<?php $this->request->getRequestUrl(); ?>">
+	<meta property="og:url" content="<?php echo htmlspecialchars($this->request->getRequestUrl(), ENT_QUOTES, 'UTF-8'); ?>">
 	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { themeAsset('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
 	<title><?php $this->archiveTitle(array(
 			'category'  =>  _t('%s 下的文章'),
@@ -98,7 +98,9 @@
 	<script type="application/ld+json"><?php echo json_encode($ldArticle, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<script type="application/ld+json"><?php echo json_encode($ldBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<?php endif; ?>
-	<!-- Speculation Rules：悬停预取同源页面，配合 pjax 让导航近乎零延迟 -->
+	<?php if (!$this->options->Pjax): ?>
+	<!-- Speculation Rules：悬停预取同源页面，让整页导航近乎零延迟。
+	     pjax 用 fetch 取页面，用不上浏览器的导航预取缓存，开启 pjax 时不输出，避免每次悬停多请求一遍 -->
 	<script type="speculationrules">
 	{
 		"prefetch": [
@@ -115,6 +117,7 @@
 		]
 	}
 	</script>
+	<?php endif; ?>
 	<!-- Typecho header -->
 	<?php $this->header(); ?>
 </head>
@@ -149,7 +152,6 @@
 							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
 						</li>
 
-						<li class="nav-item">
 						<?php
 							$this->widget('Widget_Contents_Page_List')->to($pages);
 							while($pages->next()):

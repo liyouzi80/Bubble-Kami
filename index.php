@@ -26,7 +26,7 @@
 									} else {
 										$this->options->avatarUrl();
 									}
-								?>" class="index-avatar">
+								?>" class="index-avatar" alt="<?php $this->options->title() ?>" width="100" height="100" fetchpriority="high">
 							</div>
 							<h1 class="text-white"><?php $this->options->title() ?></h1>
 							
