@@ -105,7 +105,7 @@
 </form>
 				</div>
 				<?php else: ?>
-				<div class="row align-items-center justify-content-center"><h3 id="response"><h3><?php _e('评论已关闭'); ?></h3></div>
+				<div class="row align-items-center justify-content-center"><h3 id="response"><?php _e('评论已关闭'); ?></h3></div>
 				<?php endif; ?>
 			</div>
 		</div>

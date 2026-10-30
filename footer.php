@@ -104,8 +104,10 @@
 	<!-- 主题运行时配置：站点地址 / pjax / 语法高亮等开关，供 theme.js 读取 -->
 	<script>
 		window.BB = window.BB || {};
-		window.BB.siteUrl = <?php echo json_encode(Helper::options()->siteUrl()); ?>;
-		window.BB.rewrite = <?php echo $this->options->rewrite ? 'true' : 'false'; ?>;
+		// 注意：$options->siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
+		window.BB.siteUrl = <?php echo json_encode((string)$this->options->siteUrl); ?>;
+		window.BB.adminUrl = <?php echo json_encode((string)$this->options->adminUrl); ?>;
+		window.BB.searchUrl = <?php echo json_encode(Typecho_Common::url('search/', $this->options->index)); ?>;
 		window.BB.pjax = <?php echo $this->options->Pjax ? 'true' : 'false'; ?>;
 		window.BB.prismjs = <?php echo $this->options->prismjs ? 'true' : 'false'; ?>;
 		window.BB.prismLine = <?php echo $this->options->prismLine ? 'true' : 'false'; ?>;
@@ -121,7 +123,8 @@
 			toolbar: "<?php themeAsset('assets/js/prism-toolbar.min.js'); ?>",
 			showLanguage: "<?php themeAsset('assets/js/prism-show-language.min.js'); ?>",
 			copy: "<?php themeAsset('assets/js/prism-copy-to-clipboard.min.js'); ?>",
-			lineNumbers: "<?php themeAsset('assets/js/prism-line-numbers.min.js'); ?>"
+			lineNumbers: "<?php themeAsset('assets/js/prism-line-numbers.min.js'); ?>",
+			components: "<?php echo Helper::options()->themeUrl('assets/js/prism-components/'); ?>"
 		};
 	</script>
 	<!-- 主题脚本：导航折叠 / headroom / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->

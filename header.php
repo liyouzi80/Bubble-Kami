@@ -8,7 +8,7 @@
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
 	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
-	<meta property="og:url" content="<?php $this->request->getRequestUrl(); ?>">
+	<meta property="og:url" content="<?php echo htmlspecialchars($this->request->getRequestUrl(), ENT_QUOTES, 'UTF-8'); ?>">
 	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { themeAsset('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
 	<title><?php $this->archiveTitle(array(
 			'category'  =>  _t('%s 下的文章'),
@@ -149,7 +149,6 @@
 							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
 						</li>
 
-						<li class="nav-item">
 						<?php
 							$this->widget('Widget_Contents_Page_List')->to($pages);
 							while($pages->next()):

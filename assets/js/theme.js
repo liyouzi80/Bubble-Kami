@@ -142,8 +142,9 @@
 	}
 
 	/* ---------- 页面渲染后统一初始化 ---------- */
-	function init() {
+	function init(isPjax) {
 		setupNavSolid();
+		initComments(isPjax);
 
 		// 图片懒加载：正文图片延迟加载（服务端已加 loading 属性，这里做兜底）
 		document.querySelectorAll('.content img').forEach(function (img) {
@@ -161,8 +162,14 @@
 				BB.prismJs.copy
 			];
 			if (BB.prismLine) prismUrls.push(BB.prismJs.lineNumbers);
+			// 由主题统一调用 highlightAll，避免 core 加载后自动高亮一遍
+			if (!window.Prism) window.Prism = { manual: true };
 			loadScripts(prismUrls, function () {
-				if (!window.Prism) return;
+				if (!window.Prism || !Prism.highlightAll) return;
+				// autoloader 默认按自身 src 推断语言包路径，带 ?v= 版本号时推断失败，这里显式指定自托管目录
+				if (Prism.plugins && Prism.plugins.autoloader && BB.prismJs.components) {
+					Prism.plugins.autoloader.languages_path = BB.prismJs.components;
+				}
 				if (BB.prismLine) {
 					var lineNumberClassName = 'line-numbers';
 					document.querySelectorAll('pre').forEach(function (item) {
@@ -203,7 +210,6 @@
 	if (BB.pjax) {
 		(function () {
 			var siteUrl = BB.siteUrl;
-			var rewrite = BB.rewrite;
 			var pgid = 0;
 			var cover = document.querySelector('.black-cover');
 
@@ -219,15 +225,22 @@
 				window.scrollTo({ top: 0, behavior: 'instant' });
 				destroyViewer();
 				fetch(url)
-					.then(function (res) { return res.text(); })
+					.then(function (res) {
+						var type = res.headers.get('content-type') || '';
+						if (type.indexOf('text/html') === -1) throw new Error('not html');
+						return res.text();
+					})
 					.then(function (html) {
 						var doc = new DOMParser().parseFromString(html, 'text/html');
 						var next = doc.querySelector('#pjax-container');
 						var cur = document.querySelector('#pjax-container');
+						if (!next || !cur) throw new Error('no pjax container');
 						function apply() {
-							if (next && cur) cur.innerHTML = next.innerHTML;
+							delete BB.comment;
+							cur.innerHTML = next.innerHTML;
+							runScripts(cur);
 							if (push) history.pushState({ url: url }, '', url);
-							init();
+							init(true);
 							if (typeof translateBody === "function" && currentEncoding != targetEncoding) translateBody();
 							var t = doc.querySelector('title');
 							if (t) document.title = t.textContent;
@@ -250,7 +263,24 @@
 					.catch(function () {
 						showCover(false);
 						stop_progress(pgid);
+						// 非 HTML（附件、RSS）或拿不到 pjax 容器时退回整页跳转
+						if (push) location.assign(url);
+						else location.reload();
 					});
+			}
+
+			// innerHTML 插入的 <script> 不会执行：逐个替换成新节点（TOC、评论配置等页内脚本依赖这一步）
+			function runScripts(root) {
+				root.querySelectorAll('script').forEach(function (old) {
+					var type = old.getAttribute('type');
+					if (type && !/javascript|module/i.test(type)) return;
+					var s = document.createElement('script');
+					for (var i = 0; i < old.attributes.length; i++) {
+						s.setAttribute(old.attributes[i].name, old.attributes[i].value);
+					}
+					s.textContent = old.textContent;
+					old.parentNode.replaceChild(s, old);
+				});
 			}
 
 			document.addEventListener('click', function (e) {
@@ -260,7 +290,10 @@
 				if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 				var href = a.getAttribute('href');
 				if (!href || href.indexOf(siteUrl) !== 0) return;
-				if (href.indexOf(siteUrl + '/admin') === 0) return;
+				if (BB.adminUrl && href.indexOf(BB.adminUrl) === 0) return;
+				// 同页锚点交给浏览器；附件等非页面资源直接下载/打开
+				if (a.pathname === location.pathname && a.search === location.search && a.hash) return;
+				if (/\.(?!html?$|php$)[a-z0-9]{1,5}$/i.test(a.pathname)) return;
 				e.preventDefault();
 				load(href, true);
 			});
@@ -271,8 +304,8 @@
 					e.preventDefault();
 					var input = search.querySelector('input[name="s"]');
 					var kw = input ? input.value : '';
-					var url = rewrite ? (siteUrl + 'search/' + encodeURIComponent(kw) + '/') : (siteUrl + 'index.php/search/' + encodeURIComponent(kw) + '/');
-					load(url, true);
+					if (!kw.trim()) return;
+					load(BB.searchUrl + encodeURIComponent(kw) + '/', true);
 				});
 			}
 
@@ -389,8 +422,10 @@
 		}
 	}
 
-	/* TypechoComment：评论回复（需挂到全局，供回复链接的 onclick 调用） */
-	if (BB.comment) {
+	/* TypechoComment：评论回复（需挂到全局，供回复链接的 onclick 调用）。
+	 * BB.comment 由 comments.php 注入，pjax 切页后会重新注入，因此每次 init 都要按当前页面重建。 */
+	function initComments(isPjax) {
+		if (!BB.comment) return;
 		window.TypechoComment = (function () {
 			var respondId = BB.comment.respondId;
 			function dom(id) { return document.getElementById(id); }
@@ -453,8 +488,9 @@
 		})();
 
 		bindsubmit();
-		reRunPluginScripts();
+		// 首次加载时插件脚本已由 $this->header() 输出，只有 pjax 切页后才需要补跑
+		if (isPjax) reRunPluginScripts();
 	}
 
-	init();
+	init(false);
 })();
