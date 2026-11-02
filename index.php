@@ -5,7 +5,7 @@
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
  * @version 4.2.6
- * @link https://github.com/liyouzi80/typecho-Bubble
+ * @link https://github.com/liyouzi80/Bubble-Kami
  */
 
 	if (!defined('__TYPECHO_ROOT_DIR__')) exit;
