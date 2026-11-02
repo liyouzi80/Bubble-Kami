@@ -41,13 +41,13 @@
 						var a = e.target.closest('a[href^="#cl-"]');
 						if (!a) return;
 						e.preventDefault();
-						var target = document.querySelector('[name="' + a.getAttribute('href').slice(1) + '"]');
+						var target = document.getElementById(a.getAttribute('href').slice(1));
 						if (target) {
 							window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 120, behavior: 'smooth' });
 						}
 					});
 
-					var headings = Array.prototype.slice.call(document.querySelectorAll('[name^="cl-"]')).reverse();
+					var headings = Array.prototype.slice.call(document.querySelectorAll('.toc-anchor[id^="cl-"]')).reverse();
 					var nowtoc = 'cl-1';
 
 					function onScroll() {
@@ -55,15 +55,15 @@
 						for (var i = 0; i < headings.length; i++) {
 							var ele = headings[i];
 							if (ele.getBoundingClientRect().top < 121) {
-								if (nowtoc !== ele.getAttribute('name')) {
-									var prev = list.querySelector('[name="dl-' + nowtoc.replace('cl-', '') + '"]');
+								if (nowtoc !== ele.id) {
+									var prev = document.getElementById('dl-' + nowtoc.replace('cl-', ''));
 									if (prev) prev.classList.remove('located');
-									var next = list.querySelector('[name="dl-' + ele.getAttribute('name').replace('cl-', '') + '"]');
+									var next = document.getElementById('dl-' + ele.id.replace('cl-', ''));
 									if (next) {
 										next.classList.add('located');
 										list.scrollTop = list.scrollTop - 50 + next.getBoundingClientRect().top - list.getBoundingClientRect().top;
 									}
-									nowtoc = ele.getAttribute('name');
+									nowtoc = ele.id;
 								}
 								break;
 							}

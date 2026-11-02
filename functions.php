@@ -207,7 +207,8 @@ function ensureThemeViewsColumn() {
 		try {
 			$db = Typecho_Db::get();
 			$prefix = $db->getPrefix();
-			$db->query('ALTER TABLE `' . $prefix . 'contents` ADD `views` INT(10) NOT NULL DEFAULT 0');
+			// 不加引号的标准写法，MySQL / SQLite / PostgreSQL 通用（表前缀只含字母数字下划线）
+			$db->query('ALTER TABLE ' . $prefix . 'contents ADD COLUMN views INT NOT NULL DEFAULT 0');
 			$ready = true;
 		} catch (Throwable $migrationError) {
 			$ready = false;
@@ -360,7 +361,7 @@ function createCatalog($obj) {
 		global $catalog_count;
 		$catalog_count ++;
 		$catalog[] = array('text' => trim(strip_tags($obj[3])), 'depth' => $obj[1], 'count' => $catalog_count);
-		return '<h'.$obj[1].$obj[2].'><a name="cl-'.$catalog_count.'"></a>'.$obj[3].'</h'.$obj[1].'>';
+		return '<h'.$obj[1].$obj[2].'><a id="cl-'.$catalog_count.'" class="toc-anchor"></a>'.$obj[3].'</h'.$obj[1].'>';
 	}, $obj);
 	return $obj;
 }
@@ -391,7 +392,7 @@ function getCatalog() {
 					$index .= '</li>';
 				}
 			}
-			$index .= '<li><a name="dl-' . $catalog_item['count'] . '" href="#cl-' . $catalog_item['count'] . '">'.$catalog_item['text'].'</a>';
+			$index .= '<li><a id="dl-' . $catalog_item['count'] . '" href="#cl-' . $catalog_item['count'] . '">'.$catalog_item['text'].'</a>';
 			$prev_depth = $catalog_item['depth'];
 		}
 		for ($i=0; $i<=$to_depth; $i++) {
@@ -441,12 +442,72 @@ function lazyLoadImages($content, $allLazy = false) {
  * 基于文件修改时间自动生成版本号，文件更新后旧缓存自动失效。
  */
 function themeAsset($path) {
+	echo themeAssetUrl($path);
+}
+
+function themeAssetUrl($path) {
 	static $cache = array();
 	$file = __DIR__ . '/' . ltrim($path, '/');
 	if (!array_key_exists($path, $cache)) {
 		$cache[$path] = is_file($file) ? filemtime($file) : '1';
 	}
-	echo Helper::options()->themeUrl($path) . '?v=' . $cache[$path];
+	// Typecho 1.2+ 的 themeUrl() 直接 echo，旧版本可能是返回值，两种都兼容
+	ob_start();
+	$returned = Helper::options()->themeUrl($path);
+	$echoed = ob_get_clean();
+	return ($echoed !== '' ? $echoed : (string)$returned) . '?v=' . $cache[$path];
+}
+
+/**
+ * 输出到 HTML 属性的纯文本：去标签、还原已有实体后统一转义，避免重复转义。
+ */
+function themeAttr($text) {
+	$text = html_entity_decode(strip_tags((string)$text), ENT_QUOTES, 'UTF-8');
+	return htmlspecialchars(trim(preg_replace('/\s+/u', ' ', $text)), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * 分享卡片（Open Graph / Twitter）与 JSON-LD 共用的页面信息。
+ * 文章页取摘要与正文第一张图；加密文章与列表页回退到站点描述与头像。
+ */
+function themeShareMeta($archive) {
+	$options = Helper::options();
+	$avatar = $options->avatarUrl == '' ? themeAssetUrl('images/avatar.png') : (string)$options->avatarUrl;
+	$meta = array(
+		'type' => 'website',
+		'title' => (string)$options->title,
+		'description' => (string)$options->description,
+		'image' => $avatar,
+		'hasPostImage' => false,
+	);
+	if (!$archive->is('single')) {
+		return $meta;
+	}
+	$meta['title'] = (string)$archive->title;
+	if ($archive->is('post')) {
+		$meta['type'] = 'article';
+	}
+	if ($archive->hidden) {
+		return $meta;
+	}
+	$excerpt = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string)$archive->excerpt), ENT_QUOTES, 'UTF-8')));
+	if ($excerpt !== '') {
+		$meta['description'] = Typecho_Common::subStr($excerpt, 0, 120, '…');
+	}
+	if (preg_match('/<img\b[^>]*?\ssrc=["\']([^"\']+)["\']/i', (string)$archive->content, $m)) {
+		$src = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+		if (strpos($src, '//') === 0) {
+			$src = (parse_url((string)$options->siteUrl, PHP_URL_SCHEME) ?: 'https') . ':' . $src;
+		} elseif (strpos($src, '/') === 0) {
+			$parts = parse_url((string)$options->siteUrl);
+			$src = $parts['scheme'] . '://' . $parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : '') . $src;
+		}
+		if (preg_match('#^https?://#i', $src)) {
+			$meta['image'] = $src;
+			$meta['hasPostImage'] = true;
+		}
+	}
+	return $meta;
 }
 
 /**
@@ -476,8 +537,7 @@ function themeInit($archive) {
 		if ($cid > 0) {
 			try {
 				$db = Typecho_Db::get();
-				$prefix = $db->getPrefix();
-				$db->query('UPDATE `' . $prefix . 'contents` SET `views` = `views` + 1 WHERE `cid` = ' . $cid);
+				$db->query($db->update('table.contents')->expression('views', 'views + 1')->where('cid = ?', $cid));
 				$GLOBALS['kamiViewsIncrementedCid'] = $cid;
 			} catch (Throwable $e) {
 				// 阅读数统计失败时继续正常渲染文章。

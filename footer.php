@@ -135,6 +135,14 @@
 		window.BB.katexJs = "<?php themeAsset('assets/js/katex.min.js'); ?>";
 		window.BB.autoRenderJs = "<?php themeAsset('assets/js/auto-render.min.js'); ?>";
 		window.BB.viewerJs = "<?php themeAsset('assets/js/viewer.min.js'); ?>";
+		window.BB.viewerCss = "<?php themeAsset('assets/css/viewer.min.css'); ?>";
+		window.BB.katexCss = "<?php themeAsset('assets/css/katex.min.css'); ?>";
+		window.BB.prismCss = <?php
+			$prismCss = array(themeAssetUrl('assets/css/' . $this->options->prismTheme . '.css'), themeAssetUrl('assets/css/prism-toolbar.css'));
+			if ($this->options->prismLine) $prismCss[] = themeAssetUrl('assets/css/prism-line-numbers.css');
+			echo json_encode($prismCss, JSON_UNESCAPED_SLASHES);
+		?>;
+		window.BB.twcnJs = "<?php themeAsset('assets/js/tw-cn.js'); ?>";
 		window.BB.prismJs = {
 			core: "<?php themeAsset('assets/js/prism-core.min.js'); ?>",
 			autoloader: "<?php themeAsset('assets/js/prism-autoloader.min.js'); ?>",
@@ -147,12 +155,7 @@
 	</script>
 	<!-- 主题脚本：导航折叠 / headroom / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->
 	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>
-	
-	<!-- 简繁转换（自托管） -->
-	<script src="<?php themeAsset("assets/js/tw-cn.js"); ?>"></script>
-	<script>
-		translateInitilization();
-	</script>
+	<!-- 简繁转换脚本（tw-cn.js）由 theme.js 按需加载：点击「繁」按钮或之前切换过繁体时才下载 -->
 	<!-- Typecho footer -->
 	<?php $this->footer(); ?>
 	</body>

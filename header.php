@@ -5,11 +5,20 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta name="theme-color" content="#1B365D">
-	<meta property="og:type" content="website">
-	<meta property="og:site_name" content="<?php $this->options->title(); ?>">
-	<meta property="og:title" content="<?php if ($this->is('single')) { $this->title(); } else { $this->options->title(); } ?>">
+	<?php $shareMeta = themeShareMeta($this); ?>
+	<meta property="og:type" content="<?php echo $shareMeta['type']; ?>">
+	<meta property="og:site_name" content="<?php echo themeAttr($this->options->title); ?>">
+	<meta property="og:title" content="<?php echo themeAttr($shareMeta['title']); ?>">
 	<meta property="og:url" content="<?php echo htmlspecialchars($this->request->getRequestUrl(), ENT_QUOTES, 'UTF-8'); ?>">
-	<meta property="og:image" content="<?php if ($this->options->avatarUrl == '') { themeAsset('images/avatar.png'); } else { $this->options->avatarUrl(); } ?>">
+	<?php if ($shareMeta['description'] !== ''): ?>
+	<meta property="og:description" content="<?php echo themeAttr($shareMeta['description']); ?>">
+	<?php endif; ?>
+	<meta property="og:image" content="<?php echo htmlspecialchars($shareMeta['image'], ENT_QUOTES, 'UTF-8'); ?>">
+	<?php if ($shareMeta['type'] === 'article'): ?>
+	<meta property="article:published_time" content="<?php echo date('c', $this->created); ?>">
+	<meta property="article:modified_time" content="<?php echo date('c', $this->modified); ?>">
+	<?php endif; ?>
+	<meta name="twitter:card" content="<?php echo $shareMeta['hasPostImage'] ? 'summary_large_image' : 'summary'; ?>">
 	<title><?php $this->archiveTitle(array(
 			'category'  =>  _t('%s 下的文章'),
 			'search'    =>  _t('包含关键字 %s 的文章'),
@@ -37,30 +46,17 @@
 	<!-- Kami 风格（内置默认外观） -->
 	<link type="text/css" href="<?php themeAsset("assets/css/kami.css"); ?>" rel="stylesheet">
 
-	<!-- 自托管 Noto Serif SC（500，unicode-range 切片，仅标题用） -->
-	<link type="text/css" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" rel="stylesheet">
+	<!-- 自托管 Noto Serif SC（500，unicode-range 切片，仅标题用）。
+	     样式表约 105KB，异步加载不阻塞首屏；字体未到时标题先用系统衬线字体（font-display: swap） -->
+	<link rel="preload" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link type="text/css" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" rel="stylesheet"></noscript>
 
 	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
 	<style>
 		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif; }
 	</style>
 
-	<!-- KaTeX CSS -->
-	<?php if ($this->options->katex): ?>
-	<link type="text/css" href="<?php themeAsset("assets/css/katex.min.css"); ?>" rel="stylesheet">
-	<?php endif; ?>
-
-	<!-- PrismJS CSS -->
-	<?php if ($this->options->prismjs): ?>
-	<link rel="stylesheet" type="text/css" href="<?php themeAsset('assets/css/' . $this->options->prismTheme . '.css'); ?>" />
-	<link type="text/css" href="<?php themeAsset("assets/css/prism-toolbar.css"); ?>" rel="stylesheet">
-		<?php if ($this->options->prismLine): ?>
-		<link rel="stylesheet" type="text/css" href="<?php themeAsset('assets/css/prism-line-numbers.css'); ?>" />
-		<?php endif; ?>
-	<?php endif; ?>
-
-	<!-- Viewer CSS -->
-	<link type="text/css" href="<?php themeAsset("assets/css/viewer.min.css"); ?>" rel="stylesheet">
+	<!-- KaTeX / Prism / Viewer 的样式与脚本一样按正文内容懒加载（见 theme.js） -->
 	
 	<!-- Custom CSS -->
 	<?php if ($this->options->customCss): ?>
@@ -80,7 +76,11 @@
 		'author' => array('@type' => 'Person', 'name' => $ldAuthor),
 		'publisher' => array('@type' => 'Organization', 'name' => $this->options->title),
 		'mainEntityOfPage' => array('@type' => 'WebPage', '@id' => $this->permalink),
+		'image' => $shareMeta['image'],
 	);
+	if ($shareMeta['description'] !== '') {
+		$ldArticle['description'] = html_entity_decode(strip_tags($shareMeta['description']), ENT_QUOTES, 'UTF-8');
+	}
 	$ldBreadcrumb = array(
 		'@context' => 'https://schema.org',
 		'@type' => 'BreadcrumbList',
@@ -127,7 +127,7 @@
 		<nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-transparent navbar-light headroom">
 			<div class="container">
 				<a class="navbar-brand" href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title() ?></a>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="Toggle navigation">
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="展开导航菜单">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="navbar-default">
@@ -137,7 +137,7 @@
 								<a href="<?php $this->options->siteUrl(); ?>"><h5><?php $this->options->title() ?></h5></a>
 							</div>
 							<div class="col-6 collapse-close">
-								<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="Toggle navigation">
+								<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="收起导航菜单">
 									<span></span>
 									<span></span>
 								</button>

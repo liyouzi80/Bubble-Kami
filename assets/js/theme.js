@@ -33,6 +33,16 @@
 		s.onerror = function () { scriptCache[src] = 'loaded'; };
 		document.head.appendChild(s);
 	}
+	var cssCache = {};
+	function loadCss(href) {
+		if (!href || cssCache[href]) return;
+		cssCache[href] = true;
+		var l = document.createElement('link');
+		l.rel = 'stylesheet';
+		l.href = href;
+		document.head.appendChild(l);
+	}
+
 	function loadScripts(urls, cb) {
 		var i = 0;
 		function next() {
@@ -135,6 +145,31 @@
 		});
 	})();
 
+	/* ---------- 简繁切换（tw-cn.js 按需加载） ---------- */
+	(function () {
+		// 与 tw-cn.js 中的 Cookie 名保持一致；值为 1 表示访客上次切到了繁体
+		var cookieName = 'targetEncoding' + location.origin.replace(/\./g, '');
+		var wantsTraditional = document.cookie.split(';').some(function (c) {
+			return c.trim() === cookieName + '=1';
+		});
+		function loadTwcn(cb) {
+			loadScript(BB.twcnJs, function () {
+				if (typeof translateInitilization === 'function') translateInitilization();
+				if (cb) cb();
+			});
+		}
+		if (wantsTraditional) {
+			loadTwcn();
+		} else {
+			// 占位：首次点击时加载 tw-cn.js，加载后它会定义真正的 translatePage，再调用一次完成切换
+			var stub = window.translatePage = function () {
+				loadTwcn(function () {
+					if (window.translatePage !== stub) window.translatePage();
+				});
+			};
+		}
+	})();
+
 	/* ---------- 图片查看器（有图才按需加载 Viewer.js） ---------- */
 	function initViewer() {
 		var targets = document.querySelectorAll('.content');
@@ -149,6 +184,7 @@
 				el.__viewer = new Viewer(el, { url: 'src' });
 			});
 		}
+		loadCss(BB.viewerCss);
 		if (window.Viewer) { build(); }
 		else if (BB.viewerJs) { loadScript(BB.viewerJs, build); }
 	}
@@ -183,6 +219,7 @@
 				BB.prismJs.copy
 			];
 			if (BB.prismLine) prismUrls.push(BB.prismJs.lineNumbers);
+			(BB.prismCss || []).forEach(loadCss);
 			// 由主题统一调用 highlightAll，避免 core 加载后自动高亮一遍
 			if (!window.Prism) window.Prism = { manual: true };
 			loadScripts(prismUrls, function () {
@@ -213,6 +250,7 @@
 					});
 				} catch (e) {}
 			}
+			loadCss(BB.katexCss);
 			if (window.renderMathInElement) { renderKatex(); }
 			else { loadScripts([BB.katexJs, BB.autoRenderJs], renderKatex); }
 		}
