@@ -118,8 +118,8 @@
 	}
 	</script>
 	<?php endif; ?>
-	<!-- Typecho header -->
-	<?php $this->header(); ?>
+	<!-- Typecho header（social= 关掉 Typecho 自带的 og/twitter 标签，主题上方已输出更完整的一份，避免重复） -->
+	<?php $this->header('social='); ?>
 </head>
 <body>
 	<a class="skip-link" href="#main">跳到正文</a>
