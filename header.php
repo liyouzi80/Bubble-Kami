@@ -148,10 +148,6 @@
 						<li class="nav-item">
 							<a class="nav-link" href="<?php $this->options->siteUrl(); ?>">首页</a>
 						</li>
-						<li class="nav-item">
-							<a class="nav-link" id="translateLink" href="javascript:translatePage();">简/繁</a>
-						</li>
-
 						<?php
 							$this->widget('Widget_Contents_Page_List')->to($pages);
 							while($pages->next()):
@@ -160,16 +156,6 @@
 								<a class="nav-link" href="<?php $pages->permalink(); ?>" title="<?php $pages->title(); ?>"><?php $pages->title(); ?></a>
 							</li>
 						<?php endwhile; ?>
-						<li class="navbar_search_container">
-							<form method="post" action="" id="search">
-								<div class="input-group input-group-alternative">
-									<div class="input-group-prepend">
-										<span class="input-group-text"><i class="fa fa-search"></i></span>
-									</div>
-									<input type="text" name="s" class="form-control" placeholder="搜点什么……" autocomplete="off">
-								</div>
-							</form>
-						</li>
 					</ul>
 				</div>
 			</div>

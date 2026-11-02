@@ -1,8 +1,8 @@
 var defaultEncoding = 2; // 网站默认语言，1: 繁體中文, 2: 简体中文
 var translateDelay = 0; // 延迟时间,若不在 body 底部, 要设定延迟翻译时间, 如100表示100ms,默认为0
 var cookieDomain = window.location.origin; // 使用当前站点地址，避免跨站 Cookie 串扰
-var msgToTraditionalChinese = "简/繁"; // 按钮显示文字
-var msgToSimplifiedChinese = "简/繁"; // 按钮显示文字
+var msgToTraditionalChinese = "繁"; // 当前为简体时按钮显示的文字（点击切到繁体）
+var msgToSimplifiedChinese = "简"; // 当前为繁体时按钮显示的文字（点击切到简体）
 var translateButtonId = "translateLink"; // 默认互换 id
 var currentEncoding = defaultEncoding;
 var targetEncodingCookie = "targetEncoding" + cookieDomain.replace(/\./g, "");
@@ -89,7 +89,6 @@ function getCookie(name) {
 function translateInitilization() {
 	translateButtonObject = document.getElementById(translateButtonId);
 	if (translateButtonObject) {
-		translateButtonObject.href = "javascript:translatePage();";
 		if (currentEncoding != targetEncoding) {
 			setTimeout(translateBody, translateDelay);
 			if (targetEncoding == 1) translateButtonObject.innerHTML = msgToSimplifiedChinese;

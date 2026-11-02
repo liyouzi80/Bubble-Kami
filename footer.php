@@ -77,6 +77,8 @@
 		</div>
 	</footer>
 	<?php if($this->options->Pjax) _e('</div>'); ?>
+	<!-- 右下角浮动工具：返回顶部（滚动后出现）/ 搜索 / 简繁切换 -->
+	<div class="float-tools" id="float-tools">
 	<!-- 返回顶部：外圈为阅读进度环，中间显示百分比，悬停/聚焦时换成箭头 -->
 	<button id="scrollup" type="button" class="btn btn-icon-only rounded-circle btn-secondary scrollup-btn" aria-label="返回顶部" title="返回顶部">
 		<svg class="scrollup-ring" viewBox="0 0 48 48" aria-hidden="true">
@@ -86,6 +88,11 @@
 		<span class="scrollup-pct" aria-hidden="true">0</span>
 		<i class="fa fa-arrow-up" aria-hidden="true"></i>
 	</button>
+	<button id="search-toggle" type="button" class="float-tool" aria-label="搜索" title="搜索" aria-haspopup="dialog" aria-controls="search-dialog">
+		<i class="fa fa-search" aria-hidden="true"></i>
+	</button>
+	<button id="translateLink" type="button" class="float-tool" aria-label="简繁切换" title="简繁切换" onclick="translatePage()">繁</button>
+	</div>
 	<!-- Headroom（导航栏滚动隐藏） -->
 	<script src="<?php themeAsset("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->
@@ -104,6 +111,13 @@
 			</button>
 		</div>
 		<div id="msgDetail" class="modal-body"></div>
+	</dialog>
+	<!-- 搜索弹窗 -->
+	<dialog id="search-dialog" aria-label="搜索">
+		<form method="post" action="<?php $this->options->siteUrl(); ?>" id="search" role="search">
+			<i class="fa fa-search" aria-hidden="true"></i>
+			<input type="text" name="s" placeholder="搜点什么……" autocomplete="off" enterkeyhint="search" aria-label="搜索关键词" required>
+		</form>
 	</dialog>
 	<!-- 主题运行时配置：站点地址 / pjax / 语法高亮等开关，供 theme.js 读取 -->
 	<script>

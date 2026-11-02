@@ -71,13 +71,9 @@ body {
   .headroom--not-top a,
   .headroom--not-top .nav-link,
   .headroom--not-top .navbar-nav > li > a,
-  .headroom--not-top .navbar_search_container .form-control,
-  .headroom--not-top .navbar_search_container .form-control::placeholder,
   .nav-solid a,
   .nav-solid .nav-link,
-  .nav-solid .navbar-nav > li > a,
-  .nav-solid .navbar_search_container .form-control,
-  .nav-solid .navbar_search_container .form-control::placeholder {
+  .nav-solid .navbar-nav > li > a {
     color: #fff !important;
   }
 }
@@ -102,65 +98,6 @@ button:focus-visible,
 .list-card .btn-outline-primary:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
-}
-
-/* ================================================
-   二、导航栏
-   ================================================ */
-
-.navbar_search_container {
-  display: flex;
-  align-items: center;
-  padding: 0;
-  list-style: none;
-}
-
-.navbar_search_container .input-group {
-  flex-wrap: nowrap;
-  width: 160px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-  transition: border-color 0.3s ease;
-}
-
-.navbar_search_container .input-group:focus-within {
-  border-bottom-color: rgba(255, 255, 255, 0.9);
-}
-
-.navbar_search_container .input-group-prepend .input-group-text {
-  background: transparent !important;
-  border: none !important;
-  color: rgba(255, 255, 255, 0.7);
-  padding: 0.4rem 0.5rem;
-}
-
-.navbar_search_container .form-control {
-  background: transparent !important;
-  border: none !important;
-  color: white !important;
-  box-shadow: none !important;
-  padding-left: 0;
-}
-
-.navbar_search_container .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-}
-
-/* 移动端：折叠面板是白底，搜索框文字/边框改为深色，避免白字看不清 */
-@media (max-width: 991.98px) {
-  .navbar_search_container .input-group {
-    border-bottom-color: rgba(0, 0, 0, 0.15);
-  }
-  .navbar_search_container .input-group:focus-within {
-    border-bottom-color: var(--brand);
-  }
-  .navbar_search_container .input-group-prepend .input-group-text {
-    color: var(--stone);
-  }
-  .navbar_search_container .form-control,
-  .navbar_search_container .form-control::placeholder {
-    color: var(--dark-warm) !important;
-  }
 }
 
 /* ================================================
@@ -1382,8 +1319,128 @@ body::after {
   white-space: nowrap;
 }
 
+/* 右下角浮动工具列：自下而上 简繁 → 搜索 → 返回顶部。
+   返回顶部在最上方，未出现时只是不可见、仍占位，下面两个按钮不会跳动 */
+.float-tools {
+  position: fixed;
+  right: 45px;
+  bottom: 45px;
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.float-tools > * {
+  pointer-events: auto;
+}
+
+@media screen and (max-width: 768px) {
+  .float-tools {
+    right: 15px;
+    bottom: 15px;
+    gap: 10px;
+  }
+}
+
+.float-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--ivory);
+  color: var(--brand);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(80, 66, 45, 0.12);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.2s ease,
+              background-color 0.2s ease;
+}
+
+.float-tool:hover {
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(80, 66, 45, 0.18);
+}
+
+.float-tool:active {
+  transform: scale(0.95);
+}
+
+.float-tool:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.float-tool .fa {
+  font-size: 15px;
+}
+
+/* 搜索弹窗：靠上居中的单行输入框 */
+dialog#search-dialog {
+  margin: 18vh auto auto;
+  padding: 0;
+  width: min(92vw, 32rem);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--ivory);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+dialog#search-dialog::backdrop {
+  background: rgba(20, 20, 19, 0.42);
+}
+
+dialog#search-dialog[open] {
+  animation: dialog-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+dialog#search-dialog[open]::backdrop {
+  animation: dialog-backdrop-in 0.25s ease;
+}
+
+#search-dialog form {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0 1.25rem;
+}
+
+#search-dialog .fa {
+  color: var(--stone);
+  font-size: 18px;
+}
+
+#search-dialog input {
+  flex: 1;
+  min-width: 0;
+  height: 3.5rem;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--near-black);
+  font-size: 1.05rem;
+}
+
+#search-dialog input::placeholder {
+  color: var(--stone);
+  opacity: 0.7;
+}
+
 /* 返回顶部：外圈阅读进度环 + 百分比，悬停/聚焦时换成箭头 */
 #scrollup {
+  position: relative;
+  right: auto;
+  bottom: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;

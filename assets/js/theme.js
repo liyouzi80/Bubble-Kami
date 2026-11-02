@@ -70,8 +70,9 @@
 	/* ---------- 回到顶部（带阅读进度） ---------- */
 	(function () {
 		var scrollup = document.getElementById('scrollup');
+		var tools = document.getElementById('float-tools');
 		var adminbtn = document.getElementById('adminbtn');
-		if (!scrollup) return;
+		if (!scrollup || !tools) return;
 		var bar = scrollup.querySelector('.scrollup-bar');
 		var pct = scrollup.querySelector('.scrollup-pct');
 
@@ -82,7 +83,7 @@
 				var b = parseInt(cs.bottom, 10) + parseInt(cs.height, 10) + 25;
 				if (!isNaN(b)) bottom = b;
 			}
-			scrollup.style.bottom = bottom + 'px';
+			tools.style.bottom = bottom + 'px';
 		}
 
 		positionScrollBtn();
@@ -115,6 +116,22 @@
 
 		scrollup.addEventListener('click', function () {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
+		});
+	})();
+
+	/* ---------- 搜索弹窗 ---------- */
+	(function () {
+		var toggle = document.getElementById('search-toggle');
+		var dialog = document.getElementById('search-dialog');
+		if (!toggle || !dialog || !dialog.showModal) return;
+		var input = dialog.querySelector('input[name="s"]');
+		toggle.addEventListener('click', function () {
+			dialog.showModal();
+			if (input) { input.focus(); input.select(); }
+		});
+		// 点击遮罩处关闭（Esc 由原生 <dialog> 处理）
+		dialog.addEventListener('click', function (e) {
+			if (e.target === dialog) dialog.close();
 		});
 	})();
 
@@ -309,6 +326,8 @@
 					var input = search.querySelector('input[name="s"]');
 					var kw = input ? input.value : '';
 					if (!kw.trim()) return;
+					var dialog = document.getElementById('search-dialog');
+					if (dialog && dialog.open) dialog.close();
 					load(BB.searchUrl + encodeURIComponent(kw) + '/', true);
 				});
 			}
