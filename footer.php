@@ -80,7 +80,7 @@
 	<!-- 右下角浮动工具：返回顶部（滚动后出现）/ 搜索 / 简繁切换 -->
 	<div class="float-tools" id="float-tools">
 	<!-- 返回顶部：外圈为阅读进度环，中间显示百分比，悬停/聚焦时换成箭头 -->
-	<button id="scrollup" type="button" class="btn btn-icon-only rounded-circle btn-secondary scrollup-btn" aria-label="返回顶部" title="返回顶部">
+	<button id="scrollup" type="button" class="float-tool" aria-label="返回顶部" title="返回顶部">
 		<svg class="scrollup-ring" viewBox="0 0 48 48" aria-hidden="true">
 			<circle class="scrollup-track" cx="24" cy="24" r="22"></circle>
 			<circle class="scrollup-bar" cx="24" cy="24" r="22" pathLength="100"></circle>

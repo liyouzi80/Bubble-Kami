@@ -77,13 +77,13 @@
 		var pct = scrollup.querySelector('.scrollup-pct');
 
 		function positionScrollBtn() {
-			var bottom = 25;
-			if (adminbtn) {
-				var cs = getComputedStyle(adminbtn);
-				var b = parseInt(cs.bottom, 10) + parseInt(cs.height, 10) + 25;
-				if (!isNaN(b)) bottom = b;
-			}
-			tools.style.bottom = bottom + 'px';
+			// 有后台按钮时整列移到它上方，间距与列内按钮间距（CSS gap）一致
+			tools.style.bottom = '';
+			if (!adminbtn) return;
+			var cs = getComputedStyle(adminbtn);
+			var gap = parseFloat(getComputedStyle(tools).rowGap) || 15;
+			var b = parseFloat(cs.bottom) + parseFloat(cs.height) + gap;
+			if (!isNaN(b)) tools.style.bottom = b + 'px';
 		}
 
 		positionScrollBtn();

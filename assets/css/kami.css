@@ -1285,8 +1285,7 @@ dialog#modal-notification[open]::backdrop {
 .list-card .btn-outline-primary:active,
 #comment-form #add-comment-button:active,
 #comment-form .btn-outline-success:active,
-.navbar-toggler:active,
-#scrollup.is-visible:active {
+.navbar-toggler:active {
   transform: scale(0.97);
 }
 
@@ -1319,8 +1318,9 @@ body::after {
   white-space: nowrap;
 }
 
-/* 右下角浮动工具列：自下而上 简繁 → 搜索 → 返回顶部。
-   返回顶部在最上方，未出现时只是不可见、仍占位，下面两个按钮不会跳动 */
+/* 右下角浮动按钮：返回顶部 / 搜索 / 简繁与后台按钮统一外观（尺寸、墨蓝底、阴影、按压反馈），
+   列内间距与列到后台按钮的间距相同（theme.js 读取 gap 计算）。
+   自下而上 简繁 → 搜索 → 返回顶部；返回顶部未出现时只是不可见、仍占位，下面两个按钮不会跳动 */
 .float-tools {
   position: fixed;
   right: 45px;
@@ -1329,60 +1329,149 @@ body::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
   pointer-events: none;
 }
 
 .float-tools > * {
+  margin: 0 !important;
   pointer-events: auto;
+}
+
+.float-tool {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {
   .float-tools {
     right: 15px;
     bottom: 15px;
-    gap: 10px;
+    gap: 12px;
+  }
+  .float-tool {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
   }
 }
 
+#adminbtn,
 .float-tool {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--ivory);
-  color: var(--brand);
-  font-family: var(--serif);
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(80, 66, 45, 0.12);
+  background: var(--brand) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(27, 54, 93, 0.24) !important;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.2s ease,
+              box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
               background-color 0.2s ease;
 }
 
+#adminbtn:hover,
 .float-tool:hover {
-  background: #fff;
-  box-shadow: 0 8px 22px rgba(80, 66, 45, 0.18);
+  background: #24476f !important;
+  box-shadow: 0 10px 28px rgba(27, 54, 93, 0.32) !important;
 }
 
+#adminbtn:active,
 .float-tool:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
+#adminbtn:focus-visible,
 .float-tool:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 3px;
 }
 
-.float-tool .fa {
-  font-size: 15px;
+/* 返回顶部：外圈阅读进度环 + 百分比，悬停/聚焦时换成箭头；滚动超过一屏才淡入 */
+#scrollup {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease,
+              visibility 0.25s,
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.2s ease,
+              background-color 0.2s ease;
 }
+
+#scrollup.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+#scrollup.is-visible:active {
+  transform: scale(0.97);
+}
+
+#scrollup .scrollup-ring {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+#scrollup .scrollup-track,
+#scrollup .scrollup-bar {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+#scrollup .scrollup-track {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+#scrollup .scrollup-bar {
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+#scrollup .scrollup-pct {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#scrollup .scrollup-pct::after {
+  content: "%";
+  margin-left: 1px;
+  font-size: 0.75em;
+}
+
+#scrollup .fa {
+  display: none;
+}
+
+#scrollup:hover .scrollup-pct,
+#scrollup:focus-visible .scrollup-pct {
+  display: none;
+}
+
+#scrollup:hover .fa,
+#scrollup:focus-visible .fa {
+  display: inline-block;
+}
+
 
 /* 搜索弹窗：靠上居中的单行输入框 */
 dialog#search-dialog {
@@ -1436,124 +1525,3 @@ dialog#search-dialog[open]::backdrop {
   opacity: 0.7;
 }
 
-/* 返回顶部：外圈阅读进度环 + 百分比，悬停/聚焦时换成箭头 */
-#scrollup {
-  position: relative;
-  right: auto;
-  bottom: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  background: var(--ivory) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--brand) !important;
-  box-shadow: 0 6px 20px rgba(80, 66, 45, 0.14) !important;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px);
-  transition: opacity 0.25s ease,
-              visibility 0.25s,
-              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.2s ease;
-}
-
-#scrollup.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-}
-
-#scrollup:hover {
-  box-shadow: 0 10px 28px rgba(80, 66, 45, 0.2) !important;
-}
-
-#scrollup:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
-}
-
-#scrollup .scrollup-ring {
-  position: absolute;
-  inset: 3px;
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
-  transform: rotate(-90deg);
-  pointer-events: none;
-}
-
-#scrollup .scrollup-track,
-#scrollup .scrollup-bar {
-  fill: none;
-  stroke-width: 2.5;
-}
-
-#scrollup .scrollup-track {
-  stroke: var(--warm-sand);
-}
-
-#scrollup .scrollup-bar {
-  stroke: var(--brand);
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  transition: stroke-dashoffset 0.15s linear;
-}
-
-#scrollup .scrollup-pct {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-#scrollup .scrollup-pct::after {
-  content: "%";
-  margin-left: 1px;
-  font-size: 0.75em;
-}
-
-#scrollup .fa {
-  display: none;
-  font-size: 18px;
-}
-
-#scrollup:hover .scrollup-pct,
-#scrollup:focus-visible .scrollup-pct {
-  display: none;
-}
-
-#scrollup:hover .fa,
-#scrollup:focus-visible .fa {
-  display: inline-block;
-}
-
-/* 后台管理浮动按钮：跟随纸墨配色 */
-#adminbtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 20px rgba(27, 54, 93, 0.24) !important;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-              background-color 0.2s ease;
-}
-
-#adminbtn:hover {
-  background: #24476f !important;
-  box-shadow: 0 10px 28px rgba(27, 54, 93, 0.32) !important;
-}
-
-#adminbtn:active {
-  transform: scale(0.97);
-}
-
-#adminbtn:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
-}
