@@ -1318,7 +1318,7 @@ body::after {
   white-space: nowrap;
 }
 
-/* 右下角浮动按钮：返回顶部 / 搜索 / 简繁与后台按钮统一外观（尺寸、墨蓝底、阴影、按压反馈），
+/* 右下角浮动按钮：返回顶部 / 搜索 / 简繁与后台按钮同尺寸、同中线对齐，配色保持纸面浅底；
    列内间距与列到后台按钮的间距相同（theme.js 读取 gap 计算）。
    自下而上 简繁 → 搜索 → 返回顶部；返回顶部未出现时只是不可见、仍占位，下面两个按钮不会跳动 */
 .float-tools {
@@ -1368,19 +1368,35 @@ body::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--brand) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
-  box-shadow: 0 6px 20px rgba(27, 54, 93, 0.24) !important;
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
               box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
               background-color 0.2s ease;
 }
 
-#adminbtn:hover,
-.float-tool:hover {
+/* 后台按钮：墨蓝底 */
+#adminbtn {
+  background: var(--brand) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(27, 54, 93, 0.24) !important;
+}
+
+#adminbtn:hover {
   background: #24476f !important;
   box-shadow: 0 10px 28px rgba(27, 54, 93, 0.32) !important;
+}
+
+/* 浮动工具按钮：纸面浅底、墨蓝图标 */
+.float-tool {
+  background: var(--ivory) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--brand) !important;
+  box-shadow: 0 6px 20px rgba(80, 66, 45, 0.14) !important;
+}
+
+.float-tool:hover {
+  background: #fff !important;
+  box-shadow: 0 10px 28px rgba(80, 66, 45, 0.2) !important;
 }
 
 #adminbtn:active,
@@ -1432,11 +1448,11 @@ body::after {
 }
 
 #scrollup .scrollup-track {
-  stroke: rgba(255, 255, 255, 0.2);
+  stroke: var(--warm-sand);
 }
 
 #scrollup .scrollup-bar {
-  stroke: #fff;
+  stroke: var(--brand);
   stroke-linecap: round;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
