@@ -1349,7 +1349,7 @@ dialog#modal-notification[open]::backdrop {
 #comment-form #add-comment-button:active,
 #comment-form .btn-outline-success:active,
 .navbar-toggler:active,
-#scrollbtn:active {
+#scrollup.is-visible:active {
   transform: scale(0.97);
 }
 
@@ -1380,6 +1380,97 @@ body::after {
   color: var(--vermilion) !important;
   vertical-align: 0.1em;
   white-space: nowrap;
+}
+
+/* 返回顶部：外圈阅读进度环 + 百分比，悬停/聚焦时换成箭头 */
+#scrollup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: var(--ivory) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--brand) !important;
+  box-shadow: 0 6px 20px rgba(80, 66, 45, 0.14) !important;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease,
+              visibility 0.25s,
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.2s ease;
+}
+
+#scrollup.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+#scrollup:hover {
+  box-shadow: 0 10px 28px rgba(80, 66, 45, 0.2) !important;
+}
+
+#scrollup:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+#scrollup .scrollup-ring {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+#scrollup .scrollup-track,
+#scrollup .scrollup-bar {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+#scrollup .scrollup-track {
+  stroke: var(--warm-sand);
+}
+
+#scrollup .scrollup-bar {
+  stroke: var(--brand);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+#scrollup .scrollup-pct {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#scrollup .scrollup-pct::after {
+  content: "%";
+  margin-left: 1px;
+  font-size: 0.75em;
+}
+
+#scrollup .fa {
+  display: none;
+  font-size: 18px;
+}
+
+#scrollup:hover .scrollup-pct,
+#scrollup:focus-visible .scrollup-pct {
+  display: none;
+}
+
+#scrollup:hover .fa,
+#scrollup:focus-visible .fa {
+  display: inline-block;
 }
 
 /* 后台管理浮动按钮：跟随纸墨配色 */

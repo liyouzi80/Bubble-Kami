@@ -77,11 +77,15 @@
 		</div>
 	</footer>
 	<?php if($this->options->Pjax) _e('</div>'); ?>
-	<a id="scrollup" href="#" style="display: none;">
-		<button id="scrollbtn" class="btn btn-icon-only rounded-circle btn-secondary scrollup-btn">
-			<span class="btn-inner--icon"><i class="fa fa-arrow-up" aria-hidden="true"></i></span>
-		</button>
-	</a>
+	<!-- 返回顶部：外圈为阅读进度环，中间显示百分比，悬停/聚焦时换成箭头 -->
+	<button id="scrollup" type="button" class="btn btn-icon-only rounded-circle btn-secondary scrollup-btn" aria-label="返回顶部" title="返回顶部">
+		<svg class="scrollup-ring" viewBox="0 0 48 48" aria-hidden="true">
+			<circle class="scrollup-track" cx="24" cy="24" r="22"></circle>
+			<circle class="scrollup-bar" cx="24" cy="24" r="22" pathLength="100"></circle>
+		</svg>
+		<span class="scrollup-pct" aria-hidden="true">0</span>
+		<i class="fa fa-arrow-up" aria-hidden="true"></i>
+	</button>
 	<!-- Headroom（导航栏滚动隐藏） -->
 	<script src="<?php themeAsset("assets/js/headroom.min.js"); ?>"></script>
 	<!-- Theme JS -->

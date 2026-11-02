@@ -67,12 +67,13 @@
 		}).init();
 	}
 
-	/* ---------- 回到顶部 ---------- */
+	/* ---------- 回到顶部（带阅读进度） ---------- */
 	(function () {
 		var scrollup = document.getElementById('scrollup');
-		var scrollbtn = document.getElementById('scrollbtn');
 		var adminbtn = document.getElementById('adminbtn');
-		if (!scrollup || !scrollbtn) return;
+		if (!scrollup) return;
+		var bar = scrollup.querySelector('.scrollup-bar');
+		var pct = scrollup.querySelector('.scrollup-pct');
 
 		function positionScrollBtn() {
 			var bottom = 25;
@@ -81,36 +82,39 @@
 				var b = parseInt(cs.bottom, 10) + parseInt(cs.height, 10) + 25;
 				if (!isNaN(b)) bottom = b;
 			}
-			scrollbtn.style.bottom = bottom + 'px';
+			scrollup.style.bottom = bottom + 'px';
 		}
 
 		positionScrollBtn();
 
+		var ticking = false;
+		function update() {
+			ticking = false;
+			var y = window.pageYOffset;
+			var max = document.documentElement.scrollHeight - window.innerHeight;
+			var p = max > 0 ? Math.min(100, Math.max(0, Math.round(y / max * 100))) : 0;
+			scrollup.classList.toggle('is-visible', y > 500);
+			if (bar) bar.style.strokeDashoffset = 100 - p;
+			if (pct) pct.textContent = p;
+		}
+		function requestUpdate() {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(update);
+		}
+
 		var resizeTimer;
 		window.addEventListener('resize', function () {
+			requestUpdate();
 			if (!adminbtn) return;
 			clearTimeout(resizeTimer);
 			resizeTimer = setTimeout(positionScrollBtn, 250);
 		});
+		window.addEventListener('scroll', requestUpdate, { passive: true });
+		update();
 
-		var scrollLock = 0;
-
-		function toggleVisible() {
-			if (window.pageYOffset > 500) scrollup.style.display = 'block';
-			else scrollup.style.display = 'none';
-		}
-
-		if (window.pageYOffset > 500) scrollup.style.display = 'block';
-		window.addEventListener('scroll', function () {
-			if (!scrollLock) toggleVisible();
-		}, { passive: true });
-
-		scrollup.addEventListener('click', function (e) {
-			e.preventDefault();
-			scrollLock = 1;
-			scrollup.style.display = 'none';
+		scrollup.addEventListener('click', function () {
 			window.scrollTo({ top: 0, behavior: 'smooth' });
-			setTimeout(function () { scrollLock = 0; }, 500);
 		});
 	})();
 
