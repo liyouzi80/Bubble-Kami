@@ -1,13 +1,29 @@
 name: Release
 
-# 当提交了新的主题版本号（index.php 中的 @version）时，自动创建 GitHub Release 并附带主题 zip。
+# 按 index.php 中的 @version 发布主题 zip，同一版本号可以反复发布：
+# - 该版本还没有 Release：创建 Release 并附带 zip；
+# - 已有 Release：用最新代码重新打包覆盖 zip。
+# 两种情况都会把 v{版本} 标签移到本次提交，标签、Source code 与 zip 始终一致；
+# Release 说明首行记录构建来源的提交号，便于区分同一版本的不同构建。
+# 只改了文档 / 工具 / CI 配置时不发布；需要时可在 Actions 页面手动 Run workflow。
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'tools/**'
+      - '.github/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+# 连续推送时排队依次发布，避免两次构建同时改同一个 Release
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -27,31 +43,46 @@ jobs:
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Check if release already exists
-        id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "zip=bubble-kami-$VERSION.zip" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Package theme
-        if: steps.check.outputs.exists == 'false'
         run: |
           mkdir -p Bubble-Kami
           rsync -a --exclude='.git' --exclude='.github' --exclude='tools' --exclude='*.zip' --exclude='Bubble-Kami' ./ Bubble-Kami/
-          zip -r "bubble-kami-${{ steps.version.outputs.version }}.zip" Bubble-Kami
+          zip -r "${{ steps.version.outputs.zip }}" Bubble-Kami
 
-      - name: Create GitHub Release
-        if: steps.check.outputs.exists == 'false'
+      - name: Move tag to this commit
+        run: |
+          git tag -f "${{ steps.version.outputs.tag }}" "$GITHUB_SHA"
+          git push -f origin "refs/tags/${{ steps.version.outputs.tag }}"
+
+      - name: Create or update release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+          ZIP: ${{ steps.version.outputs.zip }}
+          SHORT_SHA: ${{ steps.version.outputs.short_sha }}
         run: |
-          gh release create "v${{ steps.version.outputs.version }}" \
-            "bubble-kami-${{ steps.version.outputs.version }}.zip" \
-            --title "Bubble Kami v${{ steps.version.outputs.version }}" \
-            --generate-notes
+          BUILD_LINE="构建自 [\`$SHORT_SHA\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA) · $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') (UTC+8)"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --clobber
+            # 替换说明首行的构建信息，保留其余内容
+            gh release view "$TAG" --json body -q .body > body.md
+            if head -n 1 body.md | grep -q '^构建自 '; then
+              tail -n +2 body.md > rest.md
+            else
+              { echo; cat body.md; } > rest.md
+            fi
+            { echo "$BUILD_LINE"; cat rest.md; } > notes.md
+            gh release edit "$TAG" --notes-file notes.md
+          else
+            printf '%s\n' "$BUILD_LINE" > notes.md
+            gh release create "$TAG" "$ZIP" \
+              --title "Bubble Kami v$VERSION" \
+              --notes-file notes.md \
+              --generate-notes
+          fi
