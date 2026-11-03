@@ -122,7 +122,7 @@
 	<!-- 主题运行时配置：站点地址 / pjax / 语法高亮等开关，供 theme.js 读取 -->
 	<script>
 		window.BB = window.BB || {};
-		// 注意：$options->siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
+		// 注意：options 的 siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
 		window.BB.siteUrl = <?php echo json_encode((string)$this->options->siteUrl); ?>;
 		window.BB.adminUrl = <?php echo json_encode((string)$this->options->adminUrl); ?>;
 		window.BB.searchUrl = <?php echo json_encode(Typecho_Common::url('search/', $this->options->index)); ?>;

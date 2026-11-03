@@ -314,8 +314,11 @@
 			});
 		}
 
-		// KaTeX 按需加载：正文含 $ 数学定界符才拉取（katex.min.js 约 252KB，收益最大）
-		if (BB.katex && document.body.textContent.indexOf('$') !== -1) {
+		// KaTeX 按需加载：只看正文区域，且要有成对的 $ / $$ 定界符才拉取（katex.min.js 约 252KB）。
+		// 不能检查整个 body：页内脚本的文字也算在 textContent 里，一个 $ 就会误触发
+		var mathText = '';
+		document.querySelectorAll('.content').forEach(function (el) { mathText += el.textContent; });
+		if (BB.katex && /\$\$[\s\S]+?\$\$|\$[^$\n]+\$/.test(mathText)) {
 			function renderKatex() {
 				try {
 					renderMathInElement(document.body, {

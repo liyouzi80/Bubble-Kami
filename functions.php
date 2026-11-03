@@ -404,6 +404,44 @@ function getCatalog() {
 	echo $index;
 }
 
+/**
+ * 本站上传目录里的图片没写宽高时，读取文件补上 width / height。
+ * 浏览器据此提前按比例留出位置，图片加载完不会把下面的文字顶下去（CLS）；CSS 里 height:auto 保证不变形。
+ */
+function themeImageSize($attrs) {
+	if (preg_match('/\swidth\s*=/i', $attrs) || preg_match('/\sheight\s*=/i', $attrs)) {
+		return '';
+	}
+	if (!preg_match('/\ssrc\s*=\s*["\']([^"\']+)["\']/i', $attrs, $m)) {
+		return '';
+	}
+	$src = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+	$parts = parse_url($src);
+	if (!$parts || empty($parts['path'])) {
+		return '';
+	}
+	// 只处理本站地址（含 www 与否、http 与 https）或相对地址
+	if (!empty($parts['host'])) {
+		$siteHost = parse_url((string)Helper::options()->siteUrl, PHP_URL_HOST);
+		if (!$siteHost || preg_replace('/^www\./i', '', strtolower($parts['host'])) !== preg_replace('/^www\./i', '', strtolower($siteHost))) {
+			return '';
+		}
+	}
+	$path = rawurldecode($parts['path']);
+	if (strpos($path, '/usr/uploads/') !== 0 || strpos($path, '..') !== false) {
+		return '';
+	}
+	$file = __TYPECHO_ROOT_DIR__ . $path;
+	if (!is_file($file)) {
+		return '';
+	}
+	$size = @getimagesize($file);
+	if (!$size || empty($size[0]) || empty($size[1])) {
+		return '';
+	}
+	return ' width="' . (int)$size[0] . '" height="' . (int)$size[1] . '"';
+}
+
 function lazyLoadImages($content, $allLazy = false) {
 	if (empty($content) || strpos($content, '<img') === false) {
 		return $content;
@@ -416,7 +454,7 @@ function lazyLoadImages($content, $allLazy = false) {
 			$attrs = rtrim(substr($attrs, 0, -1));
 			$selfclose = ' /';
 		}
-		$add = '';
+		$add = themeImageSize($attrs);
 		if (!$allLazy && $first) {
 			// 单篇正文首张图通常是首屏 LCP：优先加载；其余懒加载
 			$first = false;
