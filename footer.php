@@ -51,7 +51,7 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div class="copyright">
-					<?php _e($this->options->footerText); ?><?php getBuildTime(); ?>
+					<?php echo (string)$this->options->footerText; /* 设置为空时为 null，Typecho 1.3 的 _e() 只接受字符串，会直接报错 */ ?><?php getBuildTime(); ?>
 					</div>
 				</div>
 				<div class="col-md-6">
