@@ -141,6 +141,15 @@ node tools/purge-css.js /tmp/argon-full.css
 
 只在 JS 里拼接、或由 Typecho/插件输出的 class，需要加进 `tools/purge-css.js` 的 safelist。`tools/` 目录不会打包进发布的 zip。
 
+## 为旧图片补登记附件
+
+从 WordPress 等迁移过来的图片只存在于 `usr/uploads/`，数据库里没有附件记录，所以后台「管理 → 文件」里看不到（前台显示不受影响）。`tools/register-attachments.php` 会扫描上传目录，为没有记录的文件补登记；能找到引用它的文章时，同时关联到该文章。脚本不会改动文件和文章正文。
+
+1. 先备份数据库，再把脚本上传到 Typecho 根目录（与 `config.inc.php` 同级）。
+2. 命令行运行 `php register-attachments.php` 预览，确认后加 `--apply` 写入；加 `--only-referenced` 只登记被文章引用过的文件。
+3. 没有命令行时：把脚本里的 `RUN_KEY` 改成一串随机字符，浏览器访问 `/register-attachments.php?key=那串字符` 预览，加 `&apply=1` 写入。
+4. 用完立即删除脚本。重复运行是安全的，已登记的文件会跳过。
+
 # 截图
 
 ![screenshot.png](./screenshot.png)
@@ -175,6 +184,8 @@ Open sourced under the MIT license.
 + 中文排版：中英文 / 数字间自动留白、相邻全角标点挤压，代码块保持原样
 + 新增「导航栏 LOGO 图片」设置：有图显示图片，无图显示站点名称；原「站点 LOGO 地址」更名为「站点图标（favicon）地址」，作用不变
 + 首页下滑箭头改为更大的人字形（桌面 42px），缓慢浮动，点击滚到文章列表
++ 新增 404 页面：说明、站内搜索框、最近文章与返回首页（此前主题没有 404 模板）
++ 新增 `tools/register-attachments.php`：为迁移过来的旧图片补登记附件记录，使其出现在后台「管理 → 文件」
 + 发布流程：同一版本号可反复发布（覆盖 zip、标签移到最新提交、说明注明构建提交号），支持手动触发，只改文档时不发布
 
 ## 4.2.5

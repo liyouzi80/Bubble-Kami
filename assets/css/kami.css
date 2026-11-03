@@ -1733,3 +1733,58 @@ textarea {
     from { opacity: 0; transform: translateY(12px); }
   }
 }
+
+/* 404 页面 */
+.not-found-card .not-found-code {
+  margin-bottom: 1rem;
+  font-family: var(--serif);
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--vermilion);
+  letter-spacing: 0.08em;
+}
+
+.not-found-search {
+  display: flex;
+  gap: 0.6rem;
+  max-width: 28rem;
+  margin: 1.6rem 0 2rem;
+}
+
+.not-found-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--ivory);
+  color: var(--near-black);
+  outline: none;
+}
+
+.not-found-search input:focus {
+  border-color: var(--brand);
+}
+
+.not-found-search button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--brand);
+  color: #fff;
+  cursor: pointer;
+}
+
+.not-found-title {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem !important;
+}
+
+.not-found-list {
+  margin-bottom: 1.6rem;
+  padding-left: 1.2rem;
+}
+
+.not-found-list li {
+  margin: 0.35rem 0;
+}
