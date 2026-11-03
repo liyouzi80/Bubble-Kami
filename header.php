@@ -51,11 +51,6 @@
 	<link rel="preload" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
 	<noscript><link type="text/css" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" rel="stylesheet"></noscript>
 
-	<!-- 中文字体栈：优先使用系统字体，避免加载体积庞大的在线 webfont -->
-	<style>
-		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif; }
-	</style>
-
 	<!-- KaTeX / Prism / Viewer 的样式与脚本一样按正文内容懒加载（见 theme.js） -->
 	
 	<!-- Custom CSS -->

@@ -27,7 +27,8 @@
   --nav-bg: var(--near-black);
 
   --serif: 'Noto Serif SC', Charter, Georgia, 'Songti SC', 'STSong', 'NSimSun', serif;
-  --sans: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* 中文字体排在 system-ui 前面：Chrome 的 system-ui 按系统语言挑中文字体，放前面会让中文在各浏览器里都固定用苹方 / 雅黑 */
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
   --mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, Monaco, monospace;
 }
 
@@ -484,7 +485,8 @@ main > .section-hero:not([style*="100vh"]) {
   margin-bottom: 0.8rem !important;
 }
 
-/* 正文段落：18px + 1.8 行高，中文长文阅读更舒展 */
+/* 正文段落：18px + 1.8 行高，中文长文阅读更舒展。
+   不用 text-wrap: pretty：Safari 会通盘重排整段的断行，配合两端对齐会把部分行的字距拉得很开 */
 .content p {
   font-size: 1.125rem !important;
   line-height: 1.8 !important;
@@ -494,7 +496,15 @@ main > .section-hero:not([style*="100vh"]) {
   text-justify: inter-ideograph;
   word-break: normal;
   overflow-wrap: break-word;
-  text-wrap: pretty;
+}
+
+/* Argon 给 <p> 设了 300 细体：Chrome 会用苹方细体、Safari 用常规体，两边粗细不一。正文统一用常规体 */
+.content p,
+.content li,
+.content blockquote,
+.content td,
+.content th {
+  font-weight: 400;
 }
 
 /* 引用块：墨蓝左边框 + 极淡底色 */

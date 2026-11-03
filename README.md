@@ -166,6 +166,7 @@ Open sourced under the MIT license.
 + 分享卡片：文章页 `og:type` 为 `article`，新增 `og:description`（文章摘要）、发布 / 修改时间与 Twitter 卡片，分享图优先用正文第一张图；JSON-LD 同步补充摘要与图片；关闭 Typecho 自带的同名标签，避免重复
 + 阅读数统计改用跨数据库写法，修复 PostgreSQL 下统计失效
 + 文章目录锚点改用 `id`（替代已废弃的 `<a name>`），导航按钮无障碍标签改为中文
++ 修复 Chrome 与 Safari 正文字体不一致：正文统一用常规体（原为 Argon 的 300 细体，Chrome 显示偏细偏浅）；中文字体排到 `system-ui` 之前；去掉正文段落的 `text-wrap: pretty`，避免 Safari 两端对齐时字距被拉开
 + 发布流程：同一版本号可反复发布（覆盖 zip、标签移到最新提交、说明注明构建提交号），支持手动触发，只改文档时不发布
 
 ## 4.2.5
