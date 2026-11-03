@@ -26,7 +26,8 @@
   /* 导航栏专用背景：与白色导航文字搭配，避免滚动后变成浅色背景+白字看不清 */
   --nav-bg: var(--near-black);
 
-  --serif: 'Noto Serif SC', Charter, Georgia, 'Songti SC', 'STSong', 'NSimSun', serif;
+  /* Kami Title：设置了「标题字体子集文件」时生效的本站子集；没有的字依次回退到按需切片与系统宋体 */
+  --serif: 'Kami Title', 'Noto Serif SC', Charter, Georgia, 'Songti SC', 'STSong', 'NSimSun', serif;
   /* 中文字体排在 system-ui 前面：Chrome 的 system-ui 按系统语言挑中文字体，放前面会让中文在各浏览器里都固定用苹方 / 雅黑 */
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
   --mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, Monaco, monospace;
@@ -1787,4 +1788,17 @@ textarea {
 
 .not-found-list li {
   margin: 0.35rem 0;
+}
+
+/* 内容不固定的小字用正文字体：评论者昵称、友链名、表格表头、上一篇 / 下一篇、按钮文字等。
+   这些文字无法预先放进标题字体子集，用衬线体会额外下载很多字体切片 */
+#comments .comment-head h5,
+.friend-card h5,
+.content table th,
+.post-pager-link,
+.post-pager-none,
+.continue-reading,
+.float-tool,
+#modal-notification .modal-title {
+  font-family: var(--sans) !important;
 }

@@ -9,6 +9,8 @@ function themeConfig($form) {
 	$form->addInput($logoUrl);
 	$navLogo = new Typecho_Widget_Helper_Form_Element_Text('navLogo', NULL, '', _t('导航栏 LOGO 图片'), _t('填入图片 URL 后，左上角用图片代替站点名称；留空则显示文字。导航栏是深色背景，建议用浅色、透明底的 PNG / SVG，高度 80px 以上（显示高度桌面 40px、手机 32px）'));
 	$form->addInput($navLogo);
+	$titleFont = new Typecho_Widget_Helper_Form_Element_Text('titleFont', NULL, '', _t('标题字体子集文件'), _t('可选。填入用主题 tools/build-title-font.py 为本站生成的 woff2 地址后，标题优先用这个只含本站标题用字的小字体（通常几十 KB），子集里没有的字自动回退到原来的按需字体切片。留空则保持原样'));
+	$form->addInput($titleFont);
 	$avatarUrl = new Typecho_Widget_Helper_Form_Element_Text('avatarUrl', NULL, '', _t('站点头像地址'), _t('在这里填入一个图片 URL 地址，以在网站首页上加上一个头像'));
 	$form->addInput($avatarUrl);
 	$indexImage = new Typecho_Widget_Helper_Form_Element_Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认紫色渐变背景'));

@@ -50,6 +50,11 @@
 	     样式表约 105KB，异步加载不阻塞首屏；字体未到时标题先用系统衬线字体（font-display: swap） -->
 	<link rel="preload" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
 	<noscript><link type="text/css" href="<?php themeAsset("assets/css/noto-serif-sc.css"); ?>" rel="stylesheet"></noscript>
+	<?php if ($this->options->titleFont): $titleFontUrl = htmlspecialchars((string)$this->options->titleFont, ENT_QUOTES, 'UTF-8'); ?>
+	<!-- 本站标题字体子集：只含本站标题用字，优先于上面的字体切片（见 tools/build-title-font.py） -->
+	<link rel="preload" href="<?php echo $titleFontUrl; ?>" as="font" type="font/woff2" crossorigin>
+	<style>@font-face{font-family:'Kami Title';font-style:normal;font-weight:500;font-display:swap;src:local('Noto Serif SC Medium'),local('NotoSerifSC-Medium'),local('Source Han Serif SC Medium'),local('SourceHanSerifSC-Medium'),local('Noto Serif CJK SC Medium'),local('NotoSerifCJKsc-Medium'),url('<?php echo $titleFontUrl; ?>') format('woff2');}</style>
+	<?php endif; ?>
 
 	<!-- KaTeX / Prism / Viewer 的样式与脚本一样按正文内容懒加载（见 theme.js） -->
 	
