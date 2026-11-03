@@ -198,10 +198,86 @@
 		});
 	}
 
+	/* ---------- 记住阅读位置 ----------
+	 * 文章页（main[data-post-id]）滚动时记下阅读比例，存在本机 localStorage，最多保留 50 篇；
+	 * 再次打开时在底部提示「继续阅读」。读到 95% 以后视为读完，清除记录。 */
+	var setupReadingResume = (function () {
+		var STORE = 'bubblekami:reading';
+		var MAX = 50;
+		var key = null;
+		var timer = null;
+		var toast = null;
+
+		function read() {
+			try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; }
+		}
+		function write(data) {
+			try { localStorage.setItem(STORE, JSON.stringify(data)); } catch (e) {}
+		}
+		function ratio() {
+			var max = document.documentElement.scrollHeight - window.innerHeight;
+			return max > 0 ? window.pageYOffset / max : 0;
+		}
+		function record(k, r) {
+			var data = read();
+			if (r >= 0.95) {
+				delete data[k];
+			} else if (r >= 0.05) {
+				// 不到 5% 不更新：pjax 切页时会先滚回顶部，避免把上一篇的进度误记成 0
+				data[k] = { r: Math.round(r * 1000) / 1000, t: Date.now() };
+				var keys = Object.keys(data);
+				if (keys.length > MAX) {
+					keys.sort(function (a, b) { return data[a].t - data[b].t; })
+						.slice(0, keys.length - MAX)
+						.forEach(function (old) { delete data[old]; });
+				}
+			} else {
+				return;
+			}
+			write(data);
+		}
+		window.addEventListener('scroll', function () {
+			if (!key) return;
+			var k = key, r = ratio();
+			clearTimeout(timer);
+			timer = setTimeout(function () { record(k, r); }, 600);
+		}, { passive: true });
+
+		function hide() {
+			if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+			toast = null;
+		}
+
+		return function () {
+			hide();
+			var main = document.querySelector('main[data-post-id]');
+			key = main ? 'post-' + main.getAttribute('data-post-id') : null;
+			if (!key || location.hash) return;
+			var saved = read()[key];
+			if (!saved || window.pageYOffset > 200) return;
+
+			var el = document.createElement('div');
+			el.className = 'reading-resume';
+			el.setAttribute('role', 'status');
+			el.innerHTML = '<button type="button" class="reading-resume-go">继续阅读 · 上次读到 ' + Math.round(saved.r * 100) + '%</button>'
+				+ '<button type="button" class="reading-resume-close" aria-label="关闭">×</button>';
+			el.querySelector('.reading-resume-go').addEventListener('click', function () {
+				var max = document.documentElement.scrollHeight - window.innerHeight;
+				window.scrollTo({ top: saved.r * max, behavior: 'smooth' });
+				hide();
+			});
+			el.querySelector('.reading-resume-close').addEventListener('click', hide);
+			document.body.appendChild(el);
+			toast = el;
+			setTimeout(function () { if (toast === el) hide(); }, 10000);
+		};
+	})();
+
 	/* ---------- 页面渲染后统一初始化 ---------- */
 	function init(isPjax) {
 		setupNavSolid();
 		initComments(isPjax);
+		setupReadingResume();
 
 		// 图片懒加载：正文图片延迟加载（服务端已加 loading 属性，这里做兜底）
 		document.querySelectorAll('.content img').forEach(function (img) {
@@ -280,8 +356,11 @@
 				pgid = start_progress();
 				// 支持原生视图过渡时用它做交叉淡入，否则回退到黑色遮罩
 				var useVT = !!(document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-				if (!useVT) showCover(true);
-				window.scrollTo({ top: 0, behavior: 'instant' });
+				// 视图过渡时先不滚动：旧页面截图要停在当前位置，标题才会从卡片原处移到文章大标题；滚回顶部放到 apply 里
+				if (!useVT) {
+					showCover(true);
+					window.scrollTo({ top: 0, behavior: 'instant' });
+				}
 				destroyViewer();
 				fetch(url)
 					.then(function (res) {
@@ -297,6 +376,7 @@
 						function apply() {
 							delete BB.comment;
 							cur.innerHTML = next.innerHTML;
+							if (useVT) window.scrollTo({ top: 0, behavior: 'instant' });
 							runScripts(cur);
 							if (push) history.pushState({ url: url }, '', url);
 							init(true);

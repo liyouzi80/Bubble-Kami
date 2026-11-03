@@ -246,7 +246,7 @@ function printArticle($that, $flag, $forceSticky = false) { ?>
 		<section class="section">
 			<div class="container">
 				<div class="content">
-					<h1><a class="text-default" href="<?php $that->permalink() ?>"><?php $that->title() ?></a><?php printSticky($that, $forceSticky); ?></h1>
+					<h1><a class="text-default post-vt-title" href="<?php $that->permalink() ?>" style="view-transition-name: post-<?php echo (int)$that->cid; ?>"><?php $that->title() ?></a><?php printSticky($that, $forceSticky); ?></h1>
 					<div class="list-object">
 						<span class="list-tag"><time datetime="<?php $that->date('c'); ?>"><?php $that->date('Y.m.d'); ?></time></span>
 						<?php $views = getPostViews($that); if ($views !== null): ?>

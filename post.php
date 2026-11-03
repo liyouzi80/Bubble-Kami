@@ -3,7 +3,7 @@
 	$this->need('header.php');
 ?>
 
-	<main id="main" tabindex="-1">
+	<main id="main" tabindex="-1" data-post-id="<?php echo (int)$this->cid; ?>">
 
 		<?php if($this->options->toc): ?>
 		<div class="card shadow border-0 bg-secondary toc-container" id="toc-panel">
@@ -90,7 +90,7 @@
 			<div class="container shape-container d-flex align-items-center py-lg">
 				<div class="col px-0 text-center">
 					<div class="row align-items-center justify-content-center">
-						<h1 class="text-white"><?php $this->title() ?></h1>
+						<h1 class="text-white" style="view-transition-name: post-<?php echo (int)$this->cid; ?>"><?php $this->title() ?></h1>
 					</div>
 					<div class="row align-items-center justify-content-center">
 						<p class="text-white post-meta"><?php

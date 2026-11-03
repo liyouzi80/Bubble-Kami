@@ -1551,3 +1551,142 @@ dialog#search-dialog[open]::backdrop {
   opacity: 0.7;
 }
 
+
+/* ================================================
+   跨页过渡 / 按需渲染 / 中文排版 / 继续阅读（4.2.6）
+   ================================================ */
+
+/* 跨页过渡：同源页面之间交叉淡入；首页/归档卡片标题与文章页大标题同名（post-{cid}），切页时标题平滑移动过去。
+   开启 pjax 时由 theme.js 的 document.startViewTransition 完成同样的效果；不支持的浏览器照常跳转 */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+}
+
+/* 导航栏单独成层，切页时保持不动 */
+#navbar-main {
+  view-transition-name: site-nav;
+}
+
+/* 标题过渡元素需要是一个完整的盒子（多行内联元素无法参与过渡） */
+.list-card .content h1 a.post-vt-title {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+/* 长列表按需渲染：屏幕外的文章卡片与评论先跳过渲染，滚动到附近再绘制；
+   auto 会记住渲染过的真实高度，减少滚动条跳动。首张卡片在首屏，不参与。
+   未渲染卡片的预估高度取实际站点卡片高度的中位数（桌面约 560px、手机约 780px），预估越准，跳转定位越不容易偏 */
+.list-card:not(.content-card-head) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 560px;
+}
+
+@media screen and (max-width: 768px) {
+  .list-card:not(.content-card-head) {
+    contain-intrinsic-size: auto 780px;
+  }
+}
+
+#comments .comment-list > li {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 180px;
+}
+
+/* 中文排版：中文与英文 / 数字之间自动留出约 1/8 字宽的间距，相邻全角标点挤压（如「，“」），
+   效果接近印刷排版。代码保持等宽原样。不支持的浏览器忽略这两条 */
+body {
+  text-autospace: normal;
+  text-spacing-trim: normal;
+}
+
+pre,
+code,
+kbd,
+samp,
+input,
+textarea {
+  text-autospace: no-autospace;
+  text-spacing-trim: space-all;
+}
+
+/* 继续阅读提示：再次打开读到一半的文章时出现在底部，10 秒后自动消失 */
+.reading-resume {
+  position: fixed;
+  left: 50%;
+  bottom: 45px;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--ivory);
+  color: var(--brand);
+  box-shadow: 0 8px 24px rgba(80, 66, 45, 0.16);
+  transform: translateX(-50%);
+  animation: reading-resume-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes reading-resume-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+.reading-resume button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.reading-resume-go {
+  padding: 0.7rem 0.4rem 0.7rem 1.2rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.reading-resume-go:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reading-resume-close {
+  padding: 0.7rem 1rem 0.7rem 0.6rem;
+  color: var(--stone) !important;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.reading-resume button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  border-radius: 999px;
+}
+
+/* 手机上靠左，避开右下角的浮动按钮列 */
+@media screen and (max-width: 768px) {
+  .reading-resume {
+    left: 15px;
+    bottom: 15px;
+    max-width: calc(100vw - 95px);
+    transform: none;
+  }
+  @keyframes reading-resume-in {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+}
