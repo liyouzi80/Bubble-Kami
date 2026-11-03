@@ -145,32 +145,75 @@ button:focus-visible,
   pointer-events: none;
 }
 
-.section-hero::after {
-  content: '⌄';
+/* 首页大图底部的下滑箭头：CSS 画的人字形，缓慢上下浮动，点击滚到文章列表 */
+.hero-scroll {
   position: absolute;
-  bottom: 32px;
   left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 32px;
+  bottom: 28px;
   z-index: 10;
-  animation: bounce 2.4s ease-in-out infinite;
-  pointer-events: none;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  color: rgba(255, 255, 255, 0.85) !important;
+  transform: translateX(-50%);
 }
 
-main > .section-hero:not([style*="100vh"])::after {
-  display: none !important;
+.hero-scroll:hover {
+  color: #fff !important;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateX(-50%) translateY(0);
-    opacity: 0.5;
+.hero-scroll-chevron {
+  width: 30px;
+  height: 30px;
+  margin-top: -14px;
+  border-right: 3px solid currentColor;
+  border-bottom: 3px solid currentColor;
+  border-radius: 0 0 3px 0;
+  transform: rotate(45deg);
+  animation: hero-scroll-float 2.4s ease-in-out infinite;
+}
+
+@keyframes hero-scroll-float {
+  0%, 100% { opacity: 0.45; transform: translate(-3px, -3px) rotate(45deg); }
+  50%      { opacity: 1;    transform: translate(4px, 4px) rotate(45deg); }
+}
+
+@media screen and (max-width: 768px) {
+  .hero-scroll {
+    bottom: 16px;
+    width: 56px;
+    height: 56px;
   }
-  50% {
-    transform: translateX(-50%) translateY(8px);
-    opacity: 0.9;
+  .hero-scroll-chevron {
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    border-width: 0 2.5px 2.5px 0;
+  }
+}
+
+/* 导航栏图片 LOGO（设置「导航栏 LOGO 图片」后代替站点名称） */
+.navbar-brand-logo {
+  display: flex;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar-brand-logo img {
+  display: block;
+  width: auto;
+  height: 40px;
+  max-width: 220px;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 991.98px) {
+  .navbar-brand-logo img {
+    height: 32px;
+    max-width: 160px;
   }
 }
 
@@ -985,7 +1028,7 @@ main > .section-hero:not([style*="100vh"]) {
 
 @media print {
   .navbar,
-  .section-hero::after,
+  .hero-scroll,
   .footer,
   #comments,
   .list-card .btn-outline-primary {

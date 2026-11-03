@@ -35,8 +35,9 @@
 					</div>
 				</div>
 			</div>
+			<a class="hero-scroll" href="#index-posts" aria-label="向下浏览文章" title="向下浏览文章"><span class="hero-scroll-chevron" aria-hidden="true"></span></a>
 		</section>
-		<section class="section section-components bg-secondary content-card-container">
+		<section id="index-posts" class="section section-components bg-secondary content-card-container">
 			<div class="container container-lg py-5 align-items-center content-card-container">
 				<!-- Article list -->
 				<?php

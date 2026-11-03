@@ -121,7 +121,11 @@
 	<header class="header-global">
 		<nav id="navbar-main" class="navbar navbar-main navbar-expand-lg navbar-transparent navbar-light headroom">
 			<div class="container">
+				<?php if ($this->options->navLogo): ?>
+				<a class="navbar-brand navbar-brand-logo" href="<?php $this->options->siteUrl(); ?>"><img src="<?php echo htmlspecialchars((string)$this->options->navLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo themeAttr($this->options->title); ?>"></a>
+				<?php else: ?>
 				<a class="navbar-brand" href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title() ?></a>
+				<?php endif; ?>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-default" aria-controls="navbar-default" aria-expanded="false" aria-label="展开导航菜单">
 					<span class="navbar-toggler-icon"></span>
 				</button>

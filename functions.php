@@ -5,8 +5,10 @@ function themeConfig($form) {
 	themeConfigSeedBackup();
 	$subtitle = new Typecho_Widget_Helper_Form_Element_Text('subtitle', NULL, '', _t('站点副标题'), _t('在这里填入站点副标题，以在网站标题后显示'));
 	$form->addInput($subtitle);
-	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, '', _t('站点 LOGO 地址'), _t('在这里填入一个图片 URL 地址，以在网站标题前加上一个 LOGO'));
+	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, '', _t('站点图标（favicon）地址'), _t('浏览器标签页上显示的小图标，填入图片 URL；留空使用主题自带图标'));
 	$form->addInput($logoUrl);
+	$navLogo = new Typecho_Widget_Helper_Form_Element_Text('navLogo', NULL, '', _t('导航栏 LOGO 图片'), _t('填入图片 URL 后，左上角用图片代替站点名称；留空则显示文字。导航栏是深色背景，建议用浅色、透明底的 PNG / SVG，高度 80px 以上（显示高度桌面 40px、手机 32px）'));
+	$form->addInput($navLogo);
 	$avatarUrl = new Typecho_Widget_Helper_Form_Element_Text('avatarUrl', NULL, '', _t('站点头像地址'), _t('在这里填入一个图片 URL 地址，以在网站首页上加上一个头像'));
 	$form->addInput($avatarUrl);
 	$indexImage = new Typecho_Widget_Helper_Form_Element_Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认紫色渐变背景'));
