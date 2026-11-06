@@ -18,7 +18,7 @@
 			<div class="container shape-container d-flex align-items-center py-lg">
 				<div class="col px-0">
 					<div class="row align-items-center justify-content-center">
-						<div class="col-lg-6 text-center">
+						<div class="col-lg-6 text-center hero-intro">
 							<div class="index-avatar-container">
 								<img src="<?php
 									if ($this->options->avatarUrl == '') {

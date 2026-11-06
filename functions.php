@@ -601,48 +601,21 @@ function themeInit($archive) {
  */
 function getBuildTime()
 {
-	$site_create_date = Helper::options()->siteCreateDate;
-	if (empty($site_create_date)) {
+	$created = strtotime((string)Helper::options()->siteCreateDate);
+	if (!$created) {
 		return;
 	}
-
-	$site_create_time = strtotime($site_create_date);
-	if (empty($site_create_time)) {
+	// 按日历计算（与首页统计的运行时长一致）：先算整年，再算距上个周年日的天、小时、分钟
+	$start = new DateTime('@' . $created);
+	$now = new DateTime('@' . time());
+	if ($now < $start) {
 		return;
 	}
-
-	$time = time() - $site_create_time;
-	if (is_numeric($time)) {
-		$value = array(
-			"years" => 0, "days" => 0, "hours" => 0,
-			"minutes" => 0, "seconds" => 0,
-		);
-		if ($time >= 31556926) {
-			$value["years"] = floor($time / 31556926);
-			$time = ($time % 31556926);
-		}
-		if ($time >= 86400) {
-			$value["days"] = floor($time / 86400);
-			$time = ($time % 86400);
-		}
-		if ($time >= 3600) {
-			$value["hours"] = floor($time / 3600);
-			$time = ($time % 3600);
-		}
-		if ($time >= 60) {
-			$value["minutes"] = floor($time / 60);
-			$time = ($time % 60);
-		}
-		$value["seconds"] = floor($time);
-
-		echo '<span class="btime">'." 距今已有 ".$value['years'].
-		' 年 '.$value['days'].
-		' 天 '.$value['hours'].
-		' 小时 '.$value['minutes'].
-		' 分</span>';
-	} else {
-		echo '';
-	}
+	$years = (int)$start->diff($now)->y;
+	$anniversary = (clone $start)->modify('+' . $years . ' years');
+	$rest = $now->getTimestamp() - $anniversary->getTimestamp();
+	echo '<span class="btime"> 距今已有 ' . $years . ' 年 ' . intdiv($rest, 86400) . ' 天 '
+		. intdiv($rest % 86400, 3600) . ' 小时 ' . intdiv($rest % 3600, 60) . ' 分</span>';
 }
 
 /* ---------- 首页点赞 ----------
