@@ -2147,7 +2147,6 @@ textarea {
     max-width: 100%;
   }
   .hero-intro h1 {
-    margin-bottom: 0.9rem !important;
     font-size: 3rem !important;
     letter-spacing: 0.12em !important;
   }
@@ -2157,13 +2156,9 @@ textarea {
     margin-right: auto;
     letter-spacing: 0.25em;
   }
-  .hero-intro .hero-like {
-    margin-top: 2.6rem;
-  }
   .hero-intro .hero-stats {
     flex-wrap: nowrap;
     gap: 0;
-    margin-top: 1.5rem;
   }
   .hero-intro .hero-stats li {
     padding: 0 1.4rem;
@@ -2172,4 +2167,24 @@ textarea {
   .hero-intro .hero-stats li:first-child {
     border-left: 0;
   }
+}
+
+/* 首页大图的文字节奏（桌面与手机通用）：同组紧、分组松。
+   头像→站名约 28px，站名→题句约 22px（同一组），题句→点赞约 43px（两组之间），点赞→统计约 24px（可见间距） */
+.hero-intro .index-avatar-container {
+  margin-bottom: 1.5rem !important;
+}
+.hero-intro h1 {
+  margin-bottom: 0.75rem !important;
+  line-height: 1.2 !important;
+}
+.hero-intro .lead {
+  margin: 0 auto !important;
+  line-height: 1.5 !important;
+}
+.hero-intro .hero-like {
+  margin-top: 2.4rem !important;
+}
+.hero-intro .hero-stats {
+  margin-top: 1.25rem !important;
 }
