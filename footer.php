@@ -51,7 +51,7 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div class="copyright">
-					<?php echo (string)$this->options->footerText; /* 设置为空时为 null，Typecho 1.3 的 _e() 只接受字符串，会直接报错 */ ?><?php getBuildTime(); ?>
+					<?php echo (string)$this->options->footerText; /* 设置为空时为 null，Typecho 1.3 的 _e() 只接受字符串，会直接报错 */ ?><?php if (isset($this->options->heroExtras) && (string)$this->options->heroExtras === '0') getBuildTime(); /* 首页统计已显示运行时长，关闭时才在页脚显示 */ ?>
 					</div>
 				</div>
 				<div class="col-md-6">

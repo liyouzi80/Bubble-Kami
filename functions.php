@@ -21,7 +21,7 @@ function themeConfig($form) {
 	$form->addInput($footerText);
 	$footerWidget = new Typecho_Widget_Helper_Form_Element_Radio('footerWidget', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('页脚小工具'), _t('选择是否在页面底部显示“最新评论”、“最新文章”等栏目'));
 	$form->addInput($footerWidget);
-	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于在页脚显示“本站已运行 X 年 X 天”，留空则不显示'));
+	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于首页统计的运行时长；关闭「首页点赞与统计」时改在页脚显示「距今已有 X 年 X 天」'));
 	$form->addInput($siteCreateDate);
 	$heroExtras = new Typecho_Widget_Helper_Form_Element_Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（统计每小时更新一次；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
 	$form->addInput($heroExtras);
