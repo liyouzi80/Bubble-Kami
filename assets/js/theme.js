@@ -170,6 +170,115 @@
 		}
 	})();
 
+	/* ---------- 首页点赞 ----------
+	 * 不去重，可以一直点。数字先在页面上加，停手约 0.8 秒后把这段时间点的次数一次性发给服务器
+	 * （每次最多 50 下，服务端每秒每个 IP 只受理一次，多出来的留到下一次发）。 */
+	(function () {
+		var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.4-9.6-8.9C.7 8.9 2.4 5 6.1 4.3c2.3-.4 4.3.8 5.9 2.9 1.6-2.1 3.6-3.3 5.9-2.9 3.7.7 5.4 4.6 3.7 7.8C19.2 16.6 12 21 12 21z"/></svg>';
+		var COLORS = ['#ef5b4c', '#ff8a7a', '#f6b26b', '#ff6f91', '#f28c6b'];
+		var btn = null, base = 0, pending = 0, timer = null, sending = false;
+
+		function render() {
+			if (!btn || !btn.isConnected) return;
+			btn.querySelector('.hero-like-count').textContent = (base + pending).toLocaleString('en-US');
+		}
+
+		function burst() {
+			for (var i = 0; i < 3; i++) {
+				var s = document.createElement('span');
+				s.className = 'like-float';
+				s.innerHTML = HEART;
+				s.style.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+				s.style.setProperty('--dx', Math.round(Math.random() * 60 - 30) + 'px');
+				s.style.setProperty('--dy', -Math.round(90 + Math.random() * 90) + 'px');
+				s.style.setProperty('--r', Math.round(Math.random() * 60 - 30) + 'deg');
+				s.style.setProperty('--s', (0.8 + Math.random() * 0.6).toFixed(2));
+				s.style.animationDelay = (i * 70) + 'ms';
+				s.addEventListener('animationend', function () { this.remove(); });
+				btn.appendChild(s);
+			}
+		}
+
+		function schedule(delay) {
+			clearTimeout(timer);
+			timer = setTimeout(flush, delay);
+		}
+
+		function flush() {
+			if (!pending) return;
+			if (sending) { schedule(800); return; }
+			var n = Math.min(pending, 50);
+			var body = new URLSearchParams();
+			body.append('bk_action', 'like');
+			body.append('n', n);
+			sending = true;
+			fetch(BB.siteUrl, { method: 'POST', body: body, credentials: 'same-origin' })
+				.then(function (res) { return res.json(); })
+				.then(function (data) {
+					if (!data) return;
+					if (data.ok) pending -= n;
+					if (typeof data.count === 'number') base = data.count;
+				})
+				.catch(function () {})
+				.finally(function () {
+					sending = false;
+					render();
+					if (pending > 0) schedule(1200);
+				});
+		}
+
+		document.addEventListener('click', function (e) {
+			var el = e.target.closest('.hero-like');
+			if (!el) return;
+			// pjax 切回首页后按钮是新元素：以服务端渲染的最新数为准，未发出的点击继续累计
+			if (el !== btn) {
+				btn = el;
+				base = parseInt(el.getAttribute('data-count'), 10) || 0;
+			}
+			pending++;
+			btn.classList.add('liked');
+			btn.classList.remove('pop');
+			void btn.offsetWidth;
+			btn.classList.add('pop');
+			render();
+			burst();
+			schedule(800);
+		});
+
+		// 离开页面前把没发出的点击补发出去
+		window.addEventListener('pagehide', function () {
+			if (!pending || !navigator.sendBeacon) return;
+			var body = new URLSearchParams();
+			body.append('bk_action', 'like');
+			body.append('n', Math.min(pending, 50));
+			navigator.sendBeacon(BB.siteUrl, body);
+			pending = 0;
+		});
+	})();
+
+	/* ---------- 目录页分类筛选 ---------- */
+	document.addEventListener('click', function (e) {
+		var chip = e.target.closest('.arc-chip');
+		if (!chip) return;
+		var wrap = chip.closest('.arc-wrap');
+		var cat = chip.getAttribute('data-cat');
+		wrap.querySelectorAll('.arc-chip').forEach(function (c) {
+			c.classList.toggle('active', c === chip);
+			c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
+		});
+		wrap.querySelectorAll('.arc-year').forEach(function (year) {
+			var shown = 0;
+			year.querySelectorAll('.arc-item').forEach(function (item) {
+				var hit = !cat || (' ' + item.getAttribute('data-cats') + ' ').indexOf(' ' + cat + ' ') !== -1;
+				item.hidden = !hit;
+				if (hit) shown++;
+			});
+			year.hidden = shown === 0;
+			var count = year.querySelector('.arc-year-count');
+			if (count) count.textContent = shown;
+		});
+	});
+
 	/* ---------- 图片查看器（有图才按需加载 Viewer.js） ---------- */
 	function initViewer() {
 		var targets = document.querySelectorAll('.content');

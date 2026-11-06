@@ -23,6 +23,8 @@ function themeConfig($form) {
 	$form->addInput($footerWidget);
 	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于在页脚显示“本站已运行 X 年 X 天”，留空则不显示'));
 	$form->addInput($siteCreateDate);
+	$heroExtras = new Typecho_Widget_Helper_Form_Element_Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（统计每小时更新一次；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
+	$form->addInput($heroExtras);
 	$stickyCids = new Typecho_Widget_Helper_Form_Element_Text('stickyCids', NULL, '', _t('首页置顶文章 CID'), _t('输入文章 CID，多个以英文逗号分隔；按输入顺序显示在首页最前面。留空则不置顶。'));
 	$form->addInput($stickyCids);
 	$viewsEnabled = new Typecho_Widget_Helper_Form_Element_Radio('viewsEnabled', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('文章阅读数'), _t('内置阅读数统计，无需 Views 插件；已有 views 数据会保留。'));
@@ -566,6 +568,9 @@ function isThemePrefetchRequest() {
 
 function themeInit($archive) {
 	themeConfigSeedBackup();
+	if ($archive->is('index')) {
+		themeHandleLike($archive);
+	}
 	if (!$archive->is('single')) {
 		return;
 	}
@@ -639,3 +644,121 @@ function getBuildTime()
 		echo '';
 	}
 }
+
+/* ---------- 首页点赞 ----------
+ * 不去重：访客可以一直点。前端把连续点击合并成一次请求（每次最多计 50 下），
+ * 服务端每个 IP 每秒最多受理一次，防止脚本刷爆数据库。总数存在 options 表的 bubblekami:likes。 */
+function themeLikeCount() {
+	return max(0, (int)themeOptionRead('bubblekami:likes'));
+}
+
+function themeLikeAdd($n) {
+	$name = 'bubblekami:likes';
+	if (themeOptionRead($name) === null) {
+		themeOptionWrite($name, '0');
+	}
+	try {
+		// MySQL / SQLite 可直接在文本列上做原子加法
+		$db = Typecho_Db::get();
+		$db->query($db->update('table.options')->expression('value', 'value + ' . (int)$n)->where('name = ?', $name));
+	} catch (Throwable $e) {
+		// PostgreSQL 等不支持文本与数字相加：退回读出再写入
+		themeOptionWrite($name, (string)(themeLikeCount() + (int)$n));
+	}
+}
+
+function themeHandleLike($archive) {
+	$request = $archive->request;
+	if (!$request->isPost() || $request->get('bk_action') !== 'like') {
+		return;
+	}
+	$n = max(1, min(50, (int)$request->get('n')));
+	$file = rtrim(sys_get_temp_dir(), '/\\') . '/bubblekami-like-' . md5($request->getIp() . '|' . __DIR__);
+	$now = microtime(true);
+	$accepted = !is_file($file) || $now - (float)@file_get_contents($file) >= 1;
+	if ($accepted) {
+		@file_put_contents($file, (string)$now, LOCK_EX);
+		themeLikeAdd($n);
+	}
+	header('Content-Type: application/json; charset=utf-8');
+	header('Cache-Control: no-store');
+	echo json_encode(array('ok' => $accepted, 'count' => themeLikeCount()));
+	exit;
+}
+
+/* ---------- 首页统计 ---------- */
+
+/** 正文字数：中文按字、英文与数字按词计，不计代码块、图片与链接地址 */
+function themeCountWords($text) {
+	$t = preg_replace('/^\s*<!--markdown-->/', '', (string)$text);
+	$t = preg_replace('/```.*?```/s', ' ', $t);
+	$t = preg_replace('/<(script|style|pre|code)\b.*?<\/\1>/is', ' ', $t);
+	$t = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $t);
+	$t = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $t);
+	$t = preg_replace('#https?://\S+#i', ' ', $t);
+	$t = html_entity_decode(strip_tags($t), ENT_QUOTES, 'UTF-8');
+	$han = preg_match_all('/[\x{3400}-\x{9fff}\x{f900}-\x{faff}]/u', $t);
+	$latin = preg_match_all("/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/u", $t);
+	return (int)$han + (int)$latin;
+}
+
+/** 文章数、字数、阅读数、评论数与建站时间，缓存在 options 表，每小时重新计算一次 */
+function themeSiteStats() {
+	$name = 'bubblekami:stats';
+	$cache = json_decode((string)themeOptionRead($name), true);
+	if (is_array($cache) && isset($cache['t']) && time() - (int)$cache['t'] < 3600) {
+		return $cache;
+	}
+	$stats = array('t' => time(), 'posts' => 0, 'words' => 0, 'views' => 0, 'comments' => 0, 'since' => 0);
+	try {
+		$db = Typecho_Db::get();
+		$rows = $db->fetchAll($db->select('text', 'password', 'created')->from('table.contents')
+			->where('type = ?', 'post')->where('status = ?', 'publish'));
+		$stats['posts'] = count($rows);
+		foreach ($rows as $row) {
+			if (empty($row['password'])) {
+				$stats['words'] += themeCountWords($row['text']);
+			}
+			if (!$stats['since'] || (int)$row['created'] < $stats['since']) {
+				$stats['since'] = (int)$row['created'];
+			}
+		}
+		if (ensureThemeViewsColumn()) {
+			$row = $db->fetchObject($db->select(array('SUM(views)' => 'num'))->from('table.contents')
+				->where('type = ?', 'post')->where('status = ?', 'publish'));
+			$stats['views'] = (int)$row->num;
+		}
+		$row = $db->fetchObject($db->select(array('COUNT(coid)' => 'num'))->from('table.comments')
+			->where('status = ?', 'approved')->where('type = ?', 'comment'));
+		$stats['comments'] = (int)$row->num;
+	} catch (Throwable $e) {
+		// 统计失败不影响首页渲染
+	}
+	themeOptionWrite($name, json_encode($stats));
+	return $stats;
+}
+
+/** 大数字缩写：1,234 / 5.99 万 / 22.3 万 */
+function themeShortNumber($n) {
+	$n = (int)$n;
+	if ($n < 10000) {
+		return number_format($n);
+	}
+	$v = $n / 10000;
+	return rtrim(rtrim(number_format($v, $v >= 10 ? 1 : 2, '.', ''), '0'), '.') . ' 万';
+}
+
+/** 运行时长 [年, 天]：优先用「站点创建时间」，未填写时从第一篇文章算起 */
+function themeRunningTime($since = 0) {
+	$created = strtotime((string)Helper::options()->siteCreateDate);
+	$from = $created ?: (int)$since;
+	if (!$from) {
+		return null;
+	}
+	$start = new DateTime('@' . $from);
+	$now = new DateTime('@' . time());
+	$years = (int)$start->diff($now)->y;
+	$anniversary = (clone $start)->modify('+' . $years . ' years');
+	return array($years, (int)floor(($now->getTimestamp() - $anniversary->getTimestamp()) / 86400));
+}
+

@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.2.6
+ * @version 4.2.7
  * @link https://github.com/liyouzi80/Bubble-Kami
  */
 
@@ -31,6 +31,23 @@
 							<h1 class="text-white"><?php $this->options->title() ?></h1>
 							
 							<p class="lead text-white"><?php $this->options->description() ?></p>
+							<?php if (!isset($this->options->heroExtras) || (string)$this->options->heroExtras !== '0'):
+								$likes = themeLikeCount();
+								$stats = themeSiteStats();
+								$running = themeRunningTime($stats['since']);
+							?>
+							<button type="button" class="hero-like" id="hero-like" data-count="<?php echo $likes; ?>" aria-label="点赞" title="点赞">
+								<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.4-9.6-8.9C.7 8.9 2.4 5 6.1 4.3c2.3-.4 4.3.8 5.9 2.9 1.6-2.1 3.6-3.3 5.9-2.9 3.7.7 5.4 4.6 3.7 7.8C19.2 16.6 12 21 12 21z"/></svg>
+								<span class="hero-like-count"><?php echo number_format($likes); ?></span>
+							</button>
+							<ul class="hero-stats">
+								<li><b><?php echo themeShortNumber($stats['posts']); ?></b>篇文章</li>
+								<li><b><?php echo themeShortNumber($stats['words']); ?></b>字</li>
+								<?php if (themeViewsEnabled()): ?><li><b><?php echo themeShortNumber($stats['views']); ?></b>次阅读</li><?php endif; ?>
+								<li><b><?php echo themeShortNumber($stats['comments']); ?></b>条评论</li>
+								<?php if ($running): ?><li>运行 <b><?php echo $running[0]; ?></b>年 <b><?php echo $running[1]; ?></b>天</li><?php endif; ?>
+							</ul>
+							<?php endif; ?>
 						</div>
 					</div>
 				</div>

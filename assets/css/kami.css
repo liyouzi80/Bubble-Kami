@@ -176,9 +176,10 @@ button:focus-visible,
   animation: hero-scroll-float 2.4s ease-in-out infinite;
 }
 
+/* 只做垂直浮动：translate 写在 rotate 前面，按屏幕坐标上下移动，左右两笔保持对称 */
 @keyframes hero-scroll-float {
-  0%, 100% { opacity: 0.45; transform: translate(-3px, -3px) rotate(45deg); }
-  50%      { opacity: 1;    transform: translate(4px, 4px) rotate(45deg); }
+  0%, 100% { opacity: 0.45; transform: translateY(-4px) rotate(45deg); }
+  50%      { opacity: 1;    transform: translateY(5px) rotate(45deg); }
 }
 
 @media screen and (max-width: 768px) {
@@ -1801,4 +1802,340 @@ textarea {
 .float-tool,
 #modal-notification .modal-title {
   font-family: var(--sans) !important;
+}
+
+/* ================================================
+   首页点赞与统计 / 目录页（4.2.7）
+   ================================================ */
+
+/* 点赞按钮：半透明胶囊，压在首页大图上 */
+.hero-like {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.8rem;
+  padding: 0.6rem 1.35rem 0.6rem 1.05rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font: 500 1rem/1 var(--sans);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: background-color 0.2s ease;
+}
+
+.hero-like:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.hero-like:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.hero-like svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.2s, stroke 0.2s;
+}
+
+.hero-like.liked svg {
+  fill: #ef5b4c;
+  stroke: #ef5b4c;
+}
+
+.hero-like.pop svg {
+  animation: like-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes like-pop {
+  40% { transform: scale(1.35); }
+}
+
+.hero-like-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 点击时飘出的小爱心：位移、旋转、颜色由 theme.js 随机给出 */
+.like-float {
+  position: absolute;
+  left: 1.05rem;
+  top: 0.4rem;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  animation: like-float 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.like-float svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: none;
+}
+
+@keyframes like-float {
+  0%   { opacity: 1; transform: translate(0, 0) scale(0.6) rotate(0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(var(--s)) rotate(var(--r)); }
+}
+
+/* 统计：数字用宋体加大，说明文字小号 */
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.6rem;
+  margin: 1.6rem auto 0;
+  padding: 0;
+  list-style: none;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+}
+
+.hero-stats li {
+  white-space: nowrap;
+}
+
+.hero-stats b {
+  margin-right: 0.3em;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+@media screen and (max-width: 768px) {
+  .hero-stats {
+    max-width: 20rem;
+    gap: 0.45rem 1.1rem;
+    font-size: 0.8rem;
+  }
+  .hero-stats b {
+    font-size: 1.05rem;
+  }
+}
+
+/* 目录页：顶部总数与分类筛选 */
+.arc-intro {
+  margin-bottom: 1.6rem;
+}
+
+.arc-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem 2rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.content .arc-total {
+  margin: 0 !important;
+  color: var(--stone) !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.1em;
+}
+
+.arc-total b {
+  margin-right: 0.2em;
+  font-family: var(--serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--near-black);
+}
+
+.arc-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.arc-chip {
+  padding: 0.35rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--olive);
+  font: 400 0.85rem/1.4 var(--sans);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.arc-chip:hover {
+  border-color: var(--stone);
+}
+
+.arc-chip small {
+  margin-left: 0.35em;
+  font-size: 0.78rem;
+  color: var(--stone);
+}
+
+.arc-chip.active {
+  border-color: var(--vermilion);
+  color: var(--vermilion);
+}
+
+.arc-chip.active small {
+  color: var(--vermilion);
+  opacity: 0.75;
+}
+
+/* 目录页：左侧年份，右侧竖线串起的时间轴 */
+.arc-year {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  column-gap: 2.6rem;
+  padding-top: 1.6rem;
+}
+
+.arc-year[hidden] {
+  display: none;
+}
+
+.arc-year-label {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  padding-top: 0.7rem;
+  text-align: right;
+}
+
+.arc-year-label strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 2.1rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--near-black);
+}
+
+.arc-year-label span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--stone);
+}
+
+.arc-year-label span b {
+  font-weight: 400;
+}
+
+/* .content 前缀：盖过正文列表自带的缩进与圆点，保证圆点落在竖线上 */
+.content .arc-list {
+  margin: 0 !important;
+  padding: 0 0 1.4rem 2.2rem !important;
+  border-left: 1px solid var(--border);
+  list-style: none;
+}
+
+.content .arc-item {
+  position: relative;
+  margin: 0 !important;
+  padding: 0.85rem 0 !important;
+}
+
+.content .arc-item[hidden] {
+  display: none;
+}
+
+.content .arc-item::marker {
+  content: none;
+}
+
+.content .arc-item::before {
+  content: "";
+  position: absolute;
+  left: calc(-2.2rem - 4px);
+  top: 1.5rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cfccc0;
+  box-shadow: 0 0 0 4px var(--ivory);
+  transition: background-color 0.2s;
+}
+
+.content .arc-item:hover::before {
+  background: var(--vermilion);
+}
+
+.content .arc-title {
+  font-family: var(--serif);
+  font-size: 1.18rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--near-black) !important;
+  border: 0 !important;
+  background: none !important;
+  text-decoration: none !important;
+}
+
+.content .arc-title:hover {
+  color: var(--brand) !important;
+}
+
+.arc-meta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--stone);
+}
+
+.arc-meta i {
+  margin-left: 0.9em;
+  font-style: normal;
+}
+
+@media screen and (max-width: 768px) {
+  .arc-year {
+    grid-template-columns: 1fr;
+    padding-top: 1.2rem;
+  }
+  .arc-year-label {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin-bottom: 0.2rem;
+    padding: 0.6rem 0 0.5rem;
+    background: var(--ivory);
+    text-align: left;
+  }
+  .arc-year-label strong {
+    font-size: 1.6rem;
+  }
+  .arc-year-label span {
+    margin: 0;
+  }
+  .content .arc-list {
+    padding-left: 1.4rem !important;
+  }
+  .content .arc-item::before {
+    left: calc(-1.4rem - 4px);
+  }
+  .content .arc-title {
+    font-size: 1.08rem;
+  }
 }
