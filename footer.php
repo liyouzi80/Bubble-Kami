@@ -143,6 +143,8 @@
 			echo json_encode($prismCss, JSON_UNESCAPED_SLASHES);
 		?>;
 		window.BB.twcnJs = "<?php themeAsset('assets/js/tw-cn.js'); ?>";
+		window.BB.smoothScroll = <?php echo $this->options->smoothScroll ? 'true' : 'false'; ?>;
+		window.BB.lenisJs = "<?php themeAsset('assets/js/lenis.min.js'); ?>";
 		window.BB.prismJs = {
 			core: "<?php themeAsset('assets/js/prism-core.min.js'); ?>",
 			autoloader: "<?php themeAsset('assets/js/prism-autoloader.min.js'); ?>",

@@ -43,7 +43,9 @@
 						e.preventDefault();
 						var target = document.getElementById(a.getAttribute('href').slice(1));
 						if (target) {
-							window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 120, behavior: 'smooth' });
+							var y = target.getBoundingClientRect().top + window.pageYOffset - 120;
+							if (window.themeScrollTo) themeScrollTo(y, true);
+							else window.scrollTo({ top: y, behavior: 'smooth' });
 						}
 					});
 

@@ -2554,3 +2554,22 @@ textarea {
     font-size: 0.85rem;
   }
 }
+
+/* 平滑滚动（Lenis）：开启后关闭原生 smooth，避免两者叠加；不加官方 CSS 里禁用 iframe 点击的规则，
+   以免文章里嵌入的音乐播放器等无法操作 */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}

@@ -52,6 +52,30 @@
 		next();
 	}
 
+	/* ---------- 平滑滚动（Lenis，设置里开启） ----------
+	 * 主题内所有程序化滚动都走 themeScrollTo：开启平滑滚动时交给 Lenis，避免原生滚动与 Lenis 互相抢。 */
+	var lenis = null;
+	window.themeScrollTo = function (y, smooth) {
+		if (lenis) lenis.scrollTo(y, { immediate: !smooth, force: true });
+		else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'instant' });
+	};
+	if (BB.smoothScroll && BB.lenisJs
+		&& !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+		&& window.matchMedia('(pointer: fine)').matches) {
+		loadScript(BB.lenisJs, function () {
+			if (!window.Lenis) return;
+			lenis = window.__lenis = new Lenis({
+				autoRaf: true,
+				lerp: 0.1,
+				anchors: { offset: -80 },
+				allowNestedScroll: true,
+				stopInertiaOnNavigate: true,
+				// 弹窗、图片查看器、代码块里的滚轮交给原生处理
+				prevent: function (node) { return !!(node.closest && node.closest('dialog, .viewer-container, pre')); }
+			});
+		});
+	}
+
 	/* ---------- 导航栏兜底：离开 hero 或无 hero 页面强制深色，避免 pjax/headroom 状态错位 ---------- */
 	function setupNavSolid() {
 		var nav = document.querySelector('#navbar-main');
@@ -125,7 +149,7 @@
 		update();
 
 		scrollup.addEventListener('click', function () {
-			window.scrollTo({ top: 0, behavior: 'smooth' });
+			themeScrollTo(0, true);
 		});
 	})();
 
@@ -135,7 +159,9 @@
 		var dialog = document.getElementById('search-dialog');
 		if (!toggle || !dialog || !dialog.showModal) return;
 		var input = dialog.querySelector('input[name="s"]');
+		dialog.addEventListener('close', function () { if (lenis) lenis.start(); });
 		toggle.addEventListener('click', function () {
+			if (lenis) lenis.stop();
 			dialog.showModal();
 			if (input) { input.focus(); input.select(); }
 		});
@@ -317,7 +343,10 @@
 				el.__viewer = new Viewer(el, {
 					url: 'src',
 					// 书架封面、友链头像、关于页头像是链接或装饰，不弹出大图
-					filter: function (img) { return !img.closest('.book, .link-card, .about-head'); }
+					filter: function (img) { return !img.closest('.book, .link-card, .about-head'); },
+					// 看大图时暂停平滑滚动，滚轮留给缩放
+					shown: function () { if (lenis) lenis.stop(); },
+					hidden: function () { if (lenis) lenis.start(); }
 				});
 			});
 		}
@@ -400,7 +429,7 @@
 				+ '<button type="button" class="reading-resume-close" aria-label="关闭">×</button>';
 			el.querySelector('.reading-resume-go').addEventListener('click', function () {
 				var max = document.documentElement.scrollHeight - window.innerHeight;
-				window.scrollTo({ top: saved.r * max, behavior: 'smooth' });
+				themeScrollTo(saved.r * max, true);
 				hide();
 			});
 			el.querySelector('.reading-resume-close').addEventListener('click', hide);
@@ -499,7 +528,7 @@
 				// 视图过渡时先不滚动：旧页面截图要停在当前位置，标题才会从卡片原处移到文章大标题；滚回顶部放到 apply 里
 				if (!useVT) {
 					showCover(true);
-					window.scrollTo({ top: 0, behavior: 'instant' });
+					themeScrollTo(0, false);
 				}
 				destroyViewer();
 				fetch(url)
@@ -516,7 +545,7 @@
 						function apply() {
 							delete BB.comment;
 							cur.innerHTML = next.innerHTML;
-							if (useVT) window.scrollTo({ top: 0, behavior: 'instant' });
+							if (useVT) themeScrollTo(0, false);
 							runScripts(cur);
 							if (push) history.pushState({ url: url }, '', url);
 							init(true);
@@ -642,7 +671,7 @@
 		if (commentId != -Infinity) {
 			var target = document.getElementById('comment-' + commentId);
 			if (target) {
-				window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 100, behavior: 'smooth' });
+				themeScrollTo(target.getBoundingClientRect().top + window.pageYOffset - 100, true);
 				setTimeout(function () {
 					target.style.display = 'none';
 					setTimeout(function () { target.style.display = ''; }, 90);
