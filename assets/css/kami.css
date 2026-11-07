@@ -13,6 +13,7 @@
   --ivory: #faf9f5;
   --brand: #1B365D;
   --vermilion: #a33a2a;
+  --progress-gradient: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
   --warm-sand: #e8e6dc;
 
   --near-black: #141413;
@@ -2626,7 +2627,38 @@ html.lenis {
   overscroll-behavior: contain;
 }
 
-/* 文章阅读进度：顶部 2px 朱红细线，跟随页面滚动（纯 CSS 滚动驱动动画，不支持的浏览器不显示） */
+/* 页面跳转进度条：与阅读进度线同款 2px 渐变（progress.js 控制 is-active 与 transform） */
+#argprogress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1041;
+  height: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#argprogress.is-active {
+  opacity: 1;
+  transition: none;
+}
+
+.argprogress-bar {
+  height: 100%;
+  background: var(--progress-gradient);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 0.25s ease-out;
+}
+
+/* 跳转进行中先藏起阅读进度线，免得两条线叠在一起 */
+.is-page-loading .read-progress {
+  visibility: hidden;
+}
+
+/* 文章阅读进度：顶部 2px 渐变细线，跟随页面滚动（纯 CSS 滚动驱动动画，不支持的浏览器不显示） */
 .read-progress {
   display: none;
 }
@@ -2640,7 +2672,7 @@ html.lenis {
     right: 0;
     z-index: 1040;
     height: 2px;
-    background: var(--vermilion);
+    background: var(--progress-gradient);
     transform-origin: 0 50%;
     transform: scaleX(0);
     pointer-events: none;
