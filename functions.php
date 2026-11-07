@@ -33,8 +33,6 @@ function themeConfig($form) {
 	$form->addInput($customCss);
 	$Pjax = new Typecho_Widget_Helper_Form_Element_Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
 	$form->addInput($Pjax);
-	$smoothScroll = new Typecho_Widget_Helper_Form_Element_Radio('smoothScroll', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('平滑滚动'), _t('打开后鼠标滚轮滚动带缓动惯性，像触控板一样顺滑（Lenis，约 6KB）。只对鼠标 / 触控板生效，手机保持原生滚动；系统开启「减少动态效果」时自动关闭'));
-	$form->addInput($smoothScroll);
 	$pjaxcomp = new Typecho_Widget_Helper_Form_Element_Textarea('pjaxcomp', NULL, '', _t('pjax 回调代码'), _t('在这里填入 pjax 渲染完毕后需执行的 JS 代码，具体使用方法请仔细阅读主题说明文档'));
 	$form->addInput($pjaxcomp);
 	$katex = new Typecho_Widget_Helper_Form_Element_Radio('katex', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 katex 数学公式渲染'), _t('选择是否启用 katex 数学公式渲染'));
