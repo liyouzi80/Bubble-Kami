@@ -2666,6 +2666,19 @@ textarea {
   to { transform: scaleX(1); }
 }
 
+/* 正文图片可点开看大图（PhotoSwipe，见 theme.js）；书架封面、友链头像、关于页头像除外 */
+.content img {
+  cursor: zoom-in;
+}
+
+.content :is(.book, .link-card) img {
+  cursor: pointer;
+}
+
+.content .about-head img {
+  cursor: auto;
+}
+
 /* 正文图片加载好再淡入（theme.js 只给未加载完的图片加 .img-fade） */
 .content img.img-fade {
   opacity: 0;

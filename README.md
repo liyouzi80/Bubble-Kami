@@ -9,11 +9,11 @@ Typecho 清新风格响应式主题：社区维护的 Bubble 优化分支，内�
 # 特性
 
 + **纸质书外观**：卡片式布局，暖色纸面、墨蓝点缀、衬线标题，桌面与手机自适应
-+ **阅读体验**：文章目录、上一篇 / 下一篇与相关文章；再次打开读到一半的文章会提示「继续阅读」；顶部阅读进度线、图片加载后淡入
++ **阅读体验**：文章目录、上一篇 / 下一篇与相关文章；再次打开读到一半的文章会提示「继续阅读」；顶部阅读进度线、图片加载后淡入；点图从原位放大看大图，可缩放、看原图、左右切换
 + **流畅切页**：全站 pjax 与 ajax 评论，切页时文章标题平滑过渡到文章页
 + **右下角浮动按钮**：返回顶部（带阅读进度）、搜索、简繁切换；登录后另有后台按钮
 + **中文排版**：中英文混排自动留白、全角标点挤压，简繁一键切换
-+ **代码与公式**：Prism 代码高亮（约 300 种语言、多种配色）、KaTeX 数学公式
++ **代码与公式**：Prism 1.30 代码高亮（约 300 种语言、多种配色）、KaTeX 0.19 数学公式
 + **短代码**：高亮提示框、友链卡片
 + **站点功能**：首页点赞与博客统计（文章数、字数、阅读数、评论数、运行时长）、时间轴目录页、友链页、关于页、书架页（自动同步微信读书书单）、首页置顶、内置阅读数（兼容 Views 插件数据）、自定义头图 / 壁纸 / LOGO / 样式、404 页面
 + **SEO 与分享**：JSON-LD 结构化数据，分享卡片自动带文章摘要与首图
@@ -172,4 +172,5 @@ MIT License。
 
 + 原版主题由 [三硝基豆腐](https://github.com/trinitrotofu)、[Rorical](https://github.com/Liupaperbox) 和 [Totorato](https://github.com/totorato) 共同完成
 + 基于 [Argon Design System](https://www.creative-tim.com/product/argon-design-system)；评论模块部分代码参照 Typecho 官方主题 Default
++ 自带的第三方库：[PhotoSwipe](https://photoswipe.com)（图片查看）、[Prism](https://prismjs.com)（代码高亮）、[KaTeX](https://katex.org)（数学公式），均为 MIT 协议
 + 相关主题：[Rorical](https://github.com/Liupaperbox/Rorical) · [Bubble（Totorato 修改版）](https://github.com/totorato/Bubble)

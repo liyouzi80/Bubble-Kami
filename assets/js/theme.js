@@ -74,13 +74,41 @@
 	}
 	setupNavSolid();
 
-	/* ---------- Headroom：滚动时隐藏/显示导航栏 ---------- */
-	if (window.Headroom && document.querySelector('#navbar-main.headroom')) {
-		new Headroom(document.querySelector('#navbar-main'), {
-			offset: 300,
-			tolerance: { up: 30, down: 30 }
-		}).init();
-	}
+	/* ---------- 导航栏滚动隐藏（代替 Headroom.js，类名与原库一致，样式不用改） ----------
+	 * 离顶部 300px 内：headroom--top 且始终显示；之外：headroom--not-top，
+	 * 一帧内往下滚超过 30px 收起（headroom--unpinned），往上滚超过 30px 或回到顶部区域时放出（headroom--pinned）。 */
+	(function () {
+		var nav = document.querySelector('#navbar-main.headroom');
+		if (!nav) return;
+		var OFFSET = 300, TOLERANCE = 30;
+		var lastY = window.pageYOffset, ticking = false;
+		function set(name, on) { nav.classList.toggle(name, on); }
+		function update() {
+			ticking = false;
+			var y = window.pageYOffset;
+			var delta = y - lastY;
+			lastY = y;
+			// 橡皮筋回弹（滚出顶部或底部）时不动
+			if (y < 0 || y + window.innerHeight > document.documentElement.scrollHeight) return;
+			var atTop = y <= OFFSET;
+			set('headroom--top', atTop);
+			set('headroom--not-top', !atTop);
+			if (delta > TOLERANCE && !atTop) {
+				set('headroom--unpinned', true);
+				set('headroom--pinned', false);
+			} else if ((delta < -TOLERANCE || atTop) && nav.classList.contains('headroom--unpinned')) {
+				// 与原库一致：只有收起过才加 pinned
+				set('headroom--pinned', true);
+				set('headroom--unpinned', false);
+			}
+		}
+		window.addEventListener('scroll', function () {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(update);
+		}, { passive: true });
+		update();
+	})();
 
 	/* ---------- 回到顶部（带阅读进度） ---------- */
 	(function () {
@@ -367,36 +395,96 @@
 		}
 	});
 
-	/* ---------- 图片查看器（有图才按需加载 Viewer.js） ---------- */
-	function initViewer() {
-		var targets = document.querySelectorAll('.content');
-		var hasImage = false;
-		targets.forEach(function (el) { if (el.querySelector('img')) hasImage = true; });
-		if (!hasImage) return;
-		function build() {
-			if (!window.Viewer) return;
-			targets.forEach(function (el) {
-				if (el.__viewer) return;
-				if (!el.querySelector('img')) return;
-				el.__viewer = new Viewer(el, {
-					url: 'src',
-					// 书架封面、友链头像、关于页头像是链接或装饰，不弹出大图
-					filter: function (img) { return !img.closest('.book, .link-card, .about-head'); }
-				});
-			});
-		}
-		loadCss(BB.viewerCss);
-		if (window.Viewer) { build(); }
-		else if (BB.viewerJs) { loadScript(BB.viewerJs, build); }
+	/* ---------- 图片查看器（PhotoSwipe 5，第一次点图时才加载） ----------
+	 * 点正文图片从原位放大打开；同一篇里的图片可左右滑动切换，双指 / 滚轮缩放，下拉或点空白关闭。 */
+	var pswp = null, pswpModule = null;
+	// 书架封面、友链头像、关于页头像是链接或装饰，不弹出大图
+	var PSWP_SKIP = '.book, .link-card, .about-head, .link-avatar';
+
+	function isZoomable(img) {
+		if (!img.closest('.content') || img.closest(PSWP_SKIP)) return false;
+		// 包在链接里的图片：链接指向图片文件才当作看大图，指向页面的照常跳转
+		var a = img.closest('a[href]');
+		return !a || /\.(jpe?g|png|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(a.getAttribute('href'));
 	}
 
-	function destroyViewer() {
-		document.querySelectorAll('.content').forEach(function (el) {
-			if (el.__viewer) {
-				el.__viewer.destroy();
-				el.__viewer = null;
-			}
+	function loadPhotoSwipe() {
+		if (pswpModule) return Promise.resolve(pswpModule);
+		loadCss(BB.pswpCss);
+		// 用 Function 包一层，老浏览器不认识 import() 时也不会让整个 theme.js 解析失败
+		return new Function('u', 'return import(u)')(BB.pswpJs).then(function (m) {
+			pswpModule = m.default;
+			return pswpModule;
 		});
+	}
+
+	function openPhotoSwipe(img) {
+		// 加载失败的图不放进相册（被点的那张除外）
+		var imgs = Array.prototype.filter.call(img.closest('.content').querySelectorAll('img'), function (el) {
+			return el === img || (isZoomable(el) && !(el.complete && el.naturalWidth === 0));
+		});
+		var items = imgs.map(function (el) {
+			var src = el.currentSrc || el.src;
+			return {
+				src: src,
+				msrc: src,
+				width: el.naturalWidth || parseInt(el.getAttribute('width'), 10) || 0,
+				height: el.naturalHeight || parseInt(el.getAttribute('height'), 10) || 0,
+				alt: el.alt || '',
+				element: el
+			};
+		});
+		loadPhotoSwipe().then(function (PhotoSwipe) {
+			if (pswp) pswp.destroy();
+			pswp = new PhotoSwipe({
+				dataSource: items,
+				index: Math.max(0, imgs.indexOf(img)),
+				bgOpacity: 0.92,
+				wheelToZoom: true,
+				// 打开时整图适配屏幕；点缩放按钮（或点图片）直接看原图 1:1，本来就能完整显示的小图放大到 2 倍
+				secondaryZoomLevel: function (zoom) { return zoom.fit < 1 ? 1 : 2; },
+				closeTitle: '关闭',
+				zoomTitle: '缩放',
+				arrowPrevTitle: '上一张',
+				arrowNextTitle: '下一张',
+				errorMsg: '图片加载失败'
+			});
+			// 尺寸未知的图（还没加载完）在大图加载后补上真实尺寸
+			pswp.on('contentLoadImage', function (e) {
+				var c = e.content;
+				if (c.data.width && c.data.height) return;
+				c.element && c.element.addEventListener('load', function () {
+					c.data.width = this.naturalWidth;
+					c.data.height = this.naturalHeight;
+					c.width = this.naturalWidth;
+					c.height = this.naturalHeight;
+					if (c.slide) c.slide.updateContentSize(true);
+				}, { once: true });
+			});
+			pswp.on('destroy', function () { pswp = null; });
+			pswp.init();
+		}).catch(function () {
+			// 加载失败时退回直接打开原图
+			window.open(img.currentSrc || img.src, '_blank', 'noopener');
+		});
+	}
+
+	document.addEventListener('click', function (e) {
+		var img = e.target.closest && e.target.closest('.content img');
+		if (!img || !isZoomable(img) || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+		e.preventDefault();
+		openPhotoSwipe(img);
+	});
+
+	// 鼠标移到图片上就提前拉取脚本，点下去时基本不用等
+	document.addEventListener('pointerover', function (e) {
+		if (pswpModule || e.pointerType === 'touch') return;
+		var img = e.target.closest && e.target.closest('.content img');
+		if (img && isZoomable(img)) loadPhotoSwipe().catch(function () {});
+	});
+
+	function closeViewer() {
+		if (pswp) pswp.destroy();
 	}
 
 	/* ---------- 记住阅读位置 ----------
@@ -549,7 +637,6 @@
 			try { new Function(BB.pjaxcomp)(); } catch (e) {}
 		}
 
-		setTimeout(initViewer, 300);
 	}
 
 	/* ---------- pjax ---------- */
@@ -572,7 +659,7 @@
 					showCover(true);
 					themeScrollTo(0, false);
 				}
-				destroyViewer();
+				closeViewer();
 				fetch(url)
 					.then(function (res) {
 						var type = res.headers.get('content-type') || '';
