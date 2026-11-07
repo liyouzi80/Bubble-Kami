@@ -41,7 +41,7 @@ if (!is_file($configFile)) {
 }
 require_once $configFile;
 
-$db = Typecho_Db::get();
+$db = \Typecho\Db::get();
 $uploadDir = defined('__TYPECHO_UPLOAD_DIR__') ? __TYPECHO_UPLOAD_DIR__ : '/usr/uploads';
 $uploadRoot = defined('__TYPECHO_UPLOAD_ROOT_DIR__') ? __TYPECHO_UPLOAD_ROOT_DIR__ : __TYPECHO_ROOT_DIR__;
 $scanDir = rtrim($uploadRoot, '/') . $uploadDir;
@@ -82,9 +82,9 @@ $docs = $db->fetchAll($db->select('cid', 'text', 'authorId', 'type')->from('tabl
     ->where('type IN ?', ['post', 'page', 'post_draft', 'page_draft']));
 
 // 3) 默认作者：第一位管理员
-$admin = $db->fetchRow($db->select('uid')->from('table.users')->where('table.users.group = ?', 'administrator')->order('uid', Typecho_Db::SORT_ASC)->limit(1));
+$admin = $db->fetchRow($db->select('uid')->from('table.users')->where('table.users.group = ?', 'administrator')->order('uid', \Typecho\Db::SORT_ASC)->limit(1));
 if (!$admin) {
-    $admin = $db->fetchRow($db->select('uid')->from('table.users')->order('uid', Typecho_Db::SORT_ASC)->limit(1));
+    $admin = $db->fetchRow($db->select('uid')->from('table.users')->order('uid', \Typecho\Db::SORT_ASC)->limit(1));
 }
 $defaultAuthor = $admin ? (int)$admin['uid'] : 1;
 
@@ -147,7 +147,7 @@ foreach ($plan as [$rel, $abs, $parent]) {
         'path' => $rel,
         'size' => filesize($abs),
         'type' => $ext,
-        'mime' => Typecho_Common::mimeContentType($abs),
+        'mime' => \Typecho\Common::mimeContentType($abs),
     ]);
     $cid = $db->query($db->insert('table.contents')->rows([
         'title' => htmlspecialchars($name),
@@ -165,7 +165,7 @@ foreach ($plan as [$rel, $abs, $parent]) {
         'parent' => $parent ? (int)$parent['cid'] : 0,
     ]));
     // 与 Typecho 上传时一样，用文件名生成缩略名，重名时追加 -1、-2……
-    $base = Typecho_Common::slugName($name, $cid);
+    $base = \Typecho\Common::slugName($name, $cid);
     $slug = $base;
     $n = 1;
     while ($db->fetchRow($db->select('cid')->from('table.contents')->where('slug = ? AND cid <> ?', $slug, $cid)->limit(1))) {

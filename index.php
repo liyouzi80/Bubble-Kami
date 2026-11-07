@@ -64,7 +64,7 @@
 						$stickyArchive = null;
 						$GLOBALS['kamiLoadingSticky'] = true;
 						try {
-							$this->widget('Widget_Archive@kamiSticky' . $stickyCid, 'pageSize=1&type=post', 'cid=' . $stickyCid)->to($stickyArchive);
+							\Widget\Archive::allocWithAlias('kamiSticky' . $stickyCid, 'pageSize=1&type=post', 'cid=' . $stickyCid)->to($stickyArchive);
 							if ($stickyArchive && $stickyArchive->have()) {
 								while ($stickyArchive->next()) {
 									if ($stickyArchive->status !== 'publish') continue;

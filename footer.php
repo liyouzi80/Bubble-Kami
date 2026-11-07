@@ -19,7 +19,7 @@
 			<div class="row">
 				<div class="col-md-4 widget">
 					<h5>最新评论</h5>
-					<?php $comments_recent = $this->widget('Widget_Comments_Recent', 'pageSize=5');
+					<?php $comments_recent = \Widget\Comments\Recent::alloc('pageSize=5');
 						if ($comments_recent->have())
 						{
 							_e('<ul>');
@@ -39,11 +39,11 @@
 				</div>
 				<div class="col-md-4 widget">
 					<h5><i class="fa fa-file-text-o" aria-hidden="true"></i>最新文章</h5>
-					<ul class="footer-list"><?php $this->widget('Widget_Contents_Post_Recent', 'pageSize=6')->parse('<li><a href="{permalink}" class="footer-link">{title}</a></li>'); ?></ul>
+					<ul class="footer-list"><?php \Widget\Contents\Post\Recent::alloc('pageSize=6')->parse('<li><a href="{permalink}" class="footer-link">{title}</a></li>'); ?></ul>
 				</div>
 				<div class="col-md-4 widget">
 					<h5><i class="fa fa-archive" aria-hidden="true"></i>近期归档</h5>
-					<ul class="footer-list"><?php $this->widget('Widget_Contents_Post_Date', 'limit=6&type=month&format=Y-m')->parse('<li><a href="{permalink}" class="footer-link">{date}</a></li>'); ?></ul>
+					<ul class="footer-list"><?php \Widget\Contents\Post\Date::alloc('limit=6&type=month&format=Y-m')->parse('<li><a href="{permalink}" class="footer-link">{date}</a></li>'); ?></ul>
 				</div>
 			</div>
 			<hr/>
@@ -59,7 +59,7 @@
 						<li class="nav-item">
 							<a class="nav-link" href="<?php $this->options->siteUrl(); ?>">首页</a>
 						</li>
-						<?php $this->widget('Widget_Contents_Page_List')->to($pages);
+						<?php \Widget\Contents\Page\Rows::alloc()->to($pages);
 							while($pages->next()): ?>
 							<li class="nav-item">
 								<a class="nav-link" href="<?php $pages->permalink(); ?>"><?php $pages->title(); ?></a>
@@ -123,7 +123,7 @@
 		// 注意：options 的 siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
 		window.BB.siteUrl = <?php echo json_encode((string)$this->options->siteUrl); ?>;
 		window.BB.adminUrl = <?php echo json_encode((string)$this->options->adminUrl); ?>;
-		window.BB.searchUrl = <?php echo json_encode(Typecho_Common::url('search/', $this->options->index)); ?>;
+		window.BB.searchUrl = <?php echo json_encode(\Typecho\Common::url('search/', $this->options->index)); ?>;
 		window.BB.pjax = <?php echo $this->options->Pjax ? 'true' : 'false'; ?>;
 		window.BB.prismjs = <?php echo $this->options->prismjs ? 'true' : 'false'; ?>;
 		window.BB.prismLine = <?php echo $this->options->prismLine ? 'true' : 'false'; ?>;
@@ -148,7 +148,7 @@
 			showLanguage: "<?php themeAsset('assets/js/prism-show-language.min.js'); ?>",
 			copy: "<?php themeAsset('assets/js/prism-copy-to-clipboard.min.js'); ?>",
 			lineNumbers: "<?php themeAsset('assets/js/prism-line-numbers.min.js'); ?>",
-			components: "<?php echo Helper::options()->themeUrl('assets/js/prism-components/'); ?>"
+			components: "<?php echo \Utils\Helper::options()->themeUrl('assets/js/prism-components/'); ?>"
 		};
 	</script>
 	<!-- 主题脚本：导航折叠 / 导航栏滚动隐藏 / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->

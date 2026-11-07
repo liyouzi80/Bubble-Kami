@@ -28,7 +28,7 @@
 								</form>
 								<h3 class="not-found-title">最近的文章</h3>
 								<ul class="not-found-list">
-									<?php $this->widget('Widget_Contents_Post_Recent', 'pageSize=6')->parse('<li><a href="{permalink}">{title}</a></li>'); ?>
+									<?php \Widget\Contents\Post\Recent::alloc('pageSize=6')->parse('<li><a href="{permalink}">{title}</a></li>'); ?>
 								</ul>
 								<p><a class="continue-reading" href="<?php $this->options->siteUrl(); ?>">返回首页 <span aria-hidden="true">→</span></a></p>
 							</div>

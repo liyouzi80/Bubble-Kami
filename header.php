@@ -30,11 +30,23 @@
 	?></title>
 
 	<!-- Favicon -->
-	<?php if ($this->options->logoUrl == ''): ?>
+	<?php
+		$iconUrl = trim((string)$this->options->logoUrl);
+		$touchIcon = trim((string)$this->options->touchIcon);
+		if ($iconUrl === '') {
+			$touchIcon = $touchIcon !== '' ? $touchIcon : themeAssetUrl('images/apple-touch-icon.png');
+		} elseif ($touchIcon === '' && in_array(themeIconType($iconUrl), array('image/png', 'image/jpeg'), true)) {
+			$touchIcon = $iconUrl;
+		}
+	?>
+	<?php if ($iconUrl === ''): ?>
 	<link href="<?php themeAsset("images/logo.webp"); ?>" rel="icon" type="image/webp">
 	<link href="<?php themeAsset("images/logo.png"); ?>" rel="icon" type="image/png">
-	<?php else: ?>
-	<link href="<?php $this->options->logoUrl(); ?>" rel="icon" type="image/png">
+	<?php else: $iconType = themeIconType($iconUrl); ?>
+	<link href="<?php echo htmlspecialchars($iconUrl, ENT_QUOTES, 'UTF-8'); ?>" rel="icon"<?php if ($iconType !== ''): ?> type="<?php echo $iconType; ?>"<?php endif; ?>>
+	<?php endif; ?>
+	<?php if ($touchIcon !== ''): ?>
+	<link href="<?php echo htmlspecialchars($touchIcon, ENT_QUOTES, 'UTF-8'); ?>" rel="apple-touch-icon">
 	<?php endif; ?>
 
 	<!-- FontAwesome -->
@@ -153,7 +165,7 @@
 							<a class="nav-link" href="<?php $this->options->siteUrl(); ?>">首页</a>
 						</li>
 						<?php
-							$this->widget('Widget_Contents_Page_List')->to($pages);
+							\Widget\Contents\Page\Rows::alloc()->to($pages);
 							while($pages->next()):
 						?>
 							<li class="nav-item">

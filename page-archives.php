@@ -8,7 +8,7 @@
 	$this->need('header.php');
 
 	// 全部已发布文章，按年份分组（Post_Recent 已按发布时间倒序）
-	$this->widget('Widget_Contents_Post_Recent@kamiArchives', 'pageSize=100000')->to($arcPosts);
+	\Widget\Contents\Post\Recent::allocWithAlias('kamiArchives', 'pageSize=100000')->to($arcPosts);
 	$arcYears = array();
 	$arcCats = array();
 	$arcTotal = 0;

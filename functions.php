@@ -3,45 +3,47 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 function themeConfig($form) {
 	themeConfigSeedBackup();
-	$subtitle = new Typecho_Widget_Helper_Form_Element_Text('subtitle', NULL, '', _t('站点副标题'), _t('在这里填入站点副标题，以在网站标题后显示'));
+	$subtitle = new \Typecho\Widget\Helper\Form\Element\Text('subtitle', NULL, '', _t('站点副标题'), _t('在这里填入站点副标题，以在网站标题后显示'));
 	$form->addInput($subtitle);
-	$logoUrl = new Typecho_Widget_Helper_Form_Element_Text('logoUrl', NULL, '', _t('站点图标（favicon）地址'), _t('浏览器标签页上显示的小图标，填入图片 URL；留空使用主题自带图标'));
+	$logoUrl = new \Typecho\Widget\Helper\Form\Element\Text('logoUrl', NULL, '', _t('站点图标（favicon）地址'), _t('浏览器标签页上显示的小图标，填入图片 URL；留空使用主题自带图标'));
 	$form->addInput($logoUrl);
-	$navLogo = new Typecho_Widget_Helper_Form_Element_Text('navLogo', NULL, '', _t('导航栏 LOGO 图片'), _t('填入图片 URL 后，左上角用图片代替站点名称；留空则显示文字。导航栏是深色背景，建议用浅色、透明底的 PNG / SVG，高度 80px 以上（显示高度桌面 40px、手机 32px）'));
+	$touchIcon = new \Typecho\Widget\Helper\Form\Element\Text('touchIcon', NULL, '', _t('主屏幕图标地址'), _t('iPhone / iPad「添加到主屏幕」时的图标，填入 180×180 的 PNG 图片 URL（不支持 SVG，透明背景会被填成黑色）；留空时站点图标是 PNG / JPG 就用它，否则不设置'));
+	$form->addInput($touchIcon);
+	$navLogo = new \Typecho\Widget\Helper\Form\Element\Text('navLogo', NULL, '', _t('导航栏 LOGO 图片'), _t('填入图片 URL 后，左上角用图片代替站点名称；留空则显示文字。导航栏是深色背景，建议用浅色、透明底的 PNG / SVG，高度 80px 以上（显示高度桌面 40px、手机 32px）'));
 	$form->addInput($navLogo);
-	$titleFont = new Typecho_Widget_Helper_Form_Element_Text('titleFont', NULL, '', _t('标题字体子集文件'), _t('可选。填入用主题 tools/build-title-font.py 为本站生成的 woff2 地址后，标题优先用这个只含本站标题用字的小字体（通常几十 KB），子集里没有的字自动回退到原来的按需字体切片。留空则保持原样'));
+	$titleFont = new \Typecho\Widget\Helper\Form\Element\Text('titleFont', NULL, '', _t('标题字体子集文件'), _t('可选。填入用主题 tools/build-title-font.py 为本站生成的 woff2 地址后，标题优先用这个只含本站标题用字的小字体（通常几十 KB），子集里没有的字自动回退到原来的按需字体切片。留空则保持原样'));
 	$form->addInput($titleFont);
-	$avatarUrl = new Typecho_Widget_Helper_Form_Element_Text('avatarUrl', NULL, '', _t('站点头像地址'), _t('在这里填入一个图片 URL 地址，以在网站首页上加上一个头像'));
+	$avatarUrl = new \Typecho\Widget\Helper\Form\Element\Text('avatarUrl', NULL, '', _t('站点头像地址'), _t('在这里填入一个图片 URL 地址，以在网站首页上加上一个头像'));
 	$form->addInput($avatarUrl);
-	$indexImage = new Typecho_Widget_Helper_Form_Element_Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认紫色渐变背景'));
+	$indexImage = new \Typecho\Widget\Helper\Form\Element\Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认紫色渐变背景'));
 	$form->addInput($indexImage);
-	$randomImage = new Typecho_Widget_Helper_Form_Element_Textarea('randomImage', NULL, '', _t('随机背景图像地址'), _t('在这里填入一个或多个图片 URL 地址，每行一个，<strong>请勿包含多余字符</strong>，以设定网站文章页、独立页面以及其他页面的头图，设定后将随机显示，留空则使用默认紫色渐变背景'));
+	$randomImage = new \Typecho\Widget\Helper\Form\Element\Textarea('randomImage', NULL, '', _t('随机背景图像地址'), _t('在这里填入一个或多个图片 URL 地址，每行一个，<strong>请勿包含多余字符</strong>，以设定网站文章页、独立页面以及其他页面的头图，设定后将随机显示，留空则使用默认紫色渐变背景'));
 	$form->addInput($randomImage);
-	$footerText = new Typecho_Widget_Helper_Form_Element_Text('footerText', NULL, 'Powered by <a href="https://typecho.org/" class="footer-link">Typecho</a> · Theme by <a href="https://github.com/liyouzi80/Bubble-Kami" class="footer-link">Bubble Kami</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
+	$footerText = new \Typecho\Widget\Helper\Form\Element\Text('footerText', NULL, 'Powered by <a href="https://typecho.org/" class="footer-link">Typecho</a> · Theme by <a href="https://github.com/liyouzi80/Bubble-Kami" class="footer-link">Bubble Kami</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
 	$form->addInput($footerText);
-	$footerWidget = new Typecho_Widget_Helper_Form_Element_Radio('footerWidget', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('页脚小工具'), _t('选择是否在页面底部显示“最新评论”、“最新文章”等栏目'));
+	$footerWidget = new \Typecho\Widget\Helper\Form\Element\Radio('footerWidget', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('页脚小工具'), _t('选择是否在页面底部显示“最新评论”、“最新文章”等栏目'));
 	$form->addInput($footerWidget);
-	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于首页统计的运行时长；关闭「首页点赞与统计」时改在页脚显示「距今已有 X 年 X 天」'));
+	$siteCreateDate = new \Typecho\Widget\Helper\Form\Element\Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于首页统计的运行时长；关闭「首页点赞与统计」时改在页脚显示「距今已有 X 年 X 天」'));
 	$form->addInput($siteCreateDate);
-	$heroExtras = new Typecho_Widget_Helper_Form_Element_Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（发文、改文、新评论后立即更新；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
+	$heroExtras = new \Typecho\Widget\Helper\Form\Element\Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（发文、改文、新评论后立即更新；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
 	$form->addInput($heroExtras);
-	$stickyCids = new Typecho_Widget_Helper_Form_Element_Text('stickyCids', NULL, '', _t('首页置顶文章 CID'), _t('输入文章 CID，多个以英文逗号分隔；按输入顺序显示在首页最前面。留空则不置顶。'));
+	$stickyCids = new \Typecho\Widget\Helper\Form\Element\Text('stickyCids', NULL, '', _t('首页置顶文章 CID'), _t('输入文章 CID，多个以英文逗号分隔；按输入顺序显示在首页最前面。留空则不置顶。'));
 	$form->addInput($stickyCids);
-	$viewsEnabled = new Typecho_Widget_Helper_Form_Element_Radio('viewsEnabled', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('文章阅读数'), _t('内置阅读数统计，无需 Views 插件；已有 views 数据会保留。'));
+	$viewsEnabled = new \Typecho\Widget\Helper\Form\Element\Radio('viewsEnabled', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('文章阅读数'), _t('内置阅读数统计，无需 Views 插件；已有 views 数据会保留。'));
 	$form->addInput($viewsEnabled);
-	$customCss = new Typecho_Widget_Helper_Form_Element_Textarea('customCss', NULL, '', _t('自定义 css'), _t('在这里填入所需要的 css，以实现自定义页面样式，如调整字体大小等'));
+	$customCss = new \Typecho\Widget\Helper\Form\Element\Textarea('customCss', NULL, '', _t('自定义 css'), _t('在这里填入所需要的 css，以实现自定义页面样式，如调整字体大小等'));
 	$form->addInput($customCss);
-	$Pjax = new Typecho_Widget_Helper_Form_Element_Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
+	$Pjax = new \Typecho\Widget\Helper\Form\Element\Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
 	$form->addInput($Pjax);
-	$pjaxcomp = new Typecho_Widget_Helper_Form_Element_Textarea('pjaxcomp', NULL, '', _t('pjax 回调代码'), _t('在这里填入 pjax 渲染完毕后需执行的 JS 代码，具体使用方法请仔细阅读主题说明文档'));
+	$pjaxcomp = new \Typecho\Widget\Helper\Form\Element\Textarea('pjaxcomp', NULL, '', _t('pjax 回调代码'), _t('在这里填入 pjax 渲染完毕后需执行的 JS 代码，具体使用方法请仔细阅读主题说明文档'));
 	$form->addInput($pjaxcomp);
-	$katex = new Typecho_Widget_Helper_Form_Element_Radio('katex', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 katex 数学公式渲染'), _t('选择是否启用 katex 数学公式渲染'));
+	$katex = new \Typecho\Widget\Helper\Form\Element\Radio('katex', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 katex 数学公式渲染'), _t('选择是否启用 katex 数学公式渲染'));
 	$form->addInput($katex);
-	$prismjs = new Typecho_Widget_Helper_Form_Element_Radio('prismjs', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 代码高亮'), _t('选择是否启用 prism.js 代码高亮'));
+	$prismjs = new \Typecho\Widget\Helper\Form\Element\Radio('prismjs', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 代码高亮'), _t('选择是否启用 prism.js 代码高亮'));
 	$form->addInput($prismjs);
-	$prismLine = new Typecho_Widget_Helper_Form_Element_Radio('prismLine', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 行号显示'), _t('选择是否显示 prism.js 代码高亮左侧行号'));
+	$prismLine = new \Typecho\Widget\Helper\Form\Element\Radio('prismLine', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 行号显示'), _t('选择是否显示 prism.js 代码高亮左侧行号'));
 	$form->addInput($prismLine);
-	$prismTheme = new Typecho_Widget_Helper_Form_Element_Select('prismTheme',
+	$prismTheme = new \Typecho\Widget\Helper\Form\Element\Select('prismTheme',
 		array('prism' => _t('default'),
 			'prism-coy' => _t('coy'),
 			'prism-dark' => _t('dark'),
@@ -53,13 +55,13 @@ function themeConfig($form) {
 		),
 	'prism', _t('prism.js 高亮主题'), _t('选择 prism.js 代码高亮的主题配色'));
 	$form->addInput($prismTheme);
-	$toc = new Typecho_Widget_Helper_Form_Element_Radio('toc',
+	$toc = new \Typecho\Widget\Helper\Form\Element\Radio('toc',
 		array('0' => _t('关闭'),
 			'1' => _t('打开'),
 		),
 		'1', _t('开启 TOC 文章目录功能'), _t('选择是否开启 TOC 文章目录功能'));
 	$form->addInput($toc);
-	$toc_enable = new Typecho_Widget_Helper_Form_Element_Radio('toc_enable',
+	$toc_enable = new \Typecho\Widget\Helper\Form\Element\Radio('toc_enable',
 		array('0' => _t('关闭'),
 			'1' => _t('展开'),
 		),
@@ -100,7 +102,7 @@ function themeConfigHandle($settings, $isInit = false) {
  */
 function themeOptionRead($name) {
 	try {
-		$db = Typecho_Db::get();
+		$db = \Typecho\Db::get();
 		$row = $db->fetchRow($db->select('value')->from('table.options')->where('name = ?', $name));
 		if ($row && isset($row['value'])) {
 			return $row['value'];
@@ -116,7 +118,7 @@ function themeOptionRead($name) {
  */
 function themeOptionWrite($name, $value) {
 	try {
-		$db = Typecho_Db::get();
+		$db = \Typecho\Db::get();
 		$exists = $db->fetchRow($db->select('name')->from('table.options')->where('name = ?', $name));
 		if ($exists) {
 			$db->query($db->update('table.options')->rows(array('value' => $value))->where('name = ?', $name));
@@ -136,7 +138,7 @@ function themeOptionWrite($name, $value) {
 function themeConfigSeedBackup() {
 	$backupKey = 'bubblekami:config';
 	// Typecho 每次请求都会把 user=0 的 options 整表读入内存，先查内存，已有备份就不再额外查库
-	$options = Helper::options();
+	$options = \Utils\Helper::options();
 	if (isset($options->{$backupKey}) && $options->{$backupKey} !== '') {
 		return;
 	}
@@ -172,7 +174,7 @@ function printTag($that, $icon = 0) {
 
 function getThemeStickyCids($options = null) {
 	if ($options === null) {
-		$options = Helper::options();
+		$options = \Utils\Helper::options();
 	}
 	$value = isset($options->stickyCids) ? (string)$options->stickyCids : '';
 	$ids = preg_split('/[^0-9]+/', $value, -1, PREG_SPLIT_NO_EMPTY);
@@ -192,7 +194,7 @@ function printSticky($that, $force = false) {
 
 function themeViewsEnabled($options = null) {
 	if ($options === null) {
-		$options = Helper::options();
+		$options = \Utils\Helper::options();
 	}
 	return !isset($options->viewsEnabled) || (string)$options->viewsEnabled !== '0';
 }
@@ -206,12 +208,12 @@ function ensureThemeViewsColumn() {
 		return $ready;
 	}
 	try {
-		$db = Typecho_Db::get();
+		$db = \Typecho\Db::get();
 		$db->fetchRow($db->select('views')->from('table.contents')->limit(1));
 		$ready = true;
 	} catch (Throwable $e) {
 		try {
-			$db = Typecho_Db::get();
+			$db = \Typecho\Db::get();
 			$prefix = $db->getPrefix();
 			// 不加引号的标准写法，MySQL / SQLite / PostgreSQL 通用（表前缀只含字母数字下划线）
 			$db->query('ALTER TABLE ' . $prefix . 'contents ADD COLUMN views INT NOT NULL DEFAULT 0');
@@ -232,7 +234,7 @@ function getPostViews($that) {
 	$fresh = false;
 	if ($cid > 0 && method_exists($that, 'is') && $that->is('single')) {
 		try {
-			$row = Typecho_Db::get()->fetchRow(Typecho_Db::get()->select('views')->from('table.contents')->where('cid = ?', $cid));
+			$row = \Typecho\Db::get()->fetchRow(\Typecho\Db::get()->select('views')->from('table.contents')->where('cid = ?', $cid));
 			if ($row && isset($row['views'])) {
 				$views = (int)$row['views'];
 				$fresh = true;
@@ -313,7 +315,7 @@ function relatedPosts($that, $limit = 5) {
 		$tagParams[] = array('mid' => $mid);
 	}
 
-	$related = $that->widget('Widget_Contents_Related', array(
+	$related = \Widget\Contents\Related::alloc(array(
 		'cid' => $that->cid,
 		'type' => 'post',
 		'tags' => $tagParams,
@@ -426,7 +428,7 @@ function themeImageSize($attrs) {
 	}
 	// 只处理本站地址（含 www 与否、http 与 https）或相对地址
 	if (!empty($parts['host'])) {
-		$siteHost = parse_url((string)Helper::options()->siteUrl, PHP_URL_HOST);
+		$siteHost = parse_url((string)\Utils\Helper::options()->siteUrl, PHP_URL_HOST);
 		if (!$siteHost || preg_replace('/^www\./i', '', strtolower($parts['host'])) !== preg_replace('/^www\./i', '', strtolower($siteHost))) {
 			return '';
 		}
@@ -485,6 +487,15 @@ function lazyLoadImages($content, $allLazy = false) {
  * 输出带版本号的主题静态资源 URL，用于浏览器缓存更新。
  * 基于文件修改时间自动生成版本号，文件更新后旧缓存自动失效。
  */
+/**
+ * 按图片地址的扩展名给出 MIME 类型，用于 <link rel="icon" type="…">；认不出时返回空串（不写 type，交给浏览器判断）
+ */
+function themeIconType($url) {
+	$ext = strtolower(pathinfo((string)parse_url((string)$url, PHP_URL_PATH), PATHINFO_EXTENSION));
+	$types = array('svg' => 'image/svg+xml', 'png' => 'image/png', 'ico' => 'image/x-icon', 'webp' => 'image/webp', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif', 'avif' => 'image/avif');
+	return isset($types[$ext]) ? $types[$ext] : '';
+}
+
 function themeAsset($path) {
 	echo themeAssetUrl($path);
 }
@@ -497,7 +508,7 @@ function themeAssetUrl($path) {
 	}
 	// Typecho 1.2+ 的 themeUrl() 直接 echo，旧版本可能是返回值，两种都兼容
 	ob_start();
-	$returned = Helper::options()->themeUrl($path);
+	$returned = \Utils\Helper::options()->themeUrl($path);
 	$echoed = ob_get_clean();
 	return ($echoed !== '' ? $echoed : (string)$returned) . '?v=' . $cache[$path];
 }
@@ -515,7 +526,7 @@ function themeAttr($text) {
  * 文章页取摘要与正文第一张图；加密文章与列表页回退到站点描述与头像。
  */
 function themeShareMeta($archive) {
-	$options = Helper::options();
+	$options = \Utils\Helper::options();
 	$avatar = $options->avatarUrl == '' ? themeAssetUrl('images/avatar.png') : (string)$options->avatarUrl;
 	$meta = array(
 		'type' => 'website',
@@ -536,7 +547,7 @@ function themeShareMeta($archive) {
 	}
 	$excerpt = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string)$archive->excerpt), ENT_QUOTES, 'UTF-8')));
 	if ($excerpt !== '') {
-		$meta['description'] = Typecho_Common::subStr($excerpt, 0, 120, '…');
+		$meta['description'] = \Typecho\Common::subStr($excerpt, 0, 120, '…');
 	}
 	if (preg_match('/<img\b[^>]*?\ssrc=["\']([^"\']+)["\']/i', (string)$archive->content, $m)) {
 		$src = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
@@ -583,7 +594,7 @@ function themeInit($archive) {
 		$cid = (int)$archive->cid;
 		if ($cid > 0) {
 			try {
-				$db = Typecho_Db::get();
+				$db = \Typecho\Db::get();
 				$db->query($db->update('table.contents')->expression('views', 'views + 1')->where('cid = ?', $cid));
 				$GLOBALS['kamiViewsIncrementedCid'] = $cid;
 			} catch (Throwable $e) {
@@ -601,7 +612,7 @@ function themeInit($archive) {
  */
 function getBuildTime()
 {
-	$created = strtotime((string)Helper::options()->siteCreateDate);
+	$created = strtotime((string)\Utils\Helper::options()->siteCreateDate);
 	if (!$created) {
 		return;
 	}
@@ -632,7 +643,7 @@ function themeLikeAdd($n) {
 	}
 	try {
 		// MySQL / SQLite 可直接在文本列上做原子加法
-		$db = Typecho_Db::get();
+		$db = \Typecho\Db::get();
 		$db->query($db->update('table.options')->expression('value', 'value + ' . (int)$n)->where('name = ?', $name));
 	} catch (Throwable $e) {
 		// PostgreSQL 等不支持文本与数字相加：退回读出再写入
@@ -683,7 +694,7 @@ function themeCountWords($text) {
 function themeSiteStats() {
 	$stats = array('posts' => 0, 'words' => 0, 'views' => 0, 'comments' => 0, 'since' => 0);
 	try {
-		$db = Typecho_Db::get();
+		$db = \Typecho\Db::get();
 		$row = $db->fetchObject($db->select(array('COUNT(cid)' => 'num', 'MAX(modified)' => 'modified', 'MIN(created)' => 'since'))
 			->from('table.contents')->where('type = ?', 'post')->where('status = ?', 'publish'));
 		$stats['posts'] = (int)$row->num;
@@ -731,7 +742,7 @@ function themeShortNumber($n) {
 
 /** 运行时长 [年, 天]：优先用「站点创建时间」，未填写时从第一篇文章算起 */
 function themeRunningTime($since = 0) {
-	$created = strtotime((string)Helper::options()->siteCreateDate);
+	$created = strtotime((string)\Utils\Helper::options()->siteCreateDate);
 	$from = $created ?: (int)$since;
 	if (!$from) {
 		return null;
