@@ -99,7 +99,7 @@
 	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
 	<div class="black-cover" style="display: none;"></div>
 	<?php endif; ?>
-	<!-- KaTeX / Prism / Viewer 的 JS 已改为按正文内容懒加载（见 theme.js），此处不再无条件输出 -->
+	<!-- KaTeX / Prism / PhotoSwipe 的 JS 已改为按正文内容懒加载（见 theme.js），此处不再无条件输出 -->
 	<!-- Alert（原生 <dialog>，替代 Bootstrap modal） -->
 	<dialog id="modal-notification">
 		<div class="modal-header">

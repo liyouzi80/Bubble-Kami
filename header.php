@@ -56,7 +56,7 @@
 	<style>@font-face{font-family:'Kami Title';font-style:normal;font-weight:500;font-display:swap;src:local('Noto Serif SC Medium'),local('NotoSerifSC-Medium'),local('Source Han Serif SC Medium'),local('SourceHanSerifSC-Medium'),local('Noto Serif CJK SC Medium'),local('NotoSerifCJKsc-Medium'),url('<?php echo $titleFontUrl; ?>') format('woff2');}</style>
 	<?php endif; ?>
 
-	<!-- KaTeX / Prism / Viewer 的样式与脚本一样按正文内容懒加载（见 theme.js） -->
+	<!-- KaTeX / Prism / PhotoSwipe 的样式与脚本一样按正文内容懒加载（见 theme.js） -->
 	
 	<!-- Custom CSS -->
 	<?php if ($this->options->customCss): ?>
