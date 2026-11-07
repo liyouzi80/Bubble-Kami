@@ -54,8 +54,8 @@ body {
 }
 
 /* 滚动后的导航栏：深色背景与白色文字保持对比。
-   .headroom--not-top 由 Headroom 控制；.nav-solid 是兜底类（theme.js 用 IntersectionObserver
-   在离开 hero 或无 hero 页面时强制深色，避免 pjax/headroom 状态错位导致白字压浅卡片） */
+   .headroom--not-top 由 theme.js 的滚动隐藏控制；.nav-solid 是兜底类（theme.js 用 IntersectionObserver
+   在离开 hero 或无 hero 页面时强制深色，避免状态错位导致白字压浅卡片） */
 .headroom--not-top,
 .nav-solid {
   background-color: var(--nav-bg) !important;
@@ -1057,65 +1057,7 @@ main > .section-hero:not([style*="100vh"]) {
 }
 
 /* ================================================
-   九、文章目录（TOC）
-   ================================================ */
-
-.toc-container {
-  transition: right 0.3s ease;
-  background: var(--ivory) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border: 0.5px solid var(--border) !important;
-  border-radius: 8px 0 0 8px;
-}
-
-.toc-container.toc-open {
-  right: -5px !important;
-}
-
-.toc-toggle {
-  background: transparent !important;
-  border: none !important;
-  color: var(--brand) !important;
-  opacity: 0.8 !important;
-  cursor: pointer;
-}
-
-.toc-toggle:hover {
-  opacity: 1 !important;
-}
-
-.toc-list a {
-  color: var(--olive) !important;
-  text-decoration: none !important;
-  border-bottom: none !important;
-  font-size: 0.88rem;
-  line-height: 1.7;
-  display: block;
-}
-
-.toc-list a:hover {
-  color: var(--brand) !important;
-}
-
-.toc-list a.located {
-  color: var(--brand) !important;
-  font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  .toc-container {
-    display: none !important;
-  }
-}
-
-@media print {
-  .toc-container {
-    display: none !important;
-  }
-}
-
-/* ================================================
-   十、上一篇 / 下一篇 与 相关文章
+   九、上一篇 / 下一篇 与 相关文章
    ================================================ */
 
 /* 上一篇 / 下一篇 */
@@ -1256,25 +1198,6 @@ main > .section-hero:not([style*="100vh"]) {
    现代化增量（4.2.1）
    ================================================ */
 
-/* 原生 <dialog> 弹窗（替代 Bootstrap modal） */
-dialog#modal-notification {
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0;
-  width: min(92vw, 22rem);
-  background: var(--ivory);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-dialog#modal-notification::backdrop {
-  background: rgba(0, 0, 0, 0.42);
-}
-dialog#modal-notification .modal-header {
-  border-bottom: 1px solid var(--border-soft);
-}
-dialog#modal-notification .modal-body {
-  color: var(--dark-warm);
-}
-
 /* :has() 渐进增强：有子回复的评论，作者名左侧加竖线，标明「此楼有回复」 */
 #comments li:has(> .comment-children) > div[id^="comment"] .comment-head {
   border-left: 3px solid var(--brand);
@@ -1298,7 +1221,7 @@ dialog#modal-notification .modal-body {
    设计打磨（4.2.1 · Editorial Luxury 细化）
    ================================================ */
 
-/* 平滑锚点滚动（目录 / 回复跳转更顺滑）；pjax 内部已显式 instant 覆盖 */
+/* 平滑锚点滚动（页内锚点、回复跳转更顺滑） */
 html {
   scroll-behavior: smooth;
 }
@@ -1322,19 +1245,13 @@ html {
   color: #fff;
 }
 
-/* 原生 <dialog> 弹出动画：scale + opacity，含 backdrop 淡入 */
+/* 原生 <dialog> 弹出动画：scale + opacity，含 backdrop 淡入（搜索弹窗使用） */
 @keyframes dialog-pop {
   from { opacity: 0; transform: scale(0.96); }
   to   { opacity: 1; transform: scale(1); }
 }
-dialog#modal-notification[open] {
-  animation: dialog-pop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
 @keyframes dialog-backdrop-in {
   from { opacity: 0; }
-}
-dialog#modal-notification[open]::backdrop {
-  animation: dialog-backdrop-in 0.25s ease;
 }
 
 /* 交互按压反馈：轻微下沉，模拟物理触感 */
@@ -1603,7 +1520,7 @@ dialog#search-dialog[open]::backdrop {
    ================================================ */
 
 /* 跨页过渡：同源页面之间交叉淡入；首页/归档卡片标题与文章页大标题同名（post-{cid}），切页时标题平滑移动过去。
-   开启 pjax 时由 theme.js 的 document.startViewTransition 完成同样的效果；不支持的浏览器照常跳转 */
+   支持的浏览器：Chrome / Edge 126+、Safari 18.2+；其它浏览器照常跳转 */
 @view-transition {
   navigation: auto;
 }
@@ -1800,8 +1717,7 @@ textarea {
 .post-pager-link,
 .post-pager-none,
 .continue-reading,
-.float-tool,
-#modal-notification .modal-title {
+.float-tool {
   font-family: var(--sans) !important;
 }
 
@@ -2606,37 +2522,6 @@ textarea {
   .book-title {
     font-size: 0.85rem;
   }
-}
-
-/* 页面跳转进度条：与阅读进度线同款 2px 渐变（progress.js 控制 is-active 与 transform） */
-#argprogress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1041;
-  height: 2px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-#argprogress.is-active {
-  opacity: 1;
-  transition: none;
-}
-
-.argprogress-bar {
-  height: 100%;
-  background: var(--progress-gradient);
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-  transition: transform 0.25s ease-out;
-}
-
-/* 跳转进行中先藏起阅读进度线，免得两条线叠在一起 */
-.is-page-loading .read-progress {
-  visibility: hidden;
 }
 
 /* 文章阅读进度：顶部 2px 渐变细线，跟随页面滚动（纯 CSS 滚动驱动动画，不支持的浏览器不显示） */

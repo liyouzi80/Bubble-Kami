@@ -110,9 +110,8 @@
 	<script type="application/ld+json"><?php echo json_encode($ldArticle, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<script type="application/ld+json"><?php echo json_encode($ldBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 	<?php endif; ?>
-	<?php if (!$this->options->Pjax): ?>
-	<!-- Speculation Rules：悬停预取同源页面，让整页导航近乎零延迟。
-	     pjax 用 fetch 取页面，用不上浏览器的导航预取缓存，开启 pjax 时不输出，避免每次悬停多请求一遍 -->
+	<!-- Speculation Rules：悬停预取同源页面，让整页导航近乎零延迟（Chrome / Edge）。
+	     后台、登录、退出等链接（data-no-prefetch）与 /action/ 接口不预取，免得悬停就触发操作 -->
 	<script type="speculationrules">
 	{
 		"prefetch": [
@@ -121,7 +120,9 @@
 				"where": {
 					"and": [
 						{ "href_matches": "/*" },
-						{ "not": { "selector_matches": "[no-pjax], [target='_blank']" } }
+						{ "not": { "href_matches": "/action/*" } },
+						{ "not": { "href_matches": "/index.php/action/*" } },
+						{ "not": { "selector_matches": "[data-no-prefetch], [target='_blank']" } }
 					]
 				},
 				"eagerness": "moderate"
@@ -129,7 +130,6 @@
 		]
 	}
 	</script>
-	<?php endif; ?>
 	<!-- Typecho header（social= 关掉 Typecho 自带的 og/twitter 标签，主题上方已输出更完整的一份，避免重复） -->
 	<?php $this->header('social='); ?>
 </head>
@@ -177,4 +177,3 @@
 			</div>
 		</nav>
 	</header>
-	<?php if($this->options->Pjax) _e('<div id="pjax-container">'); ?>

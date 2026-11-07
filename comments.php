@@ -111,19 +111,3 @@
 		</div>
 	</div>
 </section>
-<?php if($this->options->Pjax): ?>
-<?php
-$__u = parse_url($this->request->getRequestUrl());
-$__tokenUrl = (empty($__u['scheme']) ? 'http://' : $__u['scheme'] . '://') . $__u['host'] . (isset($__u['port']) ? ':' . $__u['port'] : '') . $__u['path'];
-?>
-<script>
-	window.BB = window.BB || {};
-	window.BB.comment = {
-		token: null,
-		respondId: <?php echo json_encode($this->respondId); ?>,
-		pluginScripts: <?php echo json_encode($this->pluginHandle()->header("", $this), JSON_UNESCAPED_UNICODE); ?>
-	};
-	// shuffleScriptVar() 输出的是自带结尾分号的完整语句，不能直接放进对象字面量（会变成 `})();,` 语法错误）
-	window.BB.comment.token = <?php echo \Typecho\Common::shuffleScriptVar($this->security->getToken($__tokenUrl)); ?>
-</script>
-<?php endif; ?>

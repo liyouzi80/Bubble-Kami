@@ -1,11 +1,11 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 		<?php if ($this->user->hasLogin()) { ?>
 			<?php if ($this->is('single')) { ?>
-			<a id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>write-<?php echo $this->is('post')?'post':'page'; ?>.php?cid=<?php echo $this->cid;?>" aria-label="编辑这篇文章" title="编辑这篇文章">
+			<a id="adminbtn" data-no-prefetch class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>write-<?php echo $this->is('post')?'post':'page'; ?>.php?cid=<?php echo $this->cid;?>" aria-label="编辑这篇文章" title="编辑这篇文章">
 				<span class="btn-inner--icon"><i class="fa fa-pencil" aria-hidden="true"></i></span>
 			</a>
 			<?php } else { ?>
-			<a id="adminbtn" class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>" aria-label="进入后台" title="进入后台">
+			<a id="adminbtn" data-no-prefetch class="btn btn-icon-only rounded-circle btn-primary admin-btn" href="<?php $this->options->adminUrl(); ?>" aria-label="进入后台" title="进入后台">
 				<span class="btn-inner--icon"><i class="fa fa-cogs" aria-hidden="true"></i></span>
 			</a>
 			<?php } ?>
@@ -66,17 +66,16 @@
 							</li>
 						<?php endwhile; ?>
 						<?php if($this->user->hasLogin()): ?>
-							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->adminUrl(); ?>">进入后台(<?php $this->user->screenName(); ?>)</a></li>
-							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->logoutUrl(); ?>">退出</a></li>
+							<li class="nav-item"><a class="nav-link" data-no-prefetch href="<?php $this->options->adminUrl(); ?>">进入后台(<?php $this->user->screenName(); ?>)</a></li>
+							<li class="nav-item"><a class="nav-link" data-no-prefetch href="<?php $this->options->logoutUrl(); ?>">退出</a></li>
 						<?php else: ?>
-							<li class="nav-item"><a class="nav-link" no-pjax href="<?php $this->options->adminUrl('login.php'); ?>">登录</a></li>
+							<li class="nav-item"><a class="nav-link" data-no-prefetch href="<?php $this->options->adminUrl('login.php'); ?>">登录</a></li>
 						<?php endif; ?>
 					</ul>
 				</div>
 			</div>
 		</div>
 	</footer>
-	<?php if($this->options->Pjax) _e('</div>'); ?>
 	<!-- 右下角浮动工具：返回顶部（滚动后出现）/ 搜索 / 简繁切换 -->
 	<div class="float-tools" id="float-tools">
 	<!-- 返回顶部：外圈为阅读进度环，中间显示百分比，悬停/聚焦时换成箭头 -->
@@ -93,21 +92,7 @@
 	</button>
 	<button id="translateLink" type="button" class="float-tool" aria-label="简繁切换" title="简繁切换" onclick="translatePage()">繁</button>
 	</div>
-	<?php if($this->options->Pjax): ?>
-	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
-	<div class="black-cover" style="display: none;"></div>
-	<?php endif; ?>
 	<!-- PhotoSwipe 的 JS 在第一次点图时才加载（见 theme.js），此处不输出 -->
-	<!-- Alert（原生 <dialog>，替代 Bootstrap modal） -->
-	<dialog id="modal-notification">
-		<div class="modal-header">
-			<h5 id="msgMain" class="modal-title"></h5>
-			<button type="button" class="close" aria-label="Close" onclick="hideNotification()">
-				<span aria-hidden="true">×</span>
-			</button>
-		</div>
-		<div id="msgDetail" class="modal-body"></div>
-	</dialog>
 	<!-- 搜索弹窗 -->
 	<dialog id="search-dialog" aria-label="搜索">
 		<form method="post" action="<?php $this->options->siteUrl(); ?>" id="search" role="search">
@@ -115,21 +100,17 @@
 			<input type="text" name="s" placeholder="搜点什么……" autocomplete="off" enterkeyhint="search" aria-label="搜索关键词" required>
 		</form>
 	</dialog>
-	<!-- 主题运行时配置：站点地址 / pjax 开关 / 按需加载的资源地址，供 theme.js 读取 -->
+	<!-- 主题运行时配置：站点地址与按需加载的资源地址，供 theme.js 读取 -->
 	<script>
 		window.BB = window.BB || {};
 		// 注意：options 的 siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
 		window.BB.siteUrl = <?php echo json_encode((string)$this->options->siteUrl); ?>;
-		window.BB.adminUrl = <?php echo json_encode((string)$this->options->adminUrl); ?>;
-		window.BB.searchUrl = <?php echo json_encode(\Typecho\Common::url('search/', $this->options->index)); ?>;
-		window.BB.pjax = <?php echo $this->options->Pjax ? 'true' : 'false'; ?>;
-		window.BB.pjaxcomp = <?php echo json_encode((string)$this->options->pjaxcomp); ?>;
 		// 按需加载的资源地址（带版本号），供 theme.js 在检测到对应内容时动态注入
 		window.BB.pswpJs = "<?php themeAsset('assets/js/photoswipe.esm.min.js'); ?>";
 		window.BB.pswpCss = "<?php themeAsset('assets/css/photoswipe.css'); ?>";
 		window.BB.twcnJs = "<?php themeAsset('assets/js/tw-cn.js'); ?>";
 	</script>
-	<!-- 主题脚本：导航折叠 / 导航栏滚动隐藏 / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->
+	<!-- 主题脚本：导航折叠 / 导航栏滚动隐藏 / 回到顶部 / 点赞 / 图片查看器 -->
 	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>
 	<!-- 简繁转换脚本（tw-cn.js）由 theme.js 按需加载：点击「繁」按钮或之前切换过繁体时才下载 -->
 	<!-- Typecho footer -->

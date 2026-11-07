@@ -33,22 +33,6 @@ function themeConfig($form) {
 	$form->addInput($viewsEnabled);
 	$customCss = new \Typecho\Widget\Helper\Form\Element\Textarea('customCss', NULL, '', _t('自定义 css'), _t('在这里填入所需要的 css，以实现自定义页面样式，如调整字体大小等'));
 	$form->addInput($customCss);
-	$Pjax = new \Typecho\Widget\Helper\Form\Element\Radio('Pjax', array('0' => _t('关闭'), '1' => _t('打开')), '1', _t('开启全站 pjax 模式'), _t('选择是否启用全站 pjax 模式提升用户访问体验。注意：启用该项可能带来页面加载问题，请仔细阅读主题说明文档。'));
-	$form->addInput($Pjax);
-	$pjaxcomp = new \Typecho\Widget\Helper\Form\Element\Textarea('pjaxcomp', NULL, '', _t('pjax 回调代码'), _t('在这里填入 pjax 渲染完毕后需执行的 JS 代码，具体使用方法请仔细阅读主题说明文档'));
-	$form->addInput($pjaxcomp);
-	$toc = new \Typecho\Widget\Helper\Form\Element\Radio('toc',
-		array('0' => _t('关闭'),
-			'1' => _t('打开'),
-		),
-		'1', _t('开启 TOC 文章目录功能'), _t('选择是否开启 TOC 文章目录功能'));
-	$form->addInput($toc);
-	$toc_enable = new \Typecho\Widget\Helper\Form\Element\Radio('toc_enable',
-		array('0' => _t('关闭'),
-			'1' => _t('展开'),
-		),
-		'0', _t('默认 TOC 目录展开状态'), _t('选择打开文章时 TOC 目录的展开状态'));
-	$form->addInput($toc_enable);
 }
 
 /**
@@ -341,57 +325,6 @@ function getRandomImage($str)
 	return $arr[mt_rand(0, count($arr) - 1)];
 }
 
-function createCatalog($obj) {
-	global $catalog;
-	global $catalog_count;
-	$catalog = array();
-	$catalog_count = 0;
-	$obj = preg_replace_callback('/<h([1-6])(.*?)>(.*?)<\/h\1>/i', function($obj) {
-		global $catalog;
-		global $catalog_count;
-		$catalog_count ++;
-		$catalog[] = array('text' => trim(strip_tags($obj[3])), 'depth' => $obj[1], 'count' => $catalog_count);
-		return '<h'.$obj[1].$obj[2].'><a id="cl-'.$catalog_count.'" class="toc-anchor"></a>'.$obj[3].'</h'.$obj[1].'>';
-	}, $obj);
-	return $obj;
-}
-
-function getCatalog() {
-	global $catalog;
-	$index = '';
-	if ($catalog) {
-		$index = '<ul>'."\n";
-		$prev_depth = '';
-		$to_depth = 0;
-		foreach($catalog as $catalog_item) {
-			$catalog_depth = $catalog_item['depth'];
-			if ($prev_depth) {
-				if ($catalog_depth == $prev_depth) {
-					$index .= '</li>'."\n";
-				} elseif ($catalog_depth > $prev_depth) {
-					$to_depth++;
-					$index .= '<ul>'."\n";
-				} else {
-					$to_depth2 = ($to_depth > ($prev_depth - $catalog_depth)) ? ($prev_depth - $catalog_depth) : $to_depth;
-					if ($to_depth2) {
-						for ($i=0; $i<$to_depth2; $i++) {
-							$index .= '</li>'."\n".'</ul>'."\n";
-							$to_depth--;
-						}
-					}
-					$index .= '</li>';
-				}
-			}
-			$index .= '<li><a id="dl-' . $catalog_item['count'] . '" href="#cl-' . $catalog_item['count'] . '">'.$catalog_item['text'].'</a>';
-			$prev_depth = $catalog_item['depth'];
-		}
-		for ($i=0; $i<=$to_depth; $i++) {
-			$index .= '</li>'."\n".'</ul>'."\n";
-		}
-	}
-	echo $index;
-}
-
 /**
  * 本站上传目录里的图片没写宽高时，读取文件补上 width / height。
  * 浏览器据此提前按比例留出位置，图片加载完不会把下面的文字顶下去（CLS）；CSS 里 height:auto 保证不变形。
@@ -568,7 +501,6 @@ function themeInit($archive) {
 		return;
 	}
 
-	$archive->content = createCatalog($archive->content);
 	if (empty($GLOBALS['kamiLoadingSticky']) && !isThemePrefetchRequest() && themeViewsEnabled() && ensureThemeViewsColumn() && $archive->type === 'post'
 		&& (!isset($archive->status) || $archive->status === 'publish')
 		&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))

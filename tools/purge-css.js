@@ -31,13 +31,12 @@ const tags = ('html body main header footer nav section article aside div span p
 		content: [
 			path.join(root, '*.php'),
 			path.join(root, 'assets/js/theme.js'),
-			path.join(root, 'assets/js/progress.js'),
 		],
 		css: [input],
 		safelist: {
 			standard: tags.concat([
 				// 脚本运行时切换的状态 class
-				'show', 'active', 'disabled', 'collapsing', 'nav-solid', 'toc-open', 'located', 'is-sticky', 'sr-only',
+				'show', 'active', 'disabled', 'collapsing', 'nav-solid', 'is-sticky', 'sr-only',
 				// Typecho 输出的分页 / 评论列表 class
 				'current', 'prev', 'next', 'avatar',
 				// select.form-control[size]
