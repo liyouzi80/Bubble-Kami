@@ -23,7 +23,7 @@ function themeConfig($form) {
 	$form->addInput($footerWidget);
 	$siteCreateDate = new Typecho_Widget_Helper_Form_Element_Text('siteCreateDate', NULL, '', _t('站点创建时间'), _t('在这里填入站点创建时间（如 2012-11-17 00:00:00），用于首页统计的运行时长；关闭「首页点赞与统计」时改在页脚显示「距今已有 X 年 X 天」'));
 	$form->addInput($siteCreateDate);
-	$heroExtras = new Typecho_Widget_Helper_Form_Element_Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（统计每小时更新一次；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
+	$heroExtras = new Typecho_Widget_Helper_Form_Element_Radio('heroExtras', array('0' => _t('不显示'), '1' => _t('显示')), '1', _t('首页点赞与统计'), _t('在首页大图的题句下方显示点赞按钮，以及文章数、字数、阅读数、评论数与运行时长（发文、改文、新评论后立即更新；运行时长按「站点创建时间」计算，未填写时从第一篇文章算起）'));
 	$form->addInput($heroExtras);
 	$stickyCids = new Typecho_Widget_Helper_Form_Element_Text('stickyCids', NULL, '', _t('首页置顶文章 CID'), _t('输入文章 CID，多个以英文逗号分隔；按输入顺序显示在首页最前面。留空则不置顶。'));
 	$form->addInput($stickyCids);
@@ -675,27 +675,36 @@ function themeCountWords($text) {
 	return (int)$han + (int)$latin;
 }
 
-/** 文章数、字数、阅读数、评论数与建站时间，缓存在 options 表，每小时重新计算一次 */
+/**
+ * 文章数、字数、阅读数、评论数与建站时间。
+ * 篇数、阅读数、评论数是几条汇总查询，每次实时计算；字数要读全部正文，结果缓存在 options 表，
+ * 并记下「已发布文章数 + 最后修改时间」作为指纹：发布、修改或删除文章后指纹变化，下次访问即重新计算。
+ */
 function themeSiteStats() {
-	$name = 'bubblekami:stats';
-	$cache = json_decode((string)themeOptionRead($name), true);
-	if (is_array($cache) && isset($cache['t']) && time() - (int)$cache['t'] < 3600) {
-		return $cache;
-	}
-	$stats = array('t' => time(), 'posts' => 0, 'words' => 0, 'views' => 0, 'comments' => 0, 'since' => 0);
+	$stats = array('posts' => 0, 'words' => 0, 'views' => 0, 'comments' => 0, 'since' => 0);
 	try {
 		$db = Typecho_Db::get();
-		$rows = $db->fetchAll($db->select('text', 'password', 'created')->from('table.contents')
-			->where('type = ?', 'post')->where('status = ?', 'publish'));
-		$stats['posts'] = count($rows);
-		foreach ($rows as $row) {
-			if (empty($row['password'])) {
-				$stats['words'] += themeCountWords($row['text']);
+		$row = $db->fetchObject($db->select(array('COUNT(cid)' => 'num', 'MAX(modified)' => 'modified', 'MIN(created)' => 'since'))
+			->from('table.contents')->where('type = ?', 'post')->where('status = ?', 'publish'));
+		$stats['posts'] = (int)$row->num;
+		$stats['since'] = (int)$row->since;
+		$fingerprint = $stats['posts'] . ':' . (int)$row->modified;
+
+		$name = 'bubblekami:stats';
+		$cache = json_decode((string)themeOptionRead($name), true);
+		if (is_array($cache) && isset($cache['fp'], $cache['words']) && $cache['fp'] === $fingerprint) {
+			$stats['words'] = (int)$cache['words'];
+		} else {
+			$rows = $db->fetchAll($db->select('text', 'password')->from('table.contents')
+				->where('type = ?', 'post')->where('status = ?', 'publish'));
+			foreach ($rows as $post) {
+				if (empty($post['password'])) {
+					$stats['words'] += themeCountWords($post['text']);
+				}
 			}
-			if (!$stats['since'] || (int)$row['created'] < $stats['since']) {
-				$stats['since'] = (int)$row['created'];
-			}
+			themeOptionWrite($name, json_encode(array('fp' => $fingerprint, 'words' => $stats['words'])));
 		}
+
 		if (ensureThemeViewsColumn()) {
 			$row = $db->fetchObject($db->select(array('SUM(views)' => 'num'))->from('table.contents')
 				->where('type = ?', 'post')->where('status = ?', 'publish'));
@@ -707,7 +716,6 @@ function themeSiteStats() {
 	} catch (Throwable $e) {
 		// 统计失败不影响首页渲染
 	}
-	themeOptionWrite($name, json_encode($stats));
 	return $stats;
 }
 
