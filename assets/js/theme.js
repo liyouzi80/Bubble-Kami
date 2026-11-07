@@ -279,6 +279,30 @@
 		});
 	});
 
+	/* ---------- 友链页：复制本站信息 ---------- */
+	document.addEventListener('click', function (e) {
+		var btn = e.target.closest('.links-copy');
+		if (!btn) return;
+		var text = btn.getAttribute('data-copy') || '';
+		var done = function () {
+			var old = btn.textContent;
+			btn.textContent = '已复制';
+			setTimeout(function () { btn.textContent = old; }, 1500);
+		};
+		if (navigator.clipboard && window.isSecureContext) {
+			navigator.clipboard.writeText(text).then(done);
+		} else {
+			var ta = document.createElement('textarea');
+			ta.value = text;
+			ta.style.position = 'fixed';
+			ta.style.opacity = '0';
+			document.body.appendChild(ta);
+			ta.select();
+			try { document.execCommand('copy'); done(); } catch (err) {}
+			ta.remove();
+		}
+	});
+
 	/* ---------- 图片查看器（有图才按需加载 Viewer.js） ---------- */
 	function initViewer() {
 		var targets = document.querySelectorAll('.content');
@@ -290,7 +314,11 @@
 			targets.forEach(function (el) {
 				if (el.__viewer) return;
 				if (!el.querySelector('img')) return;
-				el.__viewer = new Viewer(el, { url: 'src' });
+				el.__viewer = new Viewer(el, {
+					url: 'src',
+					// 书架封面、友链头像、关于页头像是链接或装饰，不弹出大图
+					filter: function (img) { return !img.closest('.book, .link-card, .about-head'); }
+				});
 			});
 		}
 		loadCss(BB.viewerCss);

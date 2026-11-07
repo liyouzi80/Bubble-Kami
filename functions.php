@@ -352,7 +352,7 @@ function printBackground($url) {
 function getRandomImage($str)
 {
 	// 后台 textarea 提交的是 \r\n，按任意换行切分并去掉空行，避免抽到空地址或带 \r 的 URL
-	$arr = array_values(array_filter(array_map('trim', preg_split('/\R/', (string)$str))));
+	$arr = array_values(array_filter(array_map('trim', preg_split('/\R/u', (string)$str))));
 	if (empty($arr)) return '';
 	return $arr[mt_rand(0, count($arr) - 1)];
 }
@@ -741,5 +741,327 @@ function themeRunningTime($since = 0) {
 	$years = (int)$start->diff($now)->y;
 	$anniversary = (clone $start)->modify('+' . $years . ' years');
 	return array($years, (int)floor(($now->getTimestamp() - $anniversary->getTimestamp()) / 86400));
+}
+
+/* ---------- 友链 / 关于 / 书架页面 ---------- */
+
+/** 名字首字做头像时的底色，按名字固定分配 */
+function themeInitialColor($name) {
+	$palette = array('#1B365D', '#7a5c3e', '#a33a2a', '#4f6b5a', '#5b5b7a', '#3d5a6c', '#6b4a3a', '#2f4a5c');
+	return $palette[abs(crc32((string)$name)) % count($palette)];
+}
+
+/** 页面正文转 HTML（Markdown 或普通文本，与 Typecho 处理正文的方式一致） */
+function themeRenderText($archive, $text) {
+	$text = trim((string)$text);
+	if ($text === '') {
+		return '';
+	}
+	// Contents::markdown() / autoP() 在 Typecho 1.2+ 是 protected，模板里调不到，直接用 Typecho 自带的转换类
+	if ($archive->isMarkdown) {
+		if (class_exists('\\Utils\\Markdown')) {
+			return \Utils\Markdown::convert($text);
+		}
+		if (class_exists('Markdown')) {
+			return Markdown::convert($text);
+		}
+	} elseif (class_exists('\\Utils\\AutoP')) {
+		$autoP = new \Utils\AutoP();
+		return $autoP->parse($text);
+	}
+	return '<p>' . nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8')) . '</p>';
+}
+
+/**
+ * 从页面正文里拆出「名称 | 链接 | …」格式的行（链接须以 http 开头），其余文字原样保留。
+ * 返回 [条目数组, 剩余正文]；条目是按 | 切开后去掉首尾空白的字段数组。
+ */
+function themeSplitListLines($text) {
+	$text = preg_replace('/^\s*<!--markdown-->/', '', (string)$text);
+	$items = array();
+	$rest = array();
+	foreach (preg_split('/\R/u', $text) as $line) {
+		$fields = array_map('trim', preg_split('/\s*[|｜]\s*/u', trim($line)));
+		if (count($fields) >= 2 && preg_match('#^https?://#i', $fields[1])) {
+			$items[] = $fields;
+		} else {
+			$rest[] = $line;
+		}
+	}
+	return array($items, implode("\n", $rest));
+}
+
+/** 简单的 HTTP GET：优先 cURL，否则用 file_get_contents。返回 [状态码, 内容]，失败时状态码为 0 */
+function themeHttpGet($url, $timeout = 8) {
+	$ua = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148';
+	if (function_exists('curl_init')) {
+		$ch = curl_init($url);
+		curl_setopt_array($ch, array(
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_MAXREDIRS => 3,
+			CURLOPT_CONNECTTIMEOUT => 5,
+			CURLOPT_TIMEOUT => $timeout,
+			CURLOPT_USERAGENT => $ua,
+		));
+		$body = curl_exec($ch);
+		$code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		return array($body === false ? 0 : $code, (string)$body);
+	}
+	$ctx = stream_context_create(array('http' => array('header' => "User-Agent: $ua\r\n", 'timeout' => $timeout, 'ignore_errors' => true)));
+	$body = @file_get_contents($url, false, $ctx);
+	$code = 0;
+	if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $m)) {
+		$code = (int)$m[1];
+	}
+	return array($body === false ? 0 : $code, (string)$body);
+}
+
+/**
+ * 解析 Nuxt 页面里 window.__NUXT__=(function(a,b,…){return {…}}(值,…)) 形式的 JS 数据字面量。
+ * 只支持对象、数组、字符串、数字、true / false / null / void 0 与参数名引用。
+ */
+class ThemeJsLiteral {
+	private $s;
+	private $i;
+	private $n;
+	private $vars;
+
+	public function __construct($src, $start = 0, $vars = array()) {
+		$this->s = $src;
+		$this->i = $start;
+		$this->n = strlen($src);
+		$this->vars = $vars;
+	}
+
+	public function position() {
+		return $this->i;
+	}
+
+	private function ws() {
+		while ($this->i < $this->n && strpos(" \t\r\n", $this->s[$this->i]) !== false) {
+			$this->i++;
+		}
+	}
+
+	public function value() {
+		$this->ws();
+		if ($this->i >= $this->n) {
+			throw new RuntimeException('unexpected end');
+		}
+		$c = $this->s[$this->i];
+		if ($c === '{') return $this->obj();
+		if ($c === '[') return $this->arr();
+		if ($c === '"' || $c === "'") return $this->str();
+		if (preg_match('/\G-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?/', $this->s, $m, 0, $this->i)) {
+			$this->i += strlen($m[0]);
+			return $m[0] + 0;
+		}
+		if (substr_compare($this->s, 'void 0', $this->i, 6) === 0) {
+			$this->i += 6;
+			return null;
+		}
+		if (preg_match('/\G[A-Za-z_$][\w$]*/', $this->s, $m, 0, $this->i)) {
+			$this->i += strlen($m[0]);
+			if ($m[0] === 'true') return true;
+			if ($m[0] === 'false') return false;
+			if ($m[0] === 'null' || $m[0] === 'undefined') return null;
+			return array_key_exists($m[0], $this->vars) ? $this->vars[$m[0]] : null;
+		}
+		throw new RuntimeException('unexpected token at ' . $this->i);
+	}
+
+	private function obj() {
+		$this->i++;
+		$out = array();
+		while (true) {
+			$this->ws();
+			if ($this->s[$this->i] === '}') {
+				$this->i++;
+				return $out;
+			}
+			$c = $this->s[$this->i];
+			if ($c === '"' || $c === "'") {
+				$key = $this->str();
+			} elseif (preg_match('/\G[\w$]+/', $this->s, $m, 0, $this->i)) {
+				$key = $m[0];
+				$this->i += strlen($key);
+			} else {
+				throw new RuntimeException('bad key at ' . $this->i);
+			}
+			$this->ws();
+			if ($this->s[$this->i] !== ':') {
+				throw new RuntimeException('expect : at ' . $this->i);
+			}
+			$this->i++;
+			$out[$key] = $this->value();
+			$this->ws();
+			if ($this->s[$this->i] === ',') {
+				$this->i++;
+			}
+		}
+	}
+
+	private function arr() {
+		$this->i++;
+		$out = array();
+		while (true) {
+			$this->ws();
+			if ($this->s[$this->i] === ']') {
+				$this->i++;
+				return $out;
+			}
+			$out[] = $this->value();
+			$this->ws();
+			if ($this->s[$this->i] === ',') {
+				$this->i++;
+			}
+		}
+	}
+
+	private function str() {
+		$quote = $this->s[$this->i++];
+		$out = '';
+		while ($this->i < $this->n) {
+			$c = $this->s[$this->i++];
+			if ($c === $quote) {
+				return $out;
+			}
+			if ($c !== '\\') {
+				$out .= $c;
+				continue;
+			}
+			$e = $this->s[$this->i++];
+			if ($e === 'u') {
+				$out .= mb_convert_encoding(pack('n', hexdec(substr($this->s, $this->i, 4))), 'UTF-8', 'UTF-16BE');
+				$this->i += 4;
+			} elseif ($e === 'n') {
+				$out .= "\n";
+			} elseif ($e === 't') {
+				$out .= "\t";
+			} elseif ($e === 'r') {
+				$out .= "\r";
+			} else {
+				$out .= $e;
+			}
+		}
+		throw new RuntimeException('unterminated string');
+	}
+}
+
+/** 取出 Nuxt 页面状态（失败返回 null） */
+function themeParseNuxt($html) {
+	if (!preg_match('/window\.__NUXT__\s*=\s*\(function\(([^)]*)\)\s*\{\s*return\s*/', $html, $m, PREG_OFFSET_CAPTURE)) {
+		return null;
+	}
+	try {
+		$params = array_map('trim', explode(',', $m[1][0]));
+		$start = $m[0][1] + strlen($m[0][0]);
+		// 先不带变量走一遍返回值对象，拿到它结束的位置，后面紧跟的就是调用参数
+		$probe = new ThemeJsLiteral($html, $start);
+		$probe->value();
+		$after = $probe->position();
+		if (!preg_match('/\G\s*;?\s*\}\s*\(/', $html, $mm, 0, $after)) {
+			return null;
+		}
+		$argsStart = $after + strlen($mm[0]);
+		$end = strpos($html, '</script>', $argsStart);
+		$src = rtrim(substr($html, $argsStart, $end === false ? null : $end - $argsStart));
+		$src = preg_replace('/\)\s*\)\s*;?\s*$/', '', $src);
+		$args = (new ThemeJsLiteral('[' . $src . ']'))->value();
+		$vars = array();
+		foreach ($params as $k => $name) {
+			$vars[$name] = isset($args[$k]) ? $args[$k] : null;
+		}
+		return (new ThemeJsLiteral($html, $start, $vars))->value();
+	} catch (Throwable $e) {
+		return null;
+	}
+}
+
+/** 微信读书书籍编号 → 网页版书籍详情页地址 */
+function themeWereadBookUrl($bookId) {
+	$id = (string)$bookId;
+	$hash = md5($id);
+	if (ctype_digit($id)) {
+		$type = '3';
+		$parts = array();
+		foreach (str_split($id, 9) as $chunk) {
+			$parts[] = dechex((int)$chunk);
+		}
+	} else {
+		$type = '4';
+		$hex = '';
+		foreach (preg_split('//u', $id, -1, PREG_SPLIT_NO_EMPTY) as $ch) {
+			$hex .= dechex(mb_ord($ch, 'UTF-8'));
+		}
+		$parts = array($hex);
+	}
+	$s = substr($hash, 0, 3) . $type . '2' . substr($hash, -2);
+	foreach ($parts as $i => $p) {
+		$s .= str_pad(dechex(strlen($p)), 2, '0', STR_PAD_LEFT) . $p;
+		if ($i < count($parts) - 1) {
+			$s .= 'g';
+		}
+	}
+	if (strlen($s) < 20) {
+		$s .= substr($hash, 0, 20 - strlen($s));
+	}
+	return 'https://weread.qq.com/web/bookDetail/' . $s . substr(md5($s), 0, 3);
+}
+
+/**
+ * 读取微信读书公开书单（不需要登录）。结果缓存在 options 表：每天刷新一次；
+ * 抓取失败时继续用上次成功的数据，并在 1 小时后再试。返回 null 表示从未成功过。
+ */
+function themeWereadBooklist($url) {
+	if (!preg_match('#weread\.qq\.com/misc/booklist/([\w-]+)#', (string)$url, $m)) {
+		return null;
+	}
+	$listId = $m[1];
+	$name = 'bubblekami:weread:' . md5($listId);
+	$cache = json_decode((string)themeOptionRead($name), true);
+	$now = time();
+	if (is_array($cache) && isset($cache['checked']) && $now - (int)$cache['checked'] < (empty($cache['books']) ? 3600 : 86400)) {
+		return empty($cache['books']) ? null : $cache;
+	}
+	$fresh = null;
+	list($code, $html) = themeHttpGet('https://weread.qq.com/misc/booklist/' . $listId);
+	if ($code === 200 && ($state = themeParseNuxt($html)) && isset($state['data'][0]['bookIds'])) {
+		$data = $state['data'][0];
+		$books = array();
+		foreach ((array)$data['bookIds'] as $id) {
+			if (empty($data['bookEntities'][$id]['title'])) {
+				continue;
+			}
+			$b = $data['bookEntities'][$id];
+			$books[] = array(
+				'title' => (string)$b['title'],
+				'author' => (string)(isset($b['author']) ? $b['author'] : ''),
+				'cover' => (string)(isset($b['cover']) ? $b['cover'] : ''),
+				'rating' => (string)(isset($b['ratingString']) ? $b['ratingString'] : ''),
+				'url' => themeWereadBookUrl($id),
+			);
+		}
+		if ($books) {
+			$list = isset($data['booklist']) ? $data['booklist'] : array();
+			$fresh = array(
+				'checked' => $now,
+				'url' => 'https://weread.qq.com/misc/booklist/' . $listId,
+				'name' => (string)(isset($list['name']) ? $list['name'] : ''),
+				'description' => (string)(isset($list['description']) ? $list['description'] : ''),
+				'total' => (int)(isset($list['totalCount']) ? $list['totalCount'] : count($books)),
+				'books' => $books,
+			);
+		}
+	}
+	if (!$fresh) {
+		// 抓取或解析失败：保留上次的书目，只更新检查时间（失败的缓存 1 小时后重试）
+		$fresh = is_array($cache) && !empty($cache['books']) ? $cache : array('books' => array());
+		$fresh['checked'] = empty($fresh['books']) ? $now : $now - 86400 + 3600;
+	}
+	themeOptionWrite($name, json_encode($fresh, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+	return empty($fresh['books']) ? null : $fresh;
 }
 
