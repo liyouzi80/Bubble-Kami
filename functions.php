@@ -37,24 +37,6 @@ function themeConfig($form) {
 	$form->addInput($Pjax);
 	$pjaxcomp = new \Typecho\Widget\Helper\Form\Element\Textarea('pjaxcomp', NULL, '', _t('pjax 回调代码'), _t('在这里填入 pjax 渲染完毕后需执行的 JS 代码，具体使用方法请仔细阅读主题说明文档'));
 	$form->addInput($pjaxcomp);
-	$katex = new \Typecho\Widget\Helper\Form\Element\Radio('katex', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 katex 数学公式渲染'), _t('选择是否启用 katex 数学公式渲染'));
-	$form->addInput($katex);
-	$prismjs = new \Typecho\Widget\Helper\Form\Element\Radio('prismjs', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 代码高亮'), _t('选择是否启用 prism.js 代码高亮'));
-	$form->addInput($prismjs);
-	$prismLine = new \Typecho\Widget\Helper\Form\Element\Radio('prismLine', array('0' => _t('关闭'), '1' => _t('打开')), '0', _t('开启 prism.js 行号显示'), _t('选择是否显示 prism.js 代码高亮左侧行号'));
-	$form->addInput($prismLine);
-	$prismTheme = new \Typecho\Widget\Helper\Form\Element\Select('prismTheme',
-		array('prism' => _t('default'),
-			'prism-coy' => _t('coy'),
-			'prism-dark' => _t('dark'),
-			'prism-funky' => _t('funky'),
-			'prism-okaidia' => _t('okaidia'),
-			'prism-solarizedlight' => _t('solarizedlight'),
-			'prism-tomorrow' => _t('tomorrow'),
-			'prism-twilight' => _t('twilight')
-		),
-	'prism', _t('prism.js 高亮主题'), _t('选择 prism.js 代码高亮的主题配色'));
-	$form->addInput($prismTheme);
 	$toc = new \Typecho\Widget\Helper\Form\Element\Radio('toc',
 		array('0' => _t('关闭'),
 			'1' => _t('打开'),

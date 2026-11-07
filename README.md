@@ -9,16 +9,16 @@ Typecho 清新风格响应式主题：社区维护的 Bubble 优化分支，内�
 # 特性
 
 + **纸质书外观**：卡片式布局，暖色纸面、墨蓝点缀、衬线标题，桌面与手机自适应
-+ **阅读体验**：文章目录、上一篇 / 下一篇与相关文章；再次打开读到一半的文章会提示「继续阅读」；顶部阅读进度线、图片加载后淡入；点图从原位放大看大图，可缩放、看原图、左右切换
++ **阅读体验**：文章目录、上一篇 / 下一篇与相关文章；顶部阅读进度线；读到一半的文章再次打开会提示「继续阅读」
++ **看图**：正文图片加载后淡入；点图从原位放大，可缩放、看原图 1:1、左右切换，手机下拉关闭
 + **流畅切页**：全站 pjax 与 ajax 评论，切页时文章标题平滑过渡到文章页
-+ **右下角浮动按钮**：返回顶部（带阅读进度）、搜索、简繁切换；登录后另有后台按钮
 + **中文排版**：中英文混排自动留白、全角标点挤压，简繁一键切换
-+ **代码与公式**：Prism 1.30 代码高亮（约 300 种语言、多种配色）、KaTeX 0.19 数学公式
-+ **短代码**：高亮提示框、友链卡片
-+ **站点功能**：首页点赞与博客统计（文章数、字数、阅读数、评论数、运行时长）、时间轴目录页、友链页、关于页、书架页（自动同步微信读书书单）、首页置顶、内置阅读数（兼容 Views 插件数据）、自定义头图 / 壁纸 / LOGO / 样式、404 页面
-+ **SEO 与分享**：JSON-LD 结构化数据，分享卡片自动带文章摘要与首图
-+ **轻量快速**：静态资源全部自托管，无 jQuery，代码高亮、公式、图片查看器等按需加载
-+ **配置持久化**：切换到其它主题再切回，外观设置自动恢复（Typecho 1.2+）
++ **页面模板**：时间轴目录页、友链页、关于页、书架页（自动同步微信读书书单）、404 页面
++ **首页**：点赞（连点有彩蛋）与博客统计（文章数、字数、阅读数、评论数、运行时长）、置顶文章
++ **右下角浮动按钮**：返回顶部（带阅读进度）、搜索、简繁切换；登录后另有后台按钮
++ **其它**：内置阅读数（兼容 Views 插件数据）、高亮提示框短代码、自定义头图 / 壁纸 / LOGO / 样式；JSON-LD 结构化数据，分享卡片自动带文章摘要与首图
++ **轻量**：静态资源全部自托管，无 jQuery；图片查看器、简繁转换等脚本用到时才加载
++ **配置持久化**：切换到其它主题再切回，外观设置自动恢复
 
 完整更新记录见 [CHANGELOG.md](./CHANGELOG.md)。
 
@@ -43,8 +43,8 @@ Typecho 清新风格响应式主题：社区维护的 Bubble 优化分支，内�
 + **主屏幕图标地址**：iPhone / iPad「添加到主屏幕」时的图标，用 180×180 的 PNG（不支持 SVG，透明背景会被填成黑色）。留空时，站点图标是 PNG / JPG 就直接用它；没设站点图标时用主题自带图标。
 + **导航栏 LOGO 图片**：填入图片 URL 后，左上角用图片代替站点名称；留空显示文字。导航栏是深色背景，建议用浅色、透明底的 PNG / SVG，高度 80px 以上（显示高度桌面 40px、手机 32px）。
 + **标题字体子集文件**：可选。填入用 `tools/build-title-font.py` 为本站生成的字体地址后，标题优先使用这个只含本站标题用字的小字体，见下方「生成标题字体子集」。
-+ **站点头像**：首页大标题上方显示的图片 URL。
-+ **首页背景图像**：首页背景图片 URL，留空则使用默认紫色渐变背景。
++ **站点头像地址**：首页大标题上方显示的图片 URL，关于页也会用到。
++ **首页背景图像地址**：首页背景图片 URL，留空则使用默认紫色渐变背景。
 + **随机背景图像地址**：文章页 / 独立页等页面的头图，每行一个 URL，从中随机抽取；留空则使用默认紫色渐变背景。
 + **页脚左下角文字**：页脚说明文字（如 Copyright、备案信息），可含 HTML。
 + **站点创建时间**：格式如 `2012-11-17 00:00:00`，用于首页统计的运行时长；关闭「首页点赞与统计」时，改在页脚显示「距今已有 X 年 X 天 X 小时 X 分」。
@@ -57,15 +57,13 @@ Typecho 清新风格响应式主题：社区维护的 Bubble 优化分支，内�
 
 ### 功能
 
-+ **全站 pjax 模式**：是否启用全站 pjax。开启后可能影响部分第三方插件（详见「pjax 回调代码」）。
++ **全站 pjax 模式**：是否启用全站 pjax（切页不刷新整页，顶部显示加载进度条）。开启后可能影响部分第三方插件（详见「pjax 回调代码」）。
 + **pjax 回调代码**：pjax 渲染完毕后执行的 JS，用于修复第三方插件在无刷新场景下的失效问题。切页后，正文区域里的内联脚本已会自动重新执行，一般不需要填写；只有依赖页面加载事件（如 `DOMContentLoaded`）初始化的插件才需要在这里补调用。例如：
 
 ```js
 myFunction();
 ```
 
-+ **katex 数学公式渲染**：是否启用 KaTeX。行内公式写作 `$E=mc^2$`，独立成行的公式写作 `$$\sum_{i=1}^n i$$`；正文里没有 `$` 时不会加载 KaTeX。
-+ **prism.js 代码高亮**：是否启用 prism.js；可进一步选择是否显示行号、高亮主题配色。
 + **TOC 文章目录**：是否启用文章目录；可设置默认展开状态。
 
 ## 目录页
@@ -84,23 +82,23 @@ myFunction();
 
 *若无法正常使用，请尝试关闭第三方插件（如第三方文章编辑器）。*
 
-### 高亮代码框
+### 高亮提示框
 
-标签：`bbcode`（`type` 取值 `success` / `danger` / `warning` / `secondary` / `info` / `default` / `primary`）。
+标签：`bbcode`，用来突出一句话或一段提示（不是代码块）。`type` 取值 `success` / `danger` / `warning` / `secondary` / `info` / `default` / `primary`。
 
 ```html
-<bbcode type="success">这是绿色高亮代码框</bbcode>
-<bbcode type="danger">这是红色高亮代码框</bbcode>
-<bbcode type="warning">这是橙色高亮代码框</bbcode>
-<bbcode type="secondary">这是灰色高亮代码框</bbcode>
-<bbcode type="info">这是蓝绿色高亮代码框</bbcode>
-<bbcode type="default">这是深蓝色高亮代码框</bbcode>
-<bbcode type="primary">这是紫色高亮代码框</bbcode>
+<bbcode type="success">绿色提示框</bbcode>
+<bbcode type="danger">红色提示框</bbcode>
+<bbcode type="warning">橙色提示框</bbcode>
+<bbcode type="secondary">灰色提示框</bbcode>
+<bbcode type="info">蓝绿色提示框</bbcode>
+<bbcode type="default">深蓝色提示框</bbcode>
+<bbcode type="primary">紫色提示框</bbcode>
 ```
 
-### 友链
+### 友链卡片
 
-标签：`bblist`（列表）、`bblink`（项）。
+标签：`bblist`（列表）、`bblink`（项）。想要单独的友链页面，用上面的「友链」模板更方便。
 
 ```html
 <bblist>
@@ -173,5 +171,5 @@ MIT License。
 
 + 原版主题由 [三硝基豆腐](https://github.com/trinitrotofu)、[Rorical](https://github.com/Liupaperbox) 和 [Totorato](https://github.com/totorato) 共同完成
 + 基于 [Argon Design System](https://www.creative-tim.com/product/argon-design-system)；评论模块部分代码参照 Typecho 官方主题 Default
-+ 自带的第三方库：[PhotoSwipe](https://photoswipe.com)（图片查看）、[Prism](https://prismjs.com)（代码高亮）、[KaTeX](https://katex.org)（数学公式），均为 MIT 协议
++ 自带的第三方资源：[PhotoSwipe](https://photoswipe.com)（图片查看，MIT）、[Font Awesome 4.7](https://fontawesome.com/v4/)（图标精简版，字体 SIL OFL 1.1 / CSS MIT）、[Noto Serif SC](https://fonts.google.com/noto/specimen/Noto+Serif+SC)（标题宋体，SIL OFL 1.1）
 + 相关主题：[Rorical](https://github.com/Liupaperbox/Rorical) · [Bubble（Totorato 修改版）](https://github.com/totorato/Bubble)

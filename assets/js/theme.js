@@ -14,7 +14,7 @@
 		target.classList.toggle('show', !expanded);
 	});
 
-	/* ---------- 按需加载脚本（带缓存与顺序保证） ---------- */
+	/* ---------- 按需加载脚本（带缓存） ---------- */
 	var scriptCache = {};
 	function loadScript(src, cb) {
 		if (!src) { if (cb) cb(); return; }
@@ -41,15 +41,6 @@
 		l.rel = 'stylesheet';
 		l.href = href;
 		document.head.appendChild(l);
-	}
-
-	function loadScripts(urls, cb) {
-		var i = 0;
-		function next() {
-			if (i >= urls.length) { if (cb) cb(); return; }
-			loadScript(urls[i++], next);
-		}
-		next();
 	}
 
 	/* 主题内的程序化滚动统一入口（回到顶部、目录跳转、pjax、继续阅读等） */
@@ -580,55 +571,6 @@
 			img.addEventListener('load', show, { once: true });
 			img.addEventListener('error', show, { once: true });
 		});
-
-		// Prism 按需加载：正文含代码块才拉取，避免无代码的散文页白下脚本
-		if (BB.prismjs && document.querySelector('pre, code[class*="language-"]')) {
-			var prismUrls = [
-				BB.prismJs.core,
-				BB.prismJs.autoloader,
-				BB.prismJs.toolbar,
-				BB.prismJs.showLanguage,
-				BB.prismJs.copy
-			];
-			if (BB.prismLine) prismUrls.push(BB.prismJs.lineNumbers);
-			(BB.prismCss || []).forEach(loadCss);
-			// 由主题统一调用 highlightAll，避免 core 加载后自动高亮一遍
-			if (!window.Prism) window.Prism = { manual: true };
-			loadScripts(prismUrls, function () {
-				if (!window.Prism || !Prism.highlightAll) return;
-				// autoloader 默认按自身 src 推断语言包路径，带 ?v= 版本号时推断失败，这里显式指定自托管目录
-				if (Prism.plugins && Prism.plugins.autoloader && BB.prismJs.components) {
-					Prism.plugins.autoloader.languages_path = BB.prismJs.components;
-				}
-				if (BB.prismLine) {
-					var lineNumberClassName = 'line-numbers';
-					document.querySelectorAll('pre').forEach(function (item) {
-						item.className = item.className === '' ? lineNumberClassName : item.className + ' ' + lineNumberClassName;
-					});
-				}
-				Prism.highlightAll(false, null);
-			});
-		}
-
-		// KaTeX 按需加载：只看正文区域，且要有成对的 $ / $$ 定界符才拉取（katex.min.js 约 252KB）。
-		// 不能检查整个 body：页内脚本的文字也算在 textContent 里，一个 $ 就会误触发
-		var mathText = '';
-		document.querySelectorAll('.content').forEach(function (el) { mathText += el.textContent; });
-		if (BB.katex && /\$\$[\s\S]+?\$\$|\$[^$\n]+\$/.test(mathText)) {
-			function renderKatex() {
-				try {
-					renderMathInElement(document.body, {
-						delimiters: [
-							{ left: "$$", right: "$$", display: true },
-							{ left: "$", right: "$", display: false }
-						]
-					});
-				} catch (e) {}
-			}
-			loadCss(BB.katexCss);
-			if (window.renderMathInElement) { renderKatex(); }
-			else { loadScripts([BB.katexJs, BB.autoRenderJs], renderKatex); }
-		}
 
 		parseBbcode();
 		parseBblink();

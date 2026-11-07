@@ -99,7 +99,7 @@
 	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
 	<div class="black-cover" style="display: none;"></div>
 	<?php endif; ?>
-	<!-- KaTeX / Prism / PhotoSwipe 的 JS 已改为按正文内容懒加载（见 theme.js），此处不再无条件输出 -->
+	<!-- PhotoSwipe 的 JS 在第一次点图时才加载（见 theme.js），此处不输出 -->
 	<!-- Alert（原生 <dialog>，替代 Bootstrap modal） -->
 	<dialog id="modal-notification">
 		<div class="modal-header">
@@ -117,7 +117,7 @@
 			<input type="text" name="s" placeholder="搜点什么……" autocomplete="off" enterkeyhint="search" aria-label="搜索关键词" required>
 		</form>
 	</dialog>
-	<!-- 主题运行时配置：站点地址 / pjax / 语法高亮等开关，供 theme.js 读取 -->
+	<!-- 主题运行时配置：站点地址 / pjax 开关 / 按需加载的资源地址，供 theme.js 读取 -->
 	<script>
 		window.BB = window.BB || {};
 		// 注意：options 的 siteUrl() 是直接 echo 的方法，这里必须取属性值再 json_encode
@@ -125,31 +125,11 @@
 		window.BB.adminUrl = <?php echo json_encode((string)$this->options->adminUrl); ?>;
 		window.BB.searchUrl = <?php echo json_encode(\Typecho\Common::url('search/', $this->options->index)); ?>;
 		window.BB.pjax = <?php echo $this->options->Pjax ? 'true' : 'false'; ?>;
-		window.BB.prismjs = <?php echo $this->options->prismjs ? 'true' : 'false'; ?>;
-		window.BB.prismLine = <?php echo $this->options->prismLine ? 'true' : 'false'; ?>;
-		window.BB.katex = <?php echo $this->options->katex ? 'true' : 'false'; ?>;
 		window.BB.pjaxcomp = <?php echo json_encode((string)$this->options->pjaxcomp); ?>;
 		// 按需加载的资源地址（带版本号），供 theme.js 在检测到对应内容时动态注入
-		window.BB.katexJs = "<?php themeAsset('assets/js/katex.min.js'); ?>";
-		window.BB.autoRenderJs = "<?php themeAsset('assets/js/auto-render.min.js'); ?>";
 		window.BB.pswpJs = "<?php themeAsset('assets/js/photoswipe.esm.min.js'); ?>";
 		window.BB.pswpCss = "<?php themeAsset('assets/css/photoswipe.css'); ?>";
-		window.BB.katexCss = "<?php themeAsset('assets/css/katex.min.css'); ?>";
-		window.BB.prismCss = <?php
-			$prismCss = array(themeAssetUrl('assets/css/' . $this->options->prismTheme . '.css'), themeAssetUrl('assets/css/prism-toolbar.css'));
-			if ($this->options->prismLine) $prismCss[] = themeAssetUrl('assets/css/prism-line-numbers.css');
-			echo json_encode($prismCss, JSON_UNESCAPED_SLASHES);
-		?>;
 		window.BB.twcnJs = "<?php themeAsset('assets/js/tw-cn.js'); ?>";
-		window.BB.prismJs = {
-			core: "<?php themeAsset('assets/js/prism-core.min.js'); ?>",
-			autoloader: "<?php themeAsset('assets/js/prism-autoloader.min.js'); ?>",
-			toolbar: "<?php themeAsset('assets/js/prism-toolbar.min.js'); ?>",
-			showLanguage: "<?php themeAsset('assets/js/prism-show-language.min.js'); ?>",
-			copy: "<?php themeAsset('assets/js/prism-copy-to-clipboard.min.js'); ?>",
-			lineNumbers: "<?php themeAsset('assets/js/prism-line-numbers.min.js'); ?>",
-			components: "<?php echo \Utils\Helper::options()->themeUrl('assets/js/prism-components/'); ?>"
-		};
 	</script>
 	<!-- 主题脚本：导航折叠 / 导航栏滚动隐藏 / 回到顶部 / pjax / 图片查看器 / 评论 / 弹窗 -->
 	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>
