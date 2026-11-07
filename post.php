@@ -4,6 +4,7 @@
 ?>
 
 	<main id="main" tabindex="-1" data-post-id="<?php echo (int)$this->cid; ?>">
+		<div class="read-progress" aria-hidden="true"></div>
 
 		<?php if($this->options->toc): ?>
 		<div class="card shadow border-0 bg-secondary toc-container" id="toc-panel">

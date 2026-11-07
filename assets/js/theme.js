@@ -203,6 +203,8 @@
 		var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.4-9.6-8.9C.7 8.9 2.4 5 6.1 4.3c2.3-.4 4.3.8 5.9 2.9 1.6-2.1 3.6-3.3 5.9-2.9 3.7.7 5.4 4.6 3.7 7.8C19.2 16.6 12 21 12 21z"/></svg>';
 		var COLORS = ['#ef5b4c', '#ff8a7a', '#f6b26b', '#ff6f91', '#f28c6b'];
 		var btn = null, base = 0, pending = 0, timer = null, sending = false;
+		var streak = 0, lastClick = 0;
+		var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 		function render() {
 			if (!btn || !btn.isConnected) return;
@@ -220,9 +222,35 @@
 				s.style.setProperty('--r', Math.round(Math.random() * 60 - 30) + 'deg');
 				s.style.setProperty('--s', (0.8 + Math.random() * 0.6).toFixed(2));
 				s.style.animationDelay = (i * 70) + 'ms';
-				s.addEventListener('animationend', function () { this.remove(); });
+				s.addEventListener('animationend', function (e) { if (e.target === this) this.remove(); });
 				btn.appendChild(s);
 			}
+		}
+
+		// 彩蛋：连点到 10 下、50 下时放一大簇爱心，并飘出连击数
+		function bigBurst(level) {
+			var count = level >= 50 ? 24 : 14;
+			var reach = level >= 50 ? 300 : 200;
+			for (var i = 0; i < count; i++) {
+				var s = document.createElement('span');
+				var angle = (-90 + (Math.random() * 2 - 1) * (level >= 50 ? 110 : 75)) * Math.PI / 180;
+				var dist = reach * (0.55 + Math.random() * 0.45);
+				s.className = 'like-float like-big';
+				s.innerHTML = HEART;
+				s.style.color = COLORS[i % COLORS.length];
+				s.style.setProperty('--dx', Math.round(Math.cos(angle) * dist) + 'px');
+				s.style.setProperty('--dy', Math.round(Math.sin(angle) * dist) + 'px');
+				s.style.setProperty('--r', Math.round(Math.random() * 90 - 45) + 'deg');
+				s.style.setProperty('--s', (1.1 + Math.random() * (level >= 50 ? 1.2 : 0.8)).toFixed(2));
+				s.style.animationDelay = Math.round(Math.random() * 160) + 'ms';
+				s.addEventListener('animationend', function (e) { if (e.target === this) this.remove(); });
+				btn.appendChild(s);
+			}
+			var tag = document.createElement('span');
+			tag.className = 'like-combo';
+			tag.textContent = '×' + level;
+			tag.addEventListener('animationend', function (e) { if (e.target === this) this.remove(); });
+			btn.appendChild(tag);
 		}
 
 		function schedule(delay) {
@@ -267,7 +295,16 @@
 			void btn.offsetWidth;
 			btn.classList.add('pop');
 			render();
-			burst();
+			var now = Date.now();
+			streak = now - lastClick > 1200 ? 1 : streak + 1;
+			lastClick = now;
+			if (reduceMotion.matches) {
+				// 减少动态效果时不飘爱心
+			} else if (streak === 10 || streak === 50) {
+				bigBurst(streak);
+			} else {
+				burst();
+			}
 			schedule(800);
 		});
 
@@ -282,7 +319,8 @@
 		});
 	})();
 
-	/* ---------- 目录页分类筛选 ---------- */
+	/* ---------- 目录页分类筛选 ----------
+	 * 切换时列表先淡出（约 150ms），换好内容后逐条淡入；减少动态效果时直接切换。 */
 	document.addEventListener('click', function (e) {
 		var chip = e.target.closest('.arc-chip');
 		if (!chip) return;
@@ -292,17 +330,38 @@
 			c.classList.toggle('active', c === chip);
 			c.setAttribute('aria-pressed', c === chip ? 'true' : 'false');
 		});
-		wrap.querySelectorAll('.arc-year').forEach(function (year) {
-			var shown = 0;
-			year.querySelectorAll('.arc-item').forEach(function (item) {
-				var hit = !cat || (' ' + item.getAttribute('data-cats') + ' ').indexOf(' ' + cat + ' ') !== -1;
-				item.hidden = !hit;
-				if (hit) shown++;
+		var animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		function apply() {
+			var index = 0;
+			wrap.querySelectorAll('.arc-year').forEach(function (year) {
+				var shown = 0;
+				year.querySelectorAll('.arc-item').forEach(function (item) {
+					var hit = !cat || (' ' + item.getAttribute('data-cats') + ' ').indexOf(' ' + cat + ' ') !== -1;
+					item.hidden = !hit;
+					item.classList.remove('arc-enter');
+					if (hit) {
+						shown++;
+						// 只给前 20 条错开节奏，后面的同时出现，免得长列表等太久
+						if (animate) {
+							item.style.setProperty('--i', Math.min(index++, 20));
+							item.classList.add('arc-enter');
+						}
+					}
+				});
+				year.hidden = shown === 0;
+				var count = year.querySelector('.arc-year-count');
+				if (count) count.textContent = shown;
 			});
-			year.hidden = shown === 0;
-			var count = year.querySelector('.arc-year-count');
-			if (count) count.textContent = shown;
-		});
+			wrap.classList.remove('arc-fading');
+		}
+		clearTimeout(wrap._arcTimer);
+		if (!animate) { apply(); return; }
+		wrap.classList.add('arc-fading');
+		wrap._arcTimer = setTimeout(apply, 150);
+	});
+
+	document.addEventListener('animationend', function (e) {
+		if (e.animationName === 'arc-enter') e.target.classList.remove('arc-enter');
 	});
 
 	/* ---------- 友链页：复制本站信息 ---------- */
@@ -446,9 +505,16 @@
 		setupReadingResume();
 
 		// 图片懒加载：正文图片延迟加载（服务端已加 loading 属性，这里做兜底）
+		// 还没加载完的图片先透明，加载好再淡入；已在缓存里的直接显示，不闪
+		var fadeImages = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		document.querySelectorAll('.content img').forEach(function (img) {
 			if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
 			if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+			if (!fadeImages || img.complete) return;
+			var show = function () { img.classList.add('img-in'); };
+			img.classList.add('img-fade');
+			img.addEventListener('load', show, { once: true });
+			img.addEventListener('error', show, { once: true });
 		});
 
 		// Prism 按需加载：正文含代码块才拉取，避免无代码的散文页白下脚本
