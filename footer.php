@@ -93,8 +93,6 @@
 	</button>
 	<button id="translateLink" type="button" class="float-tool" aria-label="简繁切换" title="简繁切换" onclick="translatePage()">繁</button>
 	</div>
-	<!-- Theme JS -->
-	<script src="<?php themeAsset("assets/js/bbrender.js"); ?>"></script>
 	<?php if($this->options->Pjax): ?>
 	<script src="<?php themeAsset("assets/js/progress.js"); ?>"></script>
 	<div class="black-cover" style="display: none;"></div>

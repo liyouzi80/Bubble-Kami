@@ -572,9 +572,6 @@
 			img.addEventListener('error', show, { once: true });
 		});
 
-		parseBbcode();
-		parseBblink();
-
 		if (BB.pjax && BB.pjaxcomp) {
 			try { new Function(BB.pjaxcomp)(); } catch (e) {}
 		}

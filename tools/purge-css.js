@@ -31,7 +31,6 @@ const tags = ('html body main header footer nav section article aside div span p
 		content: [
 			path.join(root, '*.php'),
 			path.join(root, 'assets/js/theme.js'),
-			path.join(root, 'assets/js/bbrender.js'),
 			path.join(root, 'assets/js/progress.js'),
 		],
 		css: [input],
@@ -44,7 +43,7 @@ const tags = ('html body main header footer nav section article aside div span p
 				// select.form-control[size]
 				'size',
 			]),
-			// headroom 运行时 class；alert/badge 供 bbcode 短代码与正文手写使用；comment-* 由 Typecho 评论列表输出
+			// headroom-* 由 theme.js 导航栏滚动隐藏切换；alert/badge 供正文手写使用；comment-* 由 Typecho 评论列表输出
 			deep: [/^headroom/, /^alert/, /^badge/, /^comment/],
 			greedy: [/^headroom/],
 		},
