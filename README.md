@@ -4,7 +4,7 @@ Typecho 清新风格响应式主题：社区维护的 Bubble 优化分支，内�
 
 > 原项目已停止维护。本分支适配 **Typecho 1.3 / PHP 8**（理论上兼容 1.1 / 1.2），移除了原版存在安全隐患的自动更新器、失效的在线字体与第三方脚本。目录名为 `Bubble-Kami`，可与原版 `Bubble` 并存。问题与建议欢迎提交 issue 或 PR。
 
-![screenshot.png](./screenshot.png)
+![Bubble Kami 截图](./screenshot.jpg)
 
 # 特性
 
