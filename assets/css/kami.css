@@ -86,7 +86,6 @@ section {
 body {
   margin: 0;
   line-height: 1.5;
-  color: #525f7f;
   text-align: left;
 }
 
@@ -301,7 +300,6 @@ h6,
 }
 
 .lead {
-  font-size: 1.25rem;
 }
 
 hr {
@@ -456,7 +454,6 @@ pre code {
   vertical-align: middle;
   user-select: none;
   border: 1px solid transparent;
-  font-size: 1rem;
   line-height: 1.5;
   border-radius: .25rem;
 }
@@ -606,7 +603,6 @@ pre code {
   padding-top: .0625rem;
   padding-bottom: .0625rem;
   margin-right: 1rem;
-  font-size: 1.25rem;
   line-height: inherit;
   white-space: nowrap;
 }
@@ -699,7 +695,6 @@ pre code {
 }
 
 .navbar-light .navbar-brand {
-  color: rgba(0,0,0,.9);
 }
 
 .navbar-light .navbar-brand:hover,
@@ -728,7 +723,6 @@ pre code {
 /* --- 卡片与分页 --- */
 
 .card {
-  position: relative;
   display: flex;
   flex-direction: column;
   word-wrap: break-word;
@@ -739,6 +733,26 @@ pre code {
   padding-left: 0;
   list-style: none;
   border-radius: .25rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: .35rem .375rem;
+  font-size: 66%;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: .25rem;
+}
+
+.badge-pill {
+  border-radius: 10rem;
+}
+
+.badge-primary {
+  color: #2643e9;
+  background-color: rgba(203,210,246,.5);
 }
 
 /* --- 工具类：间距、对齐、文字颜色 --- */
@@ -818,7 +832,6 @@ pre code {
 }
 
 .text-white {
-  color: #fff;
 }
 
 .text-default {
@@ -851,6 +864,10 @@ pre code {
     display: none;
   }
 
+  .badge {
+    border: .0625rem solid #000;
+  }
+
 }
 
 iframe {
@@ -871,12 +888,21 @@ main {
   font-size: 1rem;
 }
 
+.badge {
+  text-transform: uppercase;
+}
+
+.badge-pill {
+  padding-right: .875em;
+  padding-left: .875em;
+}
+
 .btn {
   position: relative;
   text-transform: uppercase;
+  will-change: transform;
   letter-spacing: .025em;
   font-size: .875rem;
-  will-change: transform;
 }
 
 .btn:hover {
@@ -1157,6 +1183,21 @@ label {
   background: linear-gradient(150deg, #281483 15%, #8f6ed5 70%, #d782d9 94%);
 }
 
+.section-components>.nav+.nav,
+.section-components>.alert+.alert,
+.section-components>.navbar+.navbar,
+.section-components>.progress+.progress,
+.section-components>.progress+.btn,
+.section-components .badge,
+.section-components .btn {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.section-components .badge {
+  margin-right: .5rem;
+}
+
 /* --- 原主题样式：导航滚动、正文、评论、分页与卡片 --- */
 
 p {
@@ -1211,11 +1252,22 @@ p {
 }
 
 .content img {
-  margin: 10px auto;
 }
 
 .avatar {
   max-height: 99999px;
+}
+
+.comment-list {
+  padding: 0;
+}
+
+.comment-children {
+  margin-bottom: 40px;
+}
+
+.comment-children ol {
+  padding-left: 40px;
 }
 
 .comment-body {
@@ -1225,6 +1277,15 @@ p {
 .comment-parent .avatar,
 .comment-children .avatar {
   margin-right: 15px;
+}
+
+@media screen and (max-width: 768px) {
+
+  .comment-children ol {
+    padding-left: 15px !important;
+    border-left: 1px #cfcfcf solid;
+  }
+
 }
 
 .comment-card {
@@ -1330,6 +1391,36 @@ table {
 .list-object {
   margin-top: 10px;
   color: #888;
+}
+
+.text {
+  font-size: 1rem;
+  line-height: 1.5;
+  width: 200px;
+  height: calc(2.75rem + 2px);
+  padding: .625rem .75rem;
+  transition: all .2s cubic-bezier(.68,-.55,.265,1.55);
+  color: #8898aa;
+  border: 1px solid #cad1d7;
+  border-radius: .25rem;
+  background-color: #fff;
+  background-clip: padding-box;
+}
+
+.submit {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: .625rem 1.25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  vertical-align: middle;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  color: #fff;
+  border-color: #11cdef;
+  background-color: #11cdef;
+  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08);
 }
 
 .widget ul {
@@ -1444,8 +1535,7 @@ h1, h2, h3, h4, h5, .list-card .content h1 {
 /* 键盘用户的可见焦点环（原样式多处 box-shadow:none，需要单独补上） */
 
 a:focus-visible,
-button:focus-visible,
-.list-card .btn-outline-primary:focus-visible {
+button:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
@@ -1490,7 +1580,6 @@ html {
 
 /* 交互按压反馈：轻微下沉，模拟物理触感 */
 
-.list-card .btn-outline-primary:active,
 #comment-form #add-comment-button:active,
 #comment-form .btn-outline-success:active,
 .navbar-toggler:active {
@@ -1562,11 +1651,10 @@ textarea {
   text-spacing-trim: space-all;
 }
 
-/* 内容不固定的小字用正文字体：评论者昵称、友链名、表格表头、上一篇 / 下一篇、按钮文字等。
+/* 内容不固定的小字用正文字体：评论者昵称、表格表头、上一篇 / 下一篇、按钮文字等。
    这些文字无法预先放进标题字体子集，用衬线体会额外下载很多字体切片 */
 
 #comments .comment-head h5,
-.friend-card h5,
 .content table th,
 .post-pager-link,
 .post-pager-none,
@@ -2085,11 +2173,6 @@ main > .section-hero:not([style*="100vh"]) {
   font-size: 0.85rem;
 }
 
-.list-tag i {
-  opacity: 0.6;
-  margin-right: 3px;
-}
-
 /* 分类：列表页用淡色文字链接，不再用蓝色药丸 */
 
 .list-object .list-cat a {
@@ -2102,28 +2185,6 @@ main > .section-hero:not([style*="100vh"]) {
 .list-object .list-cat a:hover {
   color: var(--brand) !important;
   border-bottom-color: var(--brand);
-}
-
-/* 标签：Kami 实心色，全色系覆盖 */
-
-.list-tag .badge,
-.list-tag [class^="badge-"],
-.list-tag .badge-primary,
-.list-tag .badge-secondary,
-.list-tag .badge-info,
-.list-tag .badge-success,
-.list-tag .badge-warning,
-.list-tag .badge-danger,
-.list-tag .badge-light,
-.list-tag .badge-dark {
-  background-color: var(--tag-bg);
-  color: var(--brand);
-  font-family: var(--sans);
-  font-weight: 500;
-  border: none;
-  border-radius: 4px;
-  padding: 2px 6px;
-  letter-spacing: 0;
 }
 
 /* 摘要：与文章页正文一致的行高 */
@@ -2139,30 +2200,6 @@ main > .section-hero:not([style*="100vh"]) {
 
 .list-card .content p.more {
   display: none;
-}
-
-/* 继续阅读 */
-
-.list-card .btn-outline-primary {
-  border: none;
-  background: transparent;
-  color: var(--brand);
-  padding: 0;
-  letter-spacing: 0.05em;
-  box-shadow: none;
-  margin-top: 0.4rem;
-  transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  font-size: 0.88rem;
-  font-weight: 500;
-}
-
-.list-card .btn-outline-primary:hover {
-  opacity: 0.7;
-  background: transparent !important;
-}
-
-.list-card .btn-outline-primary .btn-inner--icon {
-  opacity: 0.6;
 }
 
 /* 继续阅读：去掉过时的 ▶ 三角按钮，改为克制的纯文字 + 箭头 */
@@ -2249,7 +2286,6 @@ main > .section-hero:not([style*="100vh"]) {
    五、文章正文
    ================================================ */
 
-.post-card,
 .content-card:not(.list-card) {
   background-color: var(--ivory);
   box-shadow: 0 4px 24px rgba(var(--shadow-rgb), 0.05);
@@ -2257,7 +2293,6 @@ main > .section-hero:not([style*="100vh"]) {
   border-radius: 8px;
 }
 
-.post-card .content,
 .content-card:not(.list-card) .content {
   max-width: 660px;
   margin-left: auto;
@@ -2266,7 +2301,6 @@ main > .section-hero:not([style*="100vh"]) {
 
 /* 文章标题 */
 
-.post-card .content h1,
 .content-card:not(.list-card) .content h1 {
   font-size: 1.9rem;
   line-height: 1.3;
@@ -2648,12 +2682,6 @@ main > .section-hero:not([style*="100vh"]) {
   border-bottom: 1px solid var(--border-soft);
 }
 
-.related-posts-title i {
-  color: var(--brand);
-  opacity: 0.8;
-  margin-right: 0.45rem;
-}
-
 .related-posts-list {
   list-style: none;
   padding-left: 0;
@@ -3000,11 +3028,6 @@ main > .section-hero:not([style*="100vh"]) {
   padding-bottom: 0.6rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-soft);
-}
-
-.footer .widget h5 i {
-  color: var(--brand);
-  opacity: 0.8;
 }
 
 .footer-list {
@@ -4006,7 +4029,7 @@ dialog#search-dialog[open]::backdrop {
   .hero-scroll,
   .footer,
   #comments,
-  .list-card .btn-outline-primary {
+  .continue-reading {
     display: none !important;
   }
 
@@ -4015,7 +4038,6 @@ dialog#search-dialog[open]::backdrop {
     color: #000 !important;
   }
 
-  .post-card,
   .content-card:not(.list-card) {
     box-shadow: none !important;
     border: none !important;
@@ -4116,7 +4138,7 @@ dialog#search-dialog[open]::backdrop {
   .card,
   .form-control,
   .input-group-text,
-  .custom-select {
+  .protected .text {
     background-color: var(--ivory);
     color: var(--dark-warm);
     border-color: var(--border);
