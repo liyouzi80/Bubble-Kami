@@ -38,11 +38,11 @@
 					?>
 				</div>
 				<div class="col-md-4 widget">
-					<h5><i class="fa fa-file-text-o" aria-hidden="true"></i>最新文章</h5>
+					<h5>最新文章</h5>
 					<ul class="footer-list"><?php \Widget\Contents\Post\Recent::alloc('pageSize=6')->parse('<li><a href="{permalink}" class="footer-link">{title}</a></li>'); ?></ul>
 				</div>
 				<div class="col-md-4 widget">
-					<h5><i class="fa fa-archive" aria-hidden="true"></i>近期归档</h5>
+					<h5>近期归档</h5>
 					<ul class="footer-list"><?php \Widget\Contents\Post\Date::alloc('limit=6&type=month&format=Y-m')->parse('<li><a href="{permalink}" class="footer-link">{date}</a></li>'); ?></ul>
 				</div>
 			</div>
@@ -92,7 +92,6 @@
 	</button>
 	<button id="translateLink" type="button" class="float-tool" aria-label="简繁切换" title="简繁切换" onclick="translatePage()">繁</button>
 	</div>
-	<!-- PhotoSwipe 的 JS 在第一次点图时才加载（见 theme.js），此处不输出 -->
 	<!-- 搜索弹窗 -->
 	<dialog id="search-dialog" aria-label="搜索">
 		<form method="post" action="<?php $this->options->siteUrl(); ?>" id="search" role="search">
@@ -110,9 +109,8 @@
 		window.BB.pswpCss = "<?php themeAsset('assets/css/photoswipe.css'); ?>";
 		window.BB.twcnJs = "<?php themeAsset('assets/js/tw-cn.js'); ?>";
 	</script>
-	<!-- 主题脚本：导航折叠 / 导航栏滚动隐藏 / 回到顶部 / 点赞 / 图片查看器 -->
+	<!-- 主题脚本；图片查看器（PhotoSwipe）与简繁转换（tw-cn.js）用到时才由它加载 -->
 	<script src="<?php themeAsset("assets/js/theme.js"); ?>"></script>
-	<!-- 简繁转换脚本（tw-cn.js）由 theme.js 按需加载：点击「繁」按钮或之前切换过繁体时才下载 -->
 	<!-- Typecho footer -->
 	<?php $this->footer(); ?>
 	</body>

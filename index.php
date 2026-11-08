@@ -58,7 +58,7 @@
 			<div class="container container-lg py-5 align-items-center content-card-container">
 				<!-- Article list -->
 				<?php
-					$stickyIds = ($this->is('index') && (int)$this->_currentPage === 1) ? getThemeStickyCids($this->options) : array();
+					$stickyIds = ($this->is('index') && $this->getCurrentPage() === 1) ? getThemeStickyCids($this->options) : array();
 					$first_flag = true;
 					foreach ($stickyIds as $stickyCid):
 						$stickyArchive = null;
@@ -87,5 +87,5 @@
 				<?php printToggleButton($this); ?>
 			</div>
 		</section>
-		<?php if($this->_currentPage>1) echo("<script>var el=document.querySelector('.card.shadow.content-card.list-card.content-card-head');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset,behavior:'smooth'})</script>") ?>
+		<?php if ($this->getCurrentPage() > 1) echo("<script>var el=document.querySelector('.card.shadow.content-card.list-card.content-card-head');if(el)window.scrollTo({top:el.getBoundingClientRect().top+window.pageYOffset,behavior:'smooth'})</script>") ?>
 <?php $this->need('footer.php'); ?>

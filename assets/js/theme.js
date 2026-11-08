@@ -43,26 +43,20 @@
 		document.head.appendChild(l);
 	}
 
-	/* 主题内的程序化滚动统一入口（回到顶部、继续阅读等） */
-	window.themeScrollTo = function (y, smooth) {
-		window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'instant' });
-	};
+	function scrollToY(y) {
+		window.scrollTo({ top: y, behavior: 'smooth' });
+	}
 
 	/* ---------- 导航栏兜底：离开 hero 或无 hero 页面强制深色，避免滚动隐藏的状态错位 ---------- */
-	function setupNavSolid() {
+	(function () {
 		var nav = document.querySelector('#navbar-main');
 		if (!nav) return;
 		var hero = document.querySelector('main .section-hero');
 		if (!hero) { nav.classList.add('nav-solid'); return; }
-		if (!window.IntersectionObserver) return;
-		if (window.__navSolidObserver) window.__navSolidObserver.disconnect();
-		window.__navSolidObserver = new IntersectionObserver(function (entries) {
-			entries.forEach(function (entry) {
-				nav.classList.toggle('nav-solid', !entry.isIntersecting);
-			});
-		}, { rootMargin: '-64px 0px 0px 0px', threshold: 0 });
-		window.__navSolidObserver.observe(hero);
-	}
+		new IntersectionObserver(function (entries) {
+			nav.classList.toggle('nav-solid', !entries[entries.length - 1].isIntersecting);
+		}, { rootMargin: '-64px 0px 0px 0px', threshold: 0 }).observe(hero);
+	})();
 
 	/* ---------- 导航栏滚动隐藏（代替 Headroom.js，类名与原库一致，样式不用改） ----------
 	 * 离顶部 300px 内：headroom--top 且始终显示；之外：headroom--not-top，
@@ -148,7 +142,7 @@
 		update();
 
 		scrollup.addEventListener('click', function () {
-			themeScrollTo(0, true);
+			scrollToY(0);
 		});
 	})();
 
@@ -199,12 +193,14 @@
 	(function () {
 		var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.2-4.4-9.6-8.9C.7 8.9 2.4 5 6.1 4.3c2.3-.4 4.3.8 5.9 2.9 1.6-2.1 3.6-3.3 5.9-2.9 3.7.7 5.4 4.6 3.7 7.8C19.2 16.6 12 21 12 21z"/></svg>';
 		var COLORS = ['#ef5b4c', '#ff8a7a', '#f6b26b', '#ff6f91', '#f28c6b'];
-		var btn = null, base = 0, pending = 0, timer = null, sending = false;
+		var btn = document.getElementById('hero-like');
+		if (!btn) return;
+		var base = parseInt(btn.getAttribute('data-count'), 10) || 0;
+		var pending = 0, timer = null, sending = false;
 		var streak = 0, lastClick = 0;
 		var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 		function render() {
-			if (!btn || !btn.isConnected) return;
 			btn.querySelector('.hero-like-count').textContent = (base + pending).toLocaleString('en-US');
 		}
 
@@ -278,14 +274,7 @@
 				});
 		}
 
-		document.addEventListener('click', function (e) {
-			var el = e.target.closest('.hero-like');
-			if (!el) return;
-			// 第一次点击时以服务端渲染的数为基数
-			if (el !== btn) {
-				btn = el;
-				base = parseInt(el.getAttribute('data-count'), 10) || 0;
-			}
+		btn.addEventListener('click', function () {
 			pending++;
 			btn.classList.add('liked');
 			btn.classList.remove('pop');
@@ -524,7 +513,6 @@
 		}
 
 		return function () {
-			hide();
 			var main = document.querySelector('main[data-post-id]');
 			key = main ? 'post-' + main.getAttribute('data-post-id') : null;
 			if (!key || location.hash) return;
@@ -538,7 +526,7 @@
 				+ '<button type="button" class="reading-resume-close" aria-label="关闭">×</button>';
 			el.querySelector('.reading-resume-go').addEventListener('click', function () {
 				var max = document.documentElement.scrollHeight - window.innerHeight;
-				themeScrollTo(saved.r * max, true);
+				scrollToY(saved.r * max);
 				hide();
 			});
 			el.querySelector('.reading-resume-close').addEventListener('click', hide);
@@ -548,16 +536,15 @@
 		};
 	})();
 
-	/* ---------- 页面渲染后统一初始化 ---------- */
-	function init() {
-		setupNavSolid();
-		setupReadingResume();
+	setupReadingResume();
 
-		// 图片懒加载：正文图片延迟加载（服务端已加 loading 属性，这里做兜底）
-		// 还没加载完的图片先透明，加载好再淡入；已在缓存里的直接显示，不闪
+	/* ---------- 正文图片 ----------
+	 * 懒加载兜底（服务端已给大部分图片加了 loading 属性；首屏优先加载的图不动）；
+	 * 还没加载完的图片先透明，加载好再淡入，已在缓存里的直接显示，不闪。 */
+	(function () {
 		var fadeImages = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		document.querySelectorAll('.content img').forEach(function (img) {
-			if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+			if (!img.hasAttribute('loading') && !img.hasAttribute('fetchpriority')) img.setAttribute('loading', 'lazy');
 			if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
 			if (!fadeImages || img.complete) return;
 			var show = function () { img.classList.add('img-in'); };
@@ -565,8 +552,5 @@
 			img.addEventListener('load', show, { once: true });
 			img.addEventListener('error', show, { once: true });
 		});
-
-	}
-
-	init();
+	})();
 })();

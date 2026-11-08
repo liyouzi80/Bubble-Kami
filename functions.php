@@ -118,26 +118,6 @@ function themeConfigSeedBackup() {
 	}
 }
 
-function printCategory($that, $icon = 0) {
-	if (empty($that->categories)) return; ?>
-	<span class="list-tag">
-		<?php if ($icon) { ?><i class="fa fa-folder-o" aria-hidden="true"></i><?php } ?>
-		<?php foreach( $that->categories as $categories): ?>
-		<a href="<?php print($categories['permalink']) ?>" class="badge badge-info badge-pill"><?php print($categories['name']) ?></a>
-		<?php endforeach;?>
-	</span>
-<?php }
-
-function printTag($that, $icon = 0) {
-	if (empty($that->tags)) return; ?>
-	<span class="list-tag">
-		<?php if ($icon) { ?><i class="fa fa-tags" aria-hidden="true"></i><?php } ?>
-		<?php foreach( $that->tags as $tags): ?>
-		<a href="<?php print($tags['permalink']) ?>" class="badge badge-success badge-pill"><?php print($tags['name']) ?></a>
-		<?php endforeach;?>
-	</span>
-<?php }
-
 function getThemeStickyCids($options = null) {
 	if ($options === null) {
 		$options = \Utils\Helper::options();
@@ -295,7 +275,7 @@ function relatedPosts($that, $limit = 5) {
 	<div class="card shadow content-card related-posts-card">
 		<section class="section">
 			<div class="container">
-				<h3 class="related-posts-title"><i class="fa fa-link" aria-hidden="true"></i> 相关文章</h3>
+				<h3 class="related-posts-title">相关文章</h3>
 				<ul class="related-posts-list">
 					<?php while ($related->next()): ?>
 					<li class="related-posts-item">
@@ -399,10 +379,6 @@ function lazyLoadImages($content, $allLazy = false) {
 }
 
 /**
- * 输出带版本号的主题静态资源 URL，用于浏览器缓存更新。
- * 基于文件修改时间自动生成版本号，文件更新后旧缓存自动失效。
- */
-/**
  * 按图片地址的扩展名给出 MIME 类型，用于 <link rel="icon" type="…">；认不出时返回空串（不写 type，交给浏览器判断）
  */
 function themeIconType($url) {
@@ -411,21 +387,22 @@ function themeIconType($url) {
 	return isset($types[$ext]) ? $types[$ext] : '';
 }
 
+/**
+ * 主题静态资源地址，带文件修改时间做版本号：文件更新后浏览器缓存自动失效。
+ */
 function themeAsset($path) {
 	echo themeAssetUrl($path);
 }
 
 function themeAssetUrl($path) {
 	static $cache = array();
-	$file = __DIR__ . '/' . ltrim($path, '/');
-	if (!array_key_exists($path, $cache)) {
-		$cache[$path] = is_file($file) ? filemtime($file) : '1';
+	if (!isset($cache[$path])) {
+		$file = __DIR__ . '/' . ltrim($path, '/');
+		ob_start();
+		\Utils\Helper::options()->themeUrl($path); // Typecho 1.2+ 的 themeUrl() 直接输出
+		$cache[$path] = ob_get_clean() . '?v=' . (is_file($file) ? filemtime($file) : '1');
 	}
-	// Typecho 1.2+ 的 themeUrl() 直接 echo，旧版本可能是返回值，两种都兼容
-	ob_start();
-	$returned = \Utils\Helper::options()->themeUrl($path);
-	$echoed = ob_get_clean();
-	return ($echoed !== '' ? $echoed : (string)$returned) . '?v=' . $cache[$path];
+	return $cache[$path];
 }
 
 /**
@@ -542,24 +519,27 @@ function themeInit($archive) {
 }
 
 /**
- * 计算站点运行时长，格式 年 天 时 分
- * 站点创建时间可在主题设置中配置，留空则不显示
+ * 从某个时间戳到现在：按日历先算整年，再算距上个周年日过了多少秒。返回 [年, 秒]，时间在未来时返回 null
  */
-function getBuildTime()
-{
-	$created = strtotime((string)\Utils\Helper::options()->siteCreateDate);
-	if (!$created) {
-		return;
-	}
-	// 按日历计算（与首页统计的运行时长一致）：先算整年，再算距上个周年日的天、小时、分钟
-	$start = new DateTime('@' . $created);
+function themeElapsed($from) {
+	$start = new DateTime('@' . (int)$from);
 	$now = new DateTime('@' . time());
 	if ($now < $start) {
-		return;
+		return null;
 	}
 	$years = (int)$start->diff($now)->y;
 	$anniversary = (clone $start)->modify('+' . $years . ' years');
-	$rest = $now->getTimestamp() - $anniversary->getTimestamp();
+	return array($years, $now->getTimestamp() - $anniversary->getTimestamp());
+}
+
+/** 页脚的运行时长「距今已有 X 年 X 天 X 小时 X 分」（关闭首页统计时显示；未填站点创建时间则不显示） */
+function getBuildTime() {
+	$created = strtotime((string)\Utils\Helper::options()->siteCreateDate);
+	$e = $created ? themeElapsed($created) : null;
+	if (!$e) {
+		return;
+	}
+	list($years, $rest) = $e;
 	echo '<span class="btime"> 距今已有 ' . $years . ' 年 ' . intdiv($rest, 86400) . ' 天 '
 		. intdiv($rest % 86400, 3600) . ' 小时 ' . intdiv($rest % 3600, 60) . ' 分</span>';
 }
@@ -679,14 +659,8 @@ function themeShortNumber($n) {
 function themeRunningTime($since = 0) {
 	$created = strtotime((string)\Utils\Helper::options()->siteCreateDate);
 	$from = $created ?: (int)$since;
-	if (!$from) {
-		return null;
-	}
-	$start = new DateTime('@' . $from);
-	$now = new DateTime('@' . time());
-	$years = (int)$start->diff($now)->y;
-	$anniversary = (clone $start)->modify('+' . $years . ' years');
-	return array($years, (int)floor(($now->getTimestamp() - $anniversary->getTimestamp()) / 86400));
+	$e = $from ? themeElapsed($from) : null;
+	return $e ? array($e[0], intdiv($e[1], 86400)) : null;
 }
 
 /* ---------- 友链 / 关于 / 书架页面 ---------- */
@@ -705,17 +679,9 @@ function themeRenderText($archive, $text) {
 	}
 	// Contents::markdown() / autoP() 在 Typecho 1.2+ 是 protected，模板里调不到，直接用 Typecho 自带的转换类
 	if ($archive->isMarkdown) {
-		if (class_exists('\\Utils\\Markdown')) {
-			return \Utils\Markdown::convert($text);
-		}
-		if (class_exists('Markdown')) {
-			return Markdown::convert($text);
-		}
-	} elseif (class_exists('\\Utils\\AutoP')) {
-		$autoP = new \Utils\AutoP();
-		return $autoP->parse($text);
+		return \Utils\Markdown::convert($text);
 	}
-	return '<p>' . nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8')) . '</p>';
+	return (new \Utils\AutoP())->parse($text);
 }
 
 /**
