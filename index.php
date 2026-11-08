@@ -4,7 +4,7 @@
  *
  * @package Bubble Kami
  * @author TriNitroTofu, Rorical, Boshi (maintained by liyouzi80)
- * @version 4.2.9
+ * @version 4.3.0
  * @link https://github.com/liyouzi80/Bubble-Kami
  */
 

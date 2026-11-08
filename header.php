@@ -53,10 +53,7 @@
 	<!-- FontAwesome -->
 	<link type="text/css" href="<?php themeAsset("assets/css/font-awesome.min.css"); ?>" rel="stylesheet">
 
-	<!-- Main CSS -->
-	<link type="text/css" href="<?php themeAsset("assets/css/main.min.css"); ?>" rel="stylesheet">
-
-	<!-- Kami 风格（内置默认外观） -->
+	<!-- 主题样式：基础层 + Kami 外观 + 深色模式，全部在这一个文件里 -->
 	<link type="text/css" href="<?php themeAsset("assets/css/kami.css"); ?>" rel="stylesheet">
 
 	<!-- 自托管 Noto Serif SC（500，unicode-range 切片，仅标题用）。
