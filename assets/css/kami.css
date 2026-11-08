@@ -36,6 +36,7 @@
   --dot: #cfccc0;
   --dash: #d9d5c7;
   --apply-bg: rgba(232, 230, 220, 0.25);
+  --selection-bg: rgba(27, 54, 93, 0.2);
 
   /* 导航栏专用背景：与白色导航文字搭配，避免滚动后变成浅色背景+白字看不清 */
   --nav-bg: var(--near-black);
@@ -77,8 +78,24 @@ h1, h2, h3, h4, h5, .list-card .content h1 {
 /* 选中文字的颜色，读起来更有质感，不用浏览器默认的刺眼蓝 */
 
 ::selection {
-  background-color: rgba(var(--brand-rgb), 0.15);
+  background-color: var(--selection-bg);
   color: var(--near-black);
+}
+
+/* 大图与深色导航条上的白字：选中后仍是白字，底色用半透明白，避免深色背景上变成黑字看不清。
+   导航链接只在桌面端是白字（手机端展开面板是浅底深字，用默认选中色） */
+.section-hero ::selection,
+.navbar-brand::selection,
+.navbar-brand ::selection {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+@media (min-width: 992px) {
+  #navbar-main .nav-link::selection {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+  }
 }
 
 /* 键盘用户的可见焦点环（原样式多处 box-shadow:none，需要单独补上） */
@@ -2699,6 +2716,7 @@ dialog#search-dialog[open]::backdrop {
     --dot: #4a4740;
     --dash: #45423b;
     --apply-bg: rgba(255, 255, 255, 0.03);
+    --selection-bg: rgba(142, 174, 219, 0.34);
   }
 
   /* 纸张颗粒在深底上更显眼，减半 */
