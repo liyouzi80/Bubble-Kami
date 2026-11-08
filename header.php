@@ -4,7 +4,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="theme-color" content="#1B365D">
+	<meta name="theme-color" content="#1B365D" media="(prefers-color-scheme: light)">
+	<meta name="theme-color" content="#0f0f0e" media="(prefers-color-scheme: dark)">
 	<?php $shareMeta = themeShareMeta($this); ?>
 	<meta property="og:type" content="<?php echo $shareMeta['type']; ?>">
 	<meta property="og:site_name" content="<?php echo themeAttr($this->options->title); ?>">
