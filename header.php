@@ -74,6 +74,23 @@
 	<?php if ($this->options->customCss): ?>
 	<style type="text/css"><?php $this->options->customCss(); ?></style>
 	<?php endif; ?>
+	<!-- 首页第一页：规范地址与网站级结构化数据（文章 / 独立页的规范地址由 Typecho 的 header() 输出） -->
+	<?php if ($this->is('index') && $this->getCurrentPage() <= 1): ?>
+	<link rel="canonical" href="<?php echo htmlspecialchars((string)$this->options->siteUrl, ENT_QUOTES, 'UTF-8'); ?>">
+	<script type="application/ld+json"><?php echo json_encode(array(
+		'@context' => 'https://schema.org',
+		'@type' => 'WebSite',
+		'name' => (string)$this->options->title,
+		'url' => (string)$this->options->siteUrl,
+		'description' => (string)$this->options->description,
+		'inLanguage' => 'zh-CN',
+		'potentialAction' => array(
+			'@type' => 'SearchAction',
+			'target' => \Typecho\Common::url('search/', $this->options->index) . '{search_term_string}/',
+			'query-input' => 'required name=search_term_string',
+		),
+	), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
+	<?php endif; ?>
 	<!-- JSON-LD 结构化数据 -->
 	<?php if ($this->is('single')): ?>
 	<?php

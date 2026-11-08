@@ -492,6 +492,27 @@ function isThemePrefetchRequest() {
 	return false;
 }
 
+/**
+ * 搜索引擎爬虫、监控与命令行工具等非真人访问：不计阅读数。没有 User-Agent 的也算。
+ */
+function themeIsBot() {
+	$ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string)$_SERVER['HTTP_USER_AGENT'] : '';
+	if (trim($ua) === '') return true;
+	return (bool)preg_match('/bot\b|bot[\/;-]|spider|crawl|slurp|scrap|fetch|preview|headless|lighthouse|pagespeed|pingdom|uptime|monitor|checker|validator|archiver|feed|rss|curl|wget|python|java\/|go-http|okhttp|axios|node|php\/|libwww|httpclient|postman|insomnia|semrush|ahrefs|mj12|dotbot|petalbot|bytespider|yandex|baiduspider|sogou|360spider|yisou|facebookexternalhit|embedly|vkshare|w3c_|google-|bingpreview|applebot|duckduck/i', $ua);
+}
+
+/**
+ * 同一位访客 30 分钟内重复打开同一篇文章只计一次阅读：第一次计数时种一个 30 分钟有效的 cookie。
+ */
+function themeViewCounted($cid) {
+	$name = 'bk_v' . (int)$cid;
+	if (isset($_COOKIE[$name])) return true;
+	if (!headers_sent()) {
+		setcookie($name, '1', array('expires' => time() + 1800, 'path' => '/', 'samesite' => 'Lax', 'httponly' => true, 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'));
+	}
+	return false;
+}
+
 function themeInit($archive) {
 	themeConfigSeedBackup();
 	if ($archive->is('index')) {
@@ -506,7 +527,7 @@ function themeInit($archive) {
 		&& !(class_exists('Views_Plugin') && method_exists('Views_Plugin', 'theViews'))
 	) {
 		$cid = (int)$archive->cid;
-		if ($cid > 0) {
+		if ($cid > 0 && !themeIsBot() && !themeViewCounted($cid)) {
 			try {
 				$db = \Typecho\Db::get();
 				$db->query($db->update('table.contents')->expression('views', 'views + 1')->where('cid = ?', $cid));
