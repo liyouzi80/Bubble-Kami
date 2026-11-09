@@ -15,9 +15,9 @@ function themeConfig($form) {
 	$form->addInput($titleFont);
 	$avatarUrl = new \Typecho\Widget\Helper\Form\Element\Text('avatarUrl', NULL, '', _t('站点头像地址'), _t('在这里填入一个图片 URL 地址，以在网站首页上加上一个头像'));
 	$form->addInput($avatarUrl);
-	$indexImage = new \Typecho\Widget\Helper\Form\Element\Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认紫色渐变背景'));
+	$indexImage = new \Typecho\Widget\Helper\Form\Element\Text('indexImage', NULL, '', _t('首页背景图像地址'), _t('在这里填入一个图片 URL 地址, 以设定网站首页背景图片，留空则使用默认墨蓝渐变背景'));
 	$form->addInput($indexImage);
-	$randomImage = new \Typecho\Widget\Helper\Form\Element\Textarea('randomImage', NULL, '', _t('随机背景图像地址'), _t('在这里填入一个或多个图片 URL 地址，每行一个，<strong>请勿包含多余字符</strong>，以设定网站文章页、独立页面以及其他页面的头图，设定后将随机显示，留空则使用默认紫色渐变背景'));
+	$randomImage = new \Typecho\Widget\Helper\Form\Element\Textarea('randomImage', NULL, '', _t('随机背景图像地址'), _t('在这里填入一个或多个图片 URL 地址，每行一个，<strong>请勿包含多余字符</strong>，以设定网站文章页、独立页面以及其他页面的头图，设定后将随机显示，留空则使用默认墨蓝渐变背景'));
 	$form->addInput($randomImage);
 	$footerText = new \Typecho\Widget\Helper\Form\Element\Text('footerText', NULL, 'Powered by <a href="https://typecho.org/" class="footer-link">Typecho</a> · Theme by <a href="https://github.com/liyouzi80/Bubble-Kami" class="footer-link">Bubble Kami</a>', _t('页脚左下角文字'), _t('在这里填入页脚左下角的说明文字，如 Copyright 和 备案信息，可添加 HTML 标签'));
 	$form->addInput($footerText);
