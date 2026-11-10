@@ -143,6 +143,47 @@
 		]
 	}
 	</script>
+	<!-- 方向感切页：点「下一篇」或后一页时新页面从右侧滑入，「上一篇」或前一页从左侧滑入；
+	     浏览器后退 / 前进按原路反向。须在首次渲染前注册 pagereveal，所以放在 head 里。不支持的浏览器照常淡入 -->
+	<script>
+	(function () {
+		var CLICK = 'kami-vt-click', MAP = 'kami-vt-map';
+		function load(k) { try { return JSON.parse(sessionStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+		function save(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+		addEventListener('click', function (e) {
+			var a = e.target.closest && e.target.closest('a[href]'), d = '';
+			if (!a) return;
+			if (a.closest('.post-pager-next')) d = 'forward';
+			else if (a.closest('.post-pager-prev')) d = 'backward';
+			else if (a.closest('.page-nav')) {
+				var cur = document.querySelector('.page-nav .active a');
+				var c = cur ? parseInt(cur.textContent, 10) : NaN, n = parseInt(a.textContent, 10);
+				if (!isNaN(n) && !isNaN(c) && n !== c) d = n > c ? 'forward' : 'backward';
+				else if (a.querySelector('.fa-angle-right')) d = 'forward';
+				else if (a.querySelector('.fa-angle-left')) d = 'backward';
+			}
+			save(CLICK, d ? { d: d, u: a.href, t: Date.now() } : null);
+		}, true);
+		addEventListener('pagereveal', function (e) {
+			var nav = window.navigation, act = nav && nav.activation, map = load(MAP) || {}, d = '';
+			if (act && act.navigationType === 'traverse' && act.from && act.entry) {
+				// 后退：按当初来到上一页的方向反着走；前进：重走当初的方向
+				if (act.entry.index < act.from.index) {
+					d = { forward: 'backward', backward: 'forward' }[map[act.from.key]] || '';
+				} else {
+					d = map[act.entry.key] || '';
+				}
+			} else if (nav && nav.currentEntry) {
+				var c = load(CLICK);
+				save(CLICK, null);
+				if (c && c.u === location.href && Date.now() - c.t < 10000) d = c.d;
+				map[nav.currentEntry.key] = d;
+				save(MAP, map);
+			}
+			if (d && e.viewTransition && e.viewTransition.types) e.viewTransition.types.add(d);
+		});
+	})();
+	</script>
 	<!-- Typecho header（social= 关掉 Typecho 自带的 og/twitter 标签，主题上方已输出更完整的一份，避免重复） -->
 	<?php $this->header('social='); ?>
 </head>

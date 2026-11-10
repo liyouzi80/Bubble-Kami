@@ -1620,6 +1620,41 @@ body::after {
   animation-duration: 0.25s;
 }
 
+/* 方向感切页（类型由 header.php 里的脚本按点击的是「下一篇」还是「上一篇」设置）：
+   向后翻，旧页向左淡出、新页从右侧滑入；向前翻反过来，像翻书 */
+
+html:active-view-transition-type(forward)::view-transition-old(root) {
+  animation: vt-out-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html:active-view-transition-type(forward)::view-transition-new(root) {
+  animation: vt-in-right 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html:active-view-transition-type(backward)::view-transition-old(root) {
+  animation: vt-out-right 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+html:active-view-transition-type(backward)::view-transition-new(root) {
+  animation: vt-in-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes vt-out-left {
+  to { opacity: 0; transform: translateX(-48px); }
+}
+
+@keyframes vt-in-right {
+  from { opacity: 0; transform: translateX(48px); }
+}
+
+@keyframes vt-out-right {
+  to { opacity: 0; transform: translateX(48px); }
+}
+
+@keyframes vt-in-left {
+  from { opacity: 0; transform: translateX(-48px); }
+}
+
 /* 导航栏单独成层，切页时保持不动 */
 
 #navbar-main {
